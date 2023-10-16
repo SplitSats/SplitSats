@@ -6,6 +6,7 @@ import NDK from "@nostr-dev-kit/ndk";
 import { RELAYS, USER_NPUB } from '../constants/config';
 import { styles } from '../styles/styles';
 import { useNDK } from '../context/NDKContext';
+import { nip19 } from 'nostr-tools';
 
 
 const UserProfile = ({ }) => {
@@ -18,8 +19,14 @@ const UserProfile = ({ }) => {
             if (!ndk) {
                 throw new Error("NDK not initialized");
             }
-
-            const user = ndk.getUser({ npub: USER_NPUB });
+            
+            const userPublicKey = AsyncStorage.getItem('userPublicKey') as string;
+            if (!userPublicKey){
+              console.log("UserPublicKey not found in local storage")
+            }
+            console.log("UserPublicKey:", userPublicKey);
+            const userNpub = nip19.npubEncode(userPublicKey);
+            const user = ndk.getUser({ npub: userNpub });
             const userProfile = await user.fetchProfile();
             if (!userProfile) {
               throw new Error("User profile not found");
