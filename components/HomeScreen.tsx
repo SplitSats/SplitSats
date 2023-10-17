@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { View, Text, Button, Image, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserProfile from './UserProfile';
+import LogOutButton from './LogOutButton';
+import { styles } from '../styles/styles';
 
 const HomeScreen = ({ navigation }) => {
   const handleLogout = async () => {
@@ -18,51 +20,17 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.mainView}>
       
-      {/* User info section */}
-      {/* <UserProfile /> */}
-      <View style={styles.userInfo}>
-        <Image source={require('../assets/icon.png')} style={styles.userPhoto} />
-        <Text style={styles.welcome}>Welcome, User's Name</Text>
-      </View>
+      <UserProfile />
       
       {/* User's groups list */}
       <View style={styles.groupsList}>
         {/* List of user's groups */}
       </View>
-      <Button title="Log Out" onPress={handleLogout} />
+      <LogOutButton navigation={navigation} />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navigationBar: {
-    flexDirection: 'row',
-  },
-  option: {
-    margin: 10,
-  },
-  userInfo: {
-    alignItems: 'center',
-  },
-  userPhoto: {
-    width: 100,
-    height: 100,
-  },
-  welcome: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  groupsList: {
-    flex: 1,
-    // Add styles for the list of user's groups
-  },
-});
 
 export default HomeScreen;

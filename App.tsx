@@ -33,21 +33,21 @@ export default function App() {
   return (
     <NavigationContainer>
     {/* <MyBottomTabNavigation /> */}
-    {/* <NDKProvider> */}
-    <AuthProvider>
+    <AuthProvider> 
+    <NDKProvider>
       
       <Stack.Navigator initialRouteName="Loading">
         <Stack.Screen name="Loading" component={LoadingScreen} />
         <Stack.Screen name="Authentication" component={AuthenticationScreen} />
         <Stack.Screen name="CreateAccount" component={CreateAccountScreen} /> 
         <Stack.Screen name="LogIn" component={LogInScreen} /> 
-
         <Stack.Screen name="Home" component={HomeScreen} />
-
       </Stack.Navigator>
+    </NDKProvider>
     </AuthProvider>
-    {/* </NDKProvider> */}
+    
     {/* <NDKProvider>
+    
       <View style={styles.container}>
         <UserProfile />
         <StatusBar style="auto" />

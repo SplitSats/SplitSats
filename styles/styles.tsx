@@ -13,12 +13,6 @@ export const styles = StyleSheet.create({
       justifyContent: 'center',
     },
   
-    bigBlue: {
-      color: 'blue',
-      fontWeight: 'bold',
-      fontSize: 30,
-    },
-
     mainView: {
       flex: 1,
       alignItems: 'center',
