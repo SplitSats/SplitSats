@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import {styles} from '../styles/styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const LoadingScreen = ({ navigation }) => {
@@ -8,9 +9,9 @@ const LoadingScreen = ({ navigation }) => {
     // Simulate loading for 1-2 seconds, then navigate to the home screen
     setTimeout(() => {
       // Check if the user is authenticated, and navigate accordingly
-      // Replace the 'loggedIn' check with your authentication logic
-      const loggedIn = false; // Example
-      if (loggedIn) {
+      const loggedIn = AsyncStorage.getItem('userIsLoggedIn');
+      console.log('User logged in:', loggedIn);
+      if (loggedIn && loggedIn === 'true') {
         navigation.replace('Home');
       } else {
         navigation.replace('Authentication');

@@ -6,25 +6,20 @@ import { styles } from '../styles/styles';
 import AuthButton from './AuthButton';
 
 const AuthenticationScreen = ({ navigation }) => {
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
-
   useEffect(() => {
     // Check if the user is logged in by reading a value from AsyncStorage
     const checkLoginStatus = async () => {
-      const userLoggedInValue = await AsyncStorage.getItem('userIsLoggedIn');
-      if (userLoggedInValue === 'true') {
-        setUserLoggedIn(true);
+      const userLoggedIn = await AsyncStorage.getItem('userIsLoggedIn');
+      if (userLoggedIn && userLoggedIn === 'true') {
+        console.log('User logged in');
+        navigation.navigate('Home');
+      } else {
+        console.log('User not logged in');
       }
     };
 
     checkLoginStatus();
   }, []);
-
-  if (userLoggedIn) {
-    // User is logged in, navigate to the Home screen
-    navigation.navigate('Home');
-    return null; // No need to render the current screen
-  }
 
   return (
     <View style={styles.mainView}>

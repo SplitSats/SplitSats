@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NDK from "@nostr-dev-kit/ndk";
-import { RELAYS, USER_NPUB } from '../constants/config';
-import { styles } from '../styles/styles';
 import { useNDK } from '../context/NDKContext';
 import { nip19 } from 'nostr-tools';
-
 
 const UserProfile = ({ }) => {
     const ndk = useNDK();
@@ -41,15 +37,48 @@ const UserProfile = ({ }) => {
         fetchUserProfile();
       }, [ndk]);
 
-
-    return (
+      return (
         <View style={styles.container}>
-            <Text style={styles.bigBlue}>Hi {userProfile?.name}!</Text>
-            <Text>{userProfile?.about}</Text>
-            <Text>{userProfile?.lud16}</Text>
+          <View style={styles.userInfo}>
+            <View style={styles.textContainer}>
+              <Text style={styles.welcome}>Hello, {userProfile?.name}</Text>
+              <Text style={styles.subtitle}>Split your sats</Text>
+            </View>
+            <Image source={require('../assets/icon.png')} style={styles.userPhoto} />
+          </View>
         </View>
-    );
-
+      );    
 };
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textContainer: {
+    flex: 1,
+  },
+  welcome: {
+    fontSize: 30, // Adjust the font size as needed
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  subtitle: {
+    fontSize: 20, // Adjust the font size as needed
+    color: 'white',
+  },
+  userPhoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // To make it rounded
+    marginLeft: 20, // Add some margin between the text and image
+  },
+});
 
 export default UserProfile;
