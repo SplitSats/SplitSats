@@ -1,0 +1,180 @@
+
+@startuml
+class SplitSatsApp {
+    - ndkUser: NKDUser
+    - lnAccount: BreezSDKAccount 
+    - eventManager: EventManager
+    - groupManager: GroupManager
+    - debtManager: DebtManager
+    - contactManager: ContactManager
+}
+
+class NDKUser {
+    - ndk: NDK | undefined
+    - profile?: NDKUserProfile
+    - _npub?: Npub
+    - _hexpubkey?: Hexpubkey
+    - relayUrls: string[]
+    showNpubQR(): void
+}
+
+class NDKUserProfile {
+    - [key: string]: string | undefined
+    - name?: string
+    - displayName?: string
+    - image?: string
+    - banner?: string
+    - bio?: string
+    - nip05?: string
+    - lud06?: string
+    - lud16?: string
+    - about?: string
+    - zapService?: string
+    - website?: string
+}
+
+class Subscription {
+    kind: int 
+    authors: list[str]
+}
+
+class EventManager {
+    - subscriptions: dict[str, Subscription]
+    - ndkUser: NDKUser
+    - queue: list[Event]
+    
+    deserializeEvent(): Event
+    serializeEvent(): str
+    encryptEvent(): str
+    
+    onGroupCreated()
+    onBillCreated()
+    onCheckGroupStatus()
+    onGetMissingBills()
+    onBillSettled()
+}
+
+class BreezSDKAccount {
+    - wallet: Wallet
+    - lnurlp: str
+    - lnurlQR: str
+}
+
+class ContactManager {
+    - contacts: dict[str, Contact] = {}
+    
+    addContact(c: Contact)
+    getContactByNpub()
+    fetchContactsInfo()
+    getContacts()
+}
+
+class Contact {
+    - username: str
+    - npub: str
+    - profile: NDKUserProfile
+}
+
+class GroupManager {
+    - groups: dict[str, Group] = {}
+    - ndkUser: NDKUser
+    - debtManager: DebtManager
+    createGroup(g: Group)
+    addGroup()
+    deleteGroup(g: Group)
+    getGroups(sortBy)
+    getGroupByID()
+}
+
+class Group {
+    - author: str
+    - createdAt: datetime
+    - updatedAt: datetime
+    - group_name: str
+    - group_image: str
+    - members: list[str]
+    - groupId: str = "0"
+    - group_type: str = "private"
+    - bills: list[Bill]
+    - lastBillID: str
+
+    createBill(b: Bill)
+    addBill(b: Bill)
+    deleteBill(b: Bill)
+    getStatus()
+}
+
+class Coin {
+    - amount: int
+    - currency: str
+}
+
+class Splitter {
+    - npub: str
+    - split: Coin
+}
+
+class Bill {
+    - payer: str
+    - amount: Coin
+    - description: str
+    - date: datetime
+    - splitters: list[Splitter]
+    - billId: str = "0"
+    - lastBillID: str
+
+    serializeBill()
+    calculateSplit()
+    getBillByID()
+}
+
+class DebtTo {
+    - owner: str
+    - amount: Coin
+    - settled: bool = False
+}
+
+class CreditTo {
+    - creditor: str
+    - amount: Coin
+    - settled: bool = False
+}
+
+class DebtManager {
+    - credits: dict[str, CreditTo] = {}
+    - debts: dict[str, DebtTo] = {}
+
+    addBill(b: Bill)
+    addCredit(c: CreditTo)
+    addDebt(d: DebtTo)
+    getDebts()
+    getCredits()
+    getDebtByID()
+    getCreditByID()
+    settleDebt(d: DebtTo)
+    settleCreditRequest(c: CreditTo)
+}
+
+
+NDKUser --> NDKUserProfile: profile
+SplitSatsApp --> NDKUser: ndkUser
+SplitSatsApp --> BreezSDKAccount: lnAccount
+SplitSatsApp --> EventManager: eventManager
+SplitSatsApp --> GroupManager: groupManager
+SplitSatsApp --> DebtManager: debtManager
+SplitSatsApp --> ContactManager: contactManager
+ContactManager --> Contact: contacts
+Contact --> NDKUserProfile: profile
+EventManager --> Subscription: subscriptions
+GroupManager --> Group: groups
+GroupManager --> DebtManager: debtManager
+Group --> Bill: bills
+Bill --> Coin: amount
+Bill --> Splitter: splitters
+DebtManager --> DebtTo: debts
+DebtManager --> CreditTo: credits
+Splitter --> Coin: amount
+DebtTo --> Coin: amount
+CreditTo --> Coin: amount
+@enduml 
+ 
