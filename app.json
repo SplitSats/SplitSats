@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "splitsats-app",
+    "name": "SplitSats",
     "slug": "splitsats-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo/Splitsats-nobg_B.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -24,7 +24,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo/Splitsats-nobg_B.png"
     }
   }
 }
