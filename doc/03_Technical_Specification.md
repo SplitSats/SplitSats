@@ -42,7 +42,7 @@ Bob has received the group invitation from Alice. He wants to accept the invitat
 3. Bob check if all the group members are in his followers. If not, he add the missing members to his followers.
 4. Bob is ready to receive the group bills or generate new ones.
    
-## Adding a bill
+## createBill
 KIND: 50002
 Alice has paid a bill also for Bob and decide to Split the bill on Splitsats. 
 0. Alice press the "+" button for create a new bill. Alice fill the form with the bill information.
@@ -90,3 +90,10 @@ He pay Alice using a lightning payment to her LNURLp. When came back to the app 
 
 ## onBillSettled
 Alice has received the bill settled event from Bob. She will update the debt manager and the group status.
+
+
+- Creazione nuova bill
+- Richiesta di stato del gruppo e sincronizzazione
+- Richiesta di bill mancanti
+- Settlement con Nostr
+- Aggiungere setting per nostr e vari 
