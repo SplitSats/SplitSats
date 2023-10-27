@@ -1,6 +1,6 @@
 import NDK from '@nostr-dev-kit/ndk'
 import React, { createContext, useContext, useEffect,useState } from 'react'
-
+import { Text } from 'react-native'
 import { RELAYS } from '../consts/config'
 
 // Create a context for NDK
@@ -30,7 +30,7 @@ function NDKProvider({ children }) {
   
 	if (!ndk) {
 		// You can return a loading indicator or a placeholder here
-		return <p>Loading...</p>
+		return <Text>Loading...</Text>
 	}
   
 	return <NDKContext.Provider value={ndk}>{children}</NDKContext.Provider>

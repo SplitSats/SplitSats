@@ -2,11 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useEffect } from 'react'
 import { Button, Image, StyleSheet,Text, View } from 'react-native'
 
-import { styles } from '../styles/styles'
-import UserProfile from './account/UserProfile'
-import LogOutButton from './ButtonLogOut'
+import { styles } from '@styles/styles'
+import UserProfile from '@comps/account/UserProfile'
 
-const ScreenActivity = ({ navigation }) => (
+const GroupsScreen = ({ navigation }) => (
 	<View style={styles.mainView}>
       
 		<UserProfile />
@@ -14,9 +13,10 @@ const ScreenActivity = ({ navigation }) => (
 		{/* User's groups list */}
 		<View style={styles.groupsList}>
 			{/* List of user's groups */}
+			<Text style={styles.header}>Groups</Text>
 		</View>
-		<LogOutButton navigation={navigation} />
+		
 	</View>
 )
 
-export default ScreenActivity
+export default GroupsScreen

@@ -1,4 +1,3 @@
-import { getDecodedLnInvoice, getDecodedToken } from '@cashu/cashu-ts'
 import type { ISectionEntry } from '@gandlaf21/bolt11-decode'
 import { l } from '@log'
 import type { ILnUrl, IProofSelection } from '@model'

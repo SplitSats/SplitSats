@@ -2,8 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useEffect, useState } from 'react'
 import { Image,Text, View } from 'react-native'
 
-import { styles } from '../styles/styles'
-import AuthButton from './ButtonAuth'
+import { styles } from '@styles/styles'
+import AuthButton from '@comps/ButtonAuth'
 
 const AuthenticationScreen = ({ navigation }) => {
 	const [userLoggedIn, setUserLoggedIn] = useState(null)
@@ -13,7 +13,7 @@ const AuthenticationScreen = ({ navigation }) => {
 			const userLoggedIn = await AsyncStorage.getItem('userIsLoggedIn')
 			if (userLoggedIn === 'true') {
 				console.log('User logged in')
-				navigation.navigate('Home')
+				navigation.navigate('Groups')
 			} else {
 				console.log('User not logged in')
 			}
@@ -27,7 +27,7 @@ const AuthenticationScreen = ({ navigation }) => {
 		return (
 			<View style={styles.mainView}>
 				<View style={styles.logoContainer}>
-					<Image source={require('../assets/logo/Splitsats-nobg_W.png')} style={styles.logo} />
+					<Image source={require('@assets/logo/Splitsats-nobg_W.png')} style={styles.logo} />
 				</View>
 				<View style={styles.buttonsContainer}>
 					<AuthButton

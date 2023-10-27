@@ -44,12 +44,12 @@ const IS_DEV = _appVariant === 'dev'
 const IS_PREVIEW = _appVariant === 'preview'
 const IS_PROD = _appVariant === 'prod'
 
-const cameraPermission = 'Allow SplitSats to access camera.'
+const cameraPermission = 'Allow splitsats to access camera.'
 
 const config: ExpoConfig = {
 	name: `splitsats${!IS_PROD ? ` (${_appVariant})` : ''}`,
 	slug: 'splitsats',
-	owner: 'splitsats_wallet',
+	owner: 'bizantinw',
 	privacy: 'public',
 	platforms: [
 		'ios',
@@ -58,7 +58,7 @@ const config: ExpoConfig = {
 	version: `${version}${!IS_PROD ? `-${_appVariant}` : ''}`,
 	scheme: 'cashu',
 	orientation: 'portrait',
-	icon: './assets/app-icon-all.png',
+	icon: './assets/icon.png',
 	userInterfaceStyle: 'automatic',
 	splash: {
 		image: './assets/splash.png',
@@ -81,7 +81,7 @@ const config: ExpoConfig = {
 		config: {
 			usesNonExemptEncryption: false
 		},
-		bundleIdentifier: 'com.agron.splitsats'
+		bundleIdentifier: 'com.splitsats.splitsats'
 	},
 	android: {
 		icon: './assets/logo/Splitsats-nobg_B.png',
@@ -89,13 +89,13 @@ const config: ExpoConfig = {
 			foregroundImage: './assets/logo/Splitsats-nobg_B.png',
 			backgroundImage: './assets/logo/Splitsats-nobg_B.png'
 		},
-		package: `com.agron.splitsats${!IS_PROD ? `.${_appVariant}` : ''}`
+		package: `com.splitsats.splitsats${!IS_PROD ? `.${_appVariant}` : ''}`
 	},
 	web: {
 		favicon: './assets/favicon.png'
 	},
 	extra: {
-		eas: { projectId: '' },
+		eas: { projectId: '3f48ee8a-fdef-479b-8503-77b50fdde22f' },
 		DEBUG: process?.env?.DEBUG,
 		APP_VARIANT: _appVariant,
 		NODE_ENV: process?.env?.NODE_ENV,
@@ -117,7 +117,7 @@ const config: ExpoConfig = {
 	},
 	updates: {
 		enabled: false,
-		url: ''
+		url: 'https://u.expo.dev/3f48ee8a-fdef-479b-8503-77b50fdde22f'
 	},
 	runtimeVersion: {
 		policy: 'sdkVersion'

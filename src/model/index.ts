@@ -1,4 +1,3 @@
-import type { Proof, Token } from '@cashu/cashu-ts'
 import type { HighlightKey } from '@styles'
 import type { ExpoConfig } from 'expo/config'
 import type { SQLStmtCb, SQLStmtErrCb, WebSQLDatabase } from 'expo-sqlite'
@@ -49,12 +48,6 @@ export interface IMintBalWithName extends IMintWithBalance {
 	customName: string
 }
 
-export interface ITokenInfo {
-	mints: string[]
-	value: number
-	decoded: Token
-}
-
 export interface IPreferencesResp {
 	id: 1
 	formatBalance: string
@@ -76,10 +69,6 @@ export interface IContactResp {
 	name: string,
 	ln: string,
 	isOwner: string
-}
-
-export interface IProofSelection extends Proof {
-	selected: boolean
 }
 
 /**

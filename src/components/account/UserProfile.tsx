@@ -4,7 +4,7 @@ import { nip19 } from 'nostr-tools'
 import React, { useEffect, useState } from 'react'
 import { Button, Image, StyleSheet,Text, View } from 'react-native'
 
-import { useNDK } from '../../context/NDKContext'
+import { useNDK } from '@src/context/NDKContext'
 
 const UserProfile = ({ }) => {
 	const ndk = useNDK()
@@ -45,7 +45,7 @@ const UserProfile = ({ }) => {
 					<Text style={styles.welcome}>Hello, {userProfile?.name}</Text>
 					<Text style={styles.subtitle}>Split your sats</Text>
 				</View>
-				<Image source={require('../assets/icon.png')} style={styles.userPhoto} />
+				<Image source={require('@assets/icon.png')} style={styles.userPhoto} />
 			</View>
 		</View>
 	)    

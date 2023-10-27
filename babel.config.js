@@ -1,6 +1,5 @@
-module.exports = function(api) {
-	api.cache(true)
-	return {
-		presets: ['babel-preset-expo'],
-	}
-}
+
+require('ts-node/register')
+
+module.exports = require(`${__dirname}/config/babel.config.ts`)
+

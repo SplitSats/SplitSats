@@ -3,8 +3,8 @@ import { getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
 import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
 
-import { useAuth } from '../context/AuthContext' // Import the AuthContext
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '../styles/styles'
+import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 
 
 const LogInScreen = ({ navigation }) => {
@@ -29,7 +29,7 @@ const LogInScreen = ({ navigation }) => {
 		setUserIsLoggedIn(true)
 
 		// Navigate to the HomeScreen
-		navigation.replace('Home')
+		navigation.replace('Groups')
 	}
 
 	return (

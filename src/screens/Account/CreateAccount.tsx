@@ -3,10 +3,10 @@ import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
 import { Button, Image, StyleSheet,Text, TextInput, View } from 'react-native'
 
-import updateNostrProfile from '../../scripts/updateProfile'
-import { useAuth } from '../context/AuthContext' // Import the AuthContext
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '../styles/styles'
-import AddImageButton from './ButtonAddImage'
+import updateNostrProfile from '@nostr/updateProfile'
+import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
+import AddImageButton from '@comps/ButtonAddImage'
 
 
 // Define the user profile interface
@@ -49,7 +49,7 @@ const CreateAccountScreen = ({ navigation }) => {
 		updateNostrProfile(publicKey, userProfile) // Call the updateNostrProfile function
 
 		// Navigate to the HomeScreen
-		navigation.replace('Home')
+		navigation.replace('Groups')
 	}
 
 	return (

@@ -1,17 +1,19 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { StatusBar } from 'expo-status-bar'
 import React, { useEffect, useState } from 'react'
 import { Button, StyleSheet,Text, View } from 'react-native'
 
-import  CreateAccountScreen from './CreateAccount'
-import HomeScreen from './ScreenAccount'
-import AuthenticationScreen from './ScreenAuthentication'
-import LoadingScreen from './ScreenLoading'
-import LogInScreen from './ScreenLogIn'
-import { AuthProvider } from '../context/AuthContext'
-import { NDKProvider } from '../context/NDKContext'
-import MyBottomTabNavigation from '../navigation/MyBottomTabNavigation'
+import  CreateAccountScreen from '@screens/Account/CreateAccount'
+import AuthenticationScreen from '@screens/Auth/Authentication'
+import LoadingScreen from '@screens/Loading'
+import LogInScreen from '@screens/Auth/LogIn'
+import { AuthProvider } from '@src/context/AuthContext'
+import { NDKProvider } from '@src/context/NDKContext'
+import GroupsScreen from '@screens/Groups'
+import ContactsScreen from '@screens/Contacts'
+import AccountScreen from '@screens/Account'
+import HistoryScreen from '@screens/History'
+
 
 const Stack = createNativeStackNavigator()
 
@@ -19,10 +21,8 @@ export default function App() {
   
 	return (
 		<NavigationContainer>
-			{/* <MyBottomTabNavigation /> */}
 			<NDKProvider>
 				<AuthProvider> 
-      
 					<Stack.Navigator initialRouteName="Loading">
 						<Stack.Screen name="Loading" component={LoadingScreen} />
 						<Stack.Screen name="Authentication" component={AuthenticationScreen} />
@@ -30,29 +30,12 @@ export default function App() {
 						<Stack.Screen name="LogIn" component={LogInScreen} /> 
 						<Stack.Screen name="Groups" component={GroupsScreen} />
 						<Stack.Screen name="Contacts" component={ContactsScreen} />
-						<Stack.Screen name="Activity" component={ActivityScreen} />
+						<Stack.Screen name="History" component={HistoryScreen} />
 						<Stack.Screen name="Account" component={AccountScreen} />
 					</Stack.Navigator>
 				</AuthProvider>
 			</NDKProvider>
-    
-			{/* <NDKProvider>
-    
-      <View style={styles.container}>
-        <UserProfile />
-        <StatusBar style="auto" />
-        <Button title="Create Group" onPress={toggleModal} />
-        <Text>Selected Users: {selectedUsers.join(", ")}</Text>
-        <GroupCreation
-          isVisible={isModalVisible}
-          onClose={toggleModal}
-          onCreateGroup={handleCreateGroup}
-          setSelectedUsers={setSelectedUsers}
-        />
-      </View>
-    </NDKProvider> */}
 		</NavigationContainer>
-    
 	)
 }
 

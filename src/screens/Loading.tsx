@@ -1,9 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useEffect } from 'react'
 import { Image, StyleSheet,View } from 'react-native'
-
-import {styles} from '../styles/styles'
-
+import {styles} from '@styles/styles'
 
 const LoadingScreen = ({ navigation }) => {
 	useEffect(() => {
@@ -13,7 +11,7 @@ const LoadingScreen = ({ navigation }) => {
 			const loggedIn = AsyncStorage.getItem('userIsLoggedIn')
 			console.log('User logged in:', loggedIn)
 			if (loggedIn && loggedIn === 'true') {
-				navigation.replace('Home')
+				navigation.replace('Groups')
 			} else {
 				navigation.replace('Authentication')
 			}
@@ -22,7 +20,7 @@ const LoadingScreen = ({ navigation }) => {
 
 	return (
 		<View style={styles.mainView}>
-			<Image source={require('../assets/logo/Splitsats-nobg_W.png')} style={styles.logo} />
+			<Image source={require('../../assets/logo/Splitsats-nobg_W.png')} style={styles.logo} />
 		</View>
 	)
 }

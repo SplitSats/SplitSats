@@ -1,5 +1,5 @@
 import { UserProfile } from './types'; // Import the UserProfile interface
-import { useNDK } from '../src/context/NDKContext';
+import { useNDK } from '@src/context/NDKContext';
 
 // Function to update and publish the Nostr profile
 const updateNostrProfile = async (userPublicKey: string, userProfile: UserProfile) => {

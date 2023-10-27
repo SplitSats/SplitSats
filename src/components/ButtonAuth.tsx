@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet,Text, TouchableOpacity, View } from 'react-native'
 
-import { styles } from '../styles/styles'
+import { styles } from '@styles/styles'
 
 const AuthButton = ({ label, description, onPress }) => (
 	<TouchableOpacity style={styles.button} onPress={onPress}>

@@ -4,7 +4,7 @@ import React from 'react'
 // import { View } from 'react-native-reanimated/lib/typescript/Animated';
 import { View } from 'react-native'
 
-import HomeScreen from '../components/ScreenAccount' // Import your HomeScreen component
+import HomeScreen from '../screens/Account' // Import your HomeScreen component
 // import GroupsScreen from './GroupsScreen'; // Import other screens as needed
 // import FriendsScreen from './FriendsScreen';
 // import HistoryScreen from './HistoryScreen';

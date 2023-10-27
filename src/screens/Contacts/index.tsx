@@ -2,11 +2,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { useEffect } from 'react'
 import { Button, Image, StyleSheet,Text, View } from 'react-native'
 
-import { styles } from '../styles/styles'
-import UserProfile from './account/UserProfile'
-import LogOutButton from './ButtonLogOut'
+import { styles } from '@styles/styles'
+import UserProfile from '@comps/account/UserProfile'
+import LogOutButton from '@comps/ButtonLogOut'
 
-const HomeScreen = ({ navigation }) => (
+const ContactScreen = ({ navigation }) => (
 	<View style={styles.mainView}>
       
 		<UserProfile />
@@ -19,4 +19,4 @@ const HomeScreen = ({ navigation }) => (
 	</View>
 )
 
-export default HomeScreen
+export default ContactScreen

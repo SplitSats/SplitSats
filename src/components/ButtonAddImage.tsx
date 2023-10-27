@@ -1,7 +1,7 @@
 import React from 'react'
 import { Image, StyleSheet,Text, TouchableOpacity, View } from 'react-native'
-import ImagePicker from 'react-native-image-picker'
-
+import * as ImagePicker from 'expo-image-picker';
+ 
 const AddImageButton = ({ label, onSelectImage }) => {
 	const handleImagePick = () => {
 		const options = {
@@ -30,10 +30,10 @@ const AddImageButton = ({ label, onSelectImage }) => {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity style={styles.container} onPress={handleImagePick}>
-				<Image
+				{/* <Image
 					source={require('../assets/icon/camera-upload.svg')}
 					style={styles.icon}
-				/>
+				/> */}
 				<Text style={styles.label}>{label}</Text>
 			</TouchableOpacity>
 		</View>
