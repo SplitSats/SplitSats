@@ -65,5 +65,5 @@ export const styles = StyleSheet.create({
 		fontSize: 14,
 		marginLeft: 10, // Adjust the left margin
 	},
-
+	
 })
