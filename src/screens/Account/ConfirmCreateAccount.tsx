@@ -20,7 +20,7 @@ interface UserProfile {
 }
 
 
-const CreateAccountScreen = ({ navigation }) => {
+const ConfirmCreateAccountScreen = ({ navigation }) => {
 	const { setUserIsLoggedIn } = useAuth()
 	const [username, setUsername] = useState('')
 	const [privateKey, setPrivateKey] = useState('')
@@ -223,4 +223,4 @@ const styles = StyleSheet.create({
 	},
 })
 
-export default CreateAccountScreen
+export default ConfirmCreateAccountScreen
