@@ -4,11 +4,12 @@ import React from 'react'
 // import { View } from 'react-native-reanimated/lib/typescript/Animated';
 import { View } from 'react-native'
 
-import HomeScreen from '../screens/Account' // Import your HomeScreen component
-// import GroupsScreen from './GroupsScreen'; // Import other screens as needed
-// import FriendsScreen from './FriendsScreen';
-// import HistoryScreen from './HistoryScreen';
-import GroupIcon from '../src/components/icons/GroupIcon'
+import GroupsScreen from '@screens/Groups'
+import ContactsScreen from '@screens/Contacts'
+import AccountScreen from '@screens/Account'
+import HistoryScreen from '@screens/History'
+
+
 // Import your icon components
 const Tab = createBottomTabNavigator()
 
@@ -16,7 +17,7 @@ const Navigation = () => (
 	<Tab.Navigator>
 		<Tab.Screen
 			name="Groups"
-			component={HomeScreen}
+			component={GroupsScreen}
 			options={{
 				tabBarIcon: () => (
 					// Add your Groups icon component here
@@ -27,7 +28,7 @@ const Navigation = () => (
 		/>
 		<Tab.Screen
 			name="Friends"
-			component={HomeScreen}
+			component={ContactsScreen}
 			options={{
 				tabBarIcon: () => (
 					// Add your Friends icon component here
@@ -37,8 +38,8 @@ const Navigation = () => (
 			}}
 		/>
 		<Tab.Screen
-			name="History"
-			component={HomeScreen}
+			name="Account"
+			component={AccountScreen}
 			options={{
 				tabBarIcon: () => (
 					// Add your History icon component here
@@ -46,6 +47,19 @@ const Navigation = () => (
 				),
 			}}
 		/>
+
+		<Tab.Screen
+			name="History"
+			component={HistoryScreen}
+			options={{
+				tabBarIcon: () => (
+					// Add your History icon component here
+					<View style={{width: 24, height: 24, backgroundColor: 'red'}} />
+				),
+			}}
+		/>
+
+
 	</Tab.Navigator>
 )
 

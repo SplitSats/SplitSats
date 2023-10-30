@@ -1,19 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
-import { Button, Image, StyleSheet,Text, TextInput, View } from 'react-native'
+import { Button, TouchableOpacity, Image, StyleSheet,Text, TextInput, View } from 'react-native'
 
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import AddImageButton from '@comps/ButtonAddImage'
-
+import * as ImagePicker from 'expo-image-picker';
 
 // Define the user profile interface
 interface UserProfile {
-  name: string;
-  nip05: string;
-  lud16: string;
+	userName?: string;
+	displayName: string;
+	nip05: string;
+	lud16: string;
 }
 
 
@@ -22,12 +23,55 @@ const CreateAccountScreen = ({ navigation }) => {
 	const [username, setUsername] = useState('')
 	const [privateKey, setPrivateKey] = useState('')
 	const [publicKey, setPublicKey] = useState('')
+	
+	const [profileImage, setProfileImage] = useState(null); // Store the selected profile image
+  	const [backgroundImage, setBackgroundImage] = useState(null); // Store the selected background image
+
+
 	const [userProfile, setUserProfile] = useState<UserProfile>({
 		name: 'walter',
 		nip05: 'walter@nostr.com',
 		lud16: 'wally@getalby.com',
 	})
 
+	const handleSelectProfileImage = async () => {
+		// Use the image picker to select a profile image
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.All,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+		
+		console.log(result);
+
+		if (!result.canceled) {
+			setProfileImage(result.assets[0].uri);
+		}
+		else {
+			console.log('User cancelled image picker');
+		}
+
+	  };
+	
+	  const handleSelectBackgroundImage = async () => {
+		// Use the image picker to select a profile image
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.All,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+		
+		console.log(result);
+
+		if (!result.canceled) {
+			setBackgroundImage(result.assets[0].uri);
+		}
+		else {
+			console.log('User cancelled image picker');
+		}
+	  };
 
 	const handleCreateAccount = async () => {
 		// Generate a private key for the user
@@ -55,7 +99,31 @@ const CreateAccountScreen = ({ navigation }) => {
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>NEW ACCOUNT</Text>
-			<AddImageButton/>
+			
+			{/* Background Image Selection */}
+			<TouchableOpacity onPress={handleSelectBackgroundImage}>
+				{backgroundImage ? (
+				<Image source={{ uri: backgroundImage }} style={styles.backgroundImage} />
+				) : (
+				<View style={styles.backgroundImage}>
+					<Text style={{ color: 'white' }}>Select Background Image</Text>
+				</View>
+				)}
+			</TouchableOpacity>
+
+			{/* Profile Image Selection */}
+			<View style={styles.photoContainer}>
+				<TouchableOpacity onPress={handleSelectProfileImage}>
+				{profileImage ? (
+					<Image source={{ uri: profileImage }} style={styles.photoIcon} />
+				) : (
+					<View style={styles.photoIcon}>
+					<Text style={{ color: 'white' }}>Select Profile Image</Text>
+					</View>
+				)}
+				</TouchableOpacity>
+			</View>
+
 			<TextInput
 				style={styles.input}
 				placeholder={username}
@@ -80,7 +148,13 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.nip05} // Display the NIP05 from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} // Update the UserProfile on input change
 			/>
-			<Button title="Create Account" style={styles.createAccountButton} onPress={handleCreateAccount} />
+			<TouchableOpacity onPress={() => console.log('Next button pressed')}>
+				<View style={styles.continueButton}>
+					<Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>NEXT</Text>
+				</View>
+        	</TouchableOpacity>
+			
+			{/* <Button title="Create Account" style={styles.createAccountButton} onPress={handleCreateAccount} /> */}
 		</View>
 	)
 }
@@ -108,6 +182,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
+	backgroundImage: {
+		width: '100%',
+		height: 200,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 	input: {
 		width: '80%',
 		height: 40,
@@ -118,10 +198,14 @@ const styles = StyleSheet.create({
 		padding: 10,
 		marginBottom: 20,
 	},
-	createAccountButton: {
-		backgroundColor: SECONDARY_COLOR, // Replace with your secondary color
-		color: 'white',
+	continueButton: {
+		backgroundColor: SECONDARY_COLOR,
 		borderRadius: 10,
+		paddingVertical: 12,
+		padding: 10,
+		alignItems: 'center',
+		// ALL WIDHT
+		
 	},
 })
 
