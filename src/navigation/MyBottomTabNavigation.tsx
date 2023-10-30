@@ -59,7 +59,6 @@ const Navigation = () => (
 			}}
 		/>
 
-
 	</Tab.Navigator>
 )
 

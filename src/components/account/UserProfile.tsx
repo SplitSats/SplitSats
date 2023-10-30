@@ -3,12 +3,14 @@ import { StatusBar } from 'expo-status-bar'
 import { nip19 } from 'nostr-tools'
 import React, { useEffect, useState } from 'react'
 import { Button, Image, StyleSheet,Text, View } from 'react-native'
-
+import { AsyncStore } from '@src/storage/store/AsyncStore'
 import { useNDK } from '@src/context/NDKContext'
+import { l } from '@log'
+import { IProfileContent } from '@src/model/nostr'
 
 const UserProfile = ({ }) => {
 	const ndk = useNDK()
-	const [userProfile, setUserProfile] = useState(null)
+	const [userProfile, setUserProfile] = useState<IProfileContent | null>(null);
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -17,11 +19,14 @@ const UserProfile = ({ }) => {
 					throw new Error('NDK not initialized')
 				}
             
-				const userPublicKey = AsyncStorage.getItem('userPublicKey') as string
+				const userPublicKey = AsyncStorage.getItem('userPublicKey')
 				if (!userPublicKey){
 					console.log('UserPublicKey not found in local storage')
+					l('UserPublicKey not found in local storage')
 				}
 				console.log('UserPublicKey:', userPublicKey)
+				l('USERPUBLICKEY:')
+				l('UserPublicKey:', userPublicKey)
 				const userNpub = nip19.npubEncode(userPublicKey)
 				const user = ndk.getUser({ npub: userNpub })
 				const userProfile = await user.fetchProfile()

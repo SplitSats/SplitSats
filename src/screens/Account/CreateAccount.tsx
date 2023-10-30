@@ -1,150 +1,68 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
-import { Button, TouchableOpacity, Image, StyleSheet,Text, TextInput, View } from 'react-native'
-
+import { Button, Image, StyleSheet,Text, TextInput, View } from 'react-native'
+import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import AddImageButton from '@comps/ButtonAddImage'
-import * as ImagePicker from 'expo-image-picker';
-import TextInputWithDescription from '@comps/account/TextInputAccount'
-
-// Define the user profile interface
-interface UserProfile {
-	userName?: string;
-	displayName?: string;
-	nip05?: string;
-	lud16?: string;
-	aboutMe?: string;
-}
+import { IProfileContent } from '@src/model/nostr';
 
 
 const CreateAccountScreen = ({ navigation }) => {
-	const { setUserIsLoggedIn } = useAuth()
+	const [imageUri, setImageUri] = useState<string | ''>('');
 	const [username, setUsername] = useState('')
-	const [privateKey, setPrivateKey] = useState('')
-	const [publicKey, setPublicKey] = useState('')
-	
-	const [profileImage, setProfileImage] = useState(null); // Store the selected profile image
-  	const [backgroundImage, setBackgroundImage] = useState(null); // Store the selected background image
-
-
 	const [userProfile, setUserProfile] = useState<UserProfile>({
-		userName: '',
-		displayName: '',
-		nip05: '',
-		lud16: '',
+		name: 'walter',
+		nip05: 'walter@nostr.com',
+		lud16: 'wally@getalby.com',
 	})
-
-	const handleSelectProfileImage = async () => {
-		// Use the image picker to select a profile image
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
-			aspect: [4, 3],
-			quality: 1,
-		});
-		
-		console.log(result);
-
-		if (!result.canceled) {
-			setProfileImage(result.assets[0].uri);
-		}
-		else {
-			console.log('User cancelled image picker');
-		}
-
-	  };
 	
-	  const handleSelectBackgroundImage = async () => {
-		// Use the image picker to select a profile image
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
-			aspect: [4, 3],
-			quality: 1,
-		});
-		
-		console.log(result);
+	const handleNextButton = async (userProfile) => {
 
-		if (!result.canceled) {
-			setBackgroundImage(result.assets[0].uri);
-		}
-		else {
-			console.log('User cancelled image picker');
-		}
-	  };
-
-	const handleCreateAccount = async () => {
-		// Generate a private key for the user
-		const userPrivateKey = generatePrivateKey()  
-		const nsec = nip19.nsecEncode(userPrivateKey)
-		// Extract the public key from the private key
-		const userPublicKey = getPublicKey(userPrivateKey)
-		const npub = nip19.npubEncode(userPublicKey)
-		console.log('userPrivateKey:', nsec)
-		console.log('userPublicKey:', npub)
-    
-		// Store the private key securely, such as in AsyncStorage
-		await AsyncStorage.setItem('userPrivateKey', userPrivateKey)
-		await AsyncStorage.setItem('userPublicKey', userPublicKey)
-		await AsyncStorage.setItem('userIsLoggedIn', 'true')
-		setUserIsLoggedIn(true)
-
-		// Publish the user profile to Nostr
-		updateNostrProfile(publicKey, userProfile) // Call the updateNostrProfile function
-
-		// Navigate to the HomeScreen
-		navigation.replace('Groups')
+		navigation.replace('ConfirmCreateAccount', userProfile)
 	}
 
 	return (
 		<View style={styles.container}>
-
 			<Text style={styles.title}>NEW ACCOUNT</Text>
-			
-			<View style={{ alignItems: 'center', flexDirection: 'row',  padding: 16, }}>
-			
-				{/* Profile Image Selection */}
-				<View style={styles.photoContainer}>
-					<TouchableOpacity onPress={handleSelectProfileImage}>
-						{profileImage ? (
-							<Image source={{ uri: profileImage }} style={styles.photoIcon} />
-						) : (
-							<View style={styles.photoIcon}>
-								<Text style={{ color: 'white' }}>Select Profile Image</Text>
-							</View>
-						)}
-					</TouchableOpacity>
-				</View>
-				{/* Background Image Selection */}
-				<View style={styles.backgroundImageContainer}>
-					<TouchableOpacity onPress={handleSelectBackgroundImage}>
-						{backgroundImage ? (
-						<Image source={{ uri: backgroundImage }} style={styles.backgroundImage} />
-						) : (
-						<View style={styles.backgroundImage}>
-							<Text style={{ color: 'white' }}>Select Background Image</Text>
-						</View>
-						)}
-					</TouchableOpacity>
-				</View>
-
-			</View>
-
-			<TextInputWithDescription description="USERNAME*" value={userProfile.userName} onChangeText={(text) => setUserProfile({ ...userProfile, userName: text })} />
-			<TextInputWithDescription description="DISPLAY NAME" value={userProfile.displayName} onChangeText={(text) => setUserProfile({ ...userProfile, displayName: text })} />
-			<TextInputWithDescription description="LNURL" value={userProfile.lud16} onChangeText={(text) => setUserProfile({ ...userProfile, lud16: text })} />
-			<TextInputWithDescription description="NOSTR VERIFICATION (NIP-05)" value={userProfile.nip05} onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} />
-			<TextInputWithDescription description="ABOUT ME" value={userProfile.aboutMe} onChangeText={(text) => setUserProfile({ ...userProfile, aboutMe: text })} />
-
-			<TouchableOpacity onPress={() => console.log('Next button pressed')}>
+			<ImageUploadComponent imageUri={imageUri} setImageUri={setImageUri} />
+			<Text style={styles.label}>USERNAME*</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={username}
+				value={username}
+				onChangeText={setUsername}
+			/>
+			<Text style={styles.label}>DISPLAY NAME</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={userProfile.lud16}
+				value={userProfile.lud16} // Display the name from the UserProfile
+				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
+			/>
+			<Text style={styles.label}>LN URL</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={userProfile.lud16}
+				value={userProfile.lud16} // Display the LN Address from the UserProfile
+				onChangeText={(text) => setUserProfile({ ...userProfile, lud16: text })} // Update the UserProfile on input change
+			/>
+			<Text style={styles.label}>NOSTR VERIFICATION (NIP05)</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={userProfile.nip05}
+				value={userProfile.nip05} // Display the NIP05 from the UserProfile
+				onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} // Update the UserProfile on input change
+			/>
+			<Button title="NEXT" style={styles.button} onPress={() => handleNextButton({...userProfile})} />
+			{/* <TouchableOpacity onPress={() => console.log('Next button pressed')}>
 				<View style={styles.continueButton}>
 					<Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>NEXT</Text>
 				</View>
-        	</TouchableOpacity>
+        	</TouchableOpacity> */}
 			
+		
 		</View>
 	)
 }
@@ -161,66 +79,43 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: 'white',
 	},
-	photoContainer: {
-		marginBottom: 20,
-		width: 80,
-		height: 80,
-		borderRadius: 40,
-		backgroundColor: 'light gray', // Replace with your desired background color
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	profileImage: {
-		position: 'absolute',
-		bottom: 0, // Positioned at the bottom
-		left: 10, // Positioned at the left with some spacing
-		width: 80,
-		height: 80,
-		borderRadius: 40,
-		backgroundColor: 'darkgray', // Dark gray background color
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	photoIcon: {
-		width: 80,
-		height: 80,
-		borderRadius: 40,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	backgroundImageContainer: {
-		width: '100%',
-		height: 100,
-		backgroundColor: 'darkgray', // Dark gray background color
-		justifyContent: 'center',
-		alignItems: 'center',
-		position: 'relative', // Added relative positioning		
-	},
-	backgroundImage: {
-		width: '100%',
-		height: 200,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 	input: {
 		width: '80%',
 		height: 40,
 		color: 'white',
-		borderWidth: 2,
-		borderColor: SECONDARY_COLOR, // Replace with your secondary color
+		backgroundColor: '#333A4A',
 		borderRadius: 10,
 		padding: 10,
-		marginBottom: 20,
+		marginBottom: 10,
 	},
-	continueButton: {
-		backgroundColor: SECONDARY_COLOR,
+	button: {
+		width: '100%',
+		height: 50,
+		backgroundColor: '#0000FF', // This is a placeholder color. Adjust it to match the exact shade you want.
 		borderRadius: 10,
-		paddingVertical: 12,
-		padding: 10,
 		alignItems: 'center',
-		// ALL WIDHT
-		
+		justifyContent: 'center',
 	},
+	buttonText: {
+	fontSize: 16,
+	color: '#FFFFFF',
+	fontWeight: 'bold',
+	},
+	label: {
+		alignSelf: 'flex-start',  // Aligns text to the left
+		marginLeft: '10%',
+		color: '#B0B0B0',
+		marginBottom: 8,  // Adjust as per spacing required between label and input
+	},
+	photoIcon: {
+		width: 100,
+		height: 100,
+		backgroundColor: '#282828',
+		borderRadius: 50,
+		justifyContent: 'center',
+		alignItems: 'flex-start',
+		marginBottom: 20,
+	  }
 })
 
 export default CreateAccountScreen
