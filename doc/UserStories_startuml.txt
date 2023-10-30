@@ -1,0 +1,64 @@
+@startuml UserStories
+
+participant Alice as "Alice"
+participant Bob as "Bob"
+participant Carol as "Carol"
+database GroupDB as "Group Database"
+database EventDB as "Event Database"
+database NostrDB as "Nostr Database"
+
+== Creating a Group ==
+
+Alice -> Alice: 0. Alice initiates the group creation process by pressing the '+' button
+Alice -> Alice: 1. Alice provides group details
+Alice -> Alice: 2. Alice creates a Group object and assigns it properties
+Alice -> GroupDB: 2. Alice stores the Group object in the Group Database
+Alice -> Alice: 3. Alice serializes the Group object, generating a unique Group ID
+Alice -> Alice: 4. Alice signs the Group object with her private key
+Alice -> Bob: 5. Alice sends an encrypted message to Bob (NIP-44) with the group invitation
+Alice -> Carol: 6. Alice sends an encrypted message to Bob (NIP-44) with the group invitation
+
+@enduml
+
+@startuml UserStories
+
+participant Alice as "Alice"
+participant Bob as "Bob"
+participant Carol as "Carol"
+database GroupDB as "Group Database"
+database EventDB as "Event Database"
+database NostrDB as "Nostr Database"
+
+== Creating Shared Expense ==
+
+Alice -> Alice: 0. Alice initiates the expense creation process by pressing the '+' button
+Alice -> Alice: 1. Alice provides expense details
+Alice -> Alice: 2. Alice creates an expense object and assigns it properties
+Alice -> NostrDB: 2. Alice send to the Group members object the updated balance throgh Nostr DM (NIP-44)
+Alice -> Bob: 3. Alice send encrypted message to Bob with updated balance
+Alice -> Carol: 3. Alice send encrypted message to Bob with updated balance
+Alice -> Alice: 5. Update balance of the Group
+
+@enduml
+
+@startuml UserStories
+
+participant Alice as "Alice"
+participant Bob as "Bob"
+participant Carol as "Carol"
+database GroupDB as "Group Database"
+database EventDB as "Event Database"
+database NostrDB as "Nostr Database"
+
+== Pay Expense ==
+
+Bob -> NostrDB: 0. Bob sign in into the app entering his Private key and retrieveng his information from Nostr
+Bob -> Bob: 1. Bob access the Group created by Alice to pay his debt with her
+Bob -> Bob: 2. Bob initiates the payment expense by sliding the expense voice and pressing the 'Pay' button
+Bob -> NostrDB: 2. Pressing the button, Bob creates an invoice to pay with his lightning wallet
+Bob -> EventDB: 3. Bob open his favorite LN wallet and pays the invoice
+NostrDB -> Bob: 4. Nostr create a Zap receipt and the app intercepts it to settle the balance
+Bob -> Alice: 5. Bob send encrypted message to Alice with updated balance
+Bob -> Carol: 5. Bob send encrypted message to Carol with updated balance
+
+@enduml
