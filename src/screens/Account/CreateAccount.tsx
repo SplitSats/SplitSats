@@ -1,18 +1,19 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
-import { Button, Image, StyleSheet,Text, TextInput, View } from 'react-native'
+import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-
+import BannerUploadComponent from '@comps/BannerUploadComponent'
 
 // Define the user profile interface
 interface UserProfile {
   name: string;
   nip05: string;
   lud16: string;
+  about_me:string;
 }
 
 
@@ -26,6 +27,7 @@ const CreateAccountScreen = ({ navigation }) => {
 		name: 'walter',
 		nip05: 'walter@nostr.com',
 		lud16: 'wally@getalby.com',
+		about_me: 'Lurem ipisum',
 	})
 
 
@@ -50,13 +52,16 @@ const CreateAccountScreen = ({ navigation }) => {
 		updateNostrProfile(publicKey, userProfile) // Call the updateNostrProfile function
 
 		// Navigate to the HomeScreen
-		navigation.replace('Groups')
+		navigation.replace('Confrim')
 	}
 
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>NEW ACCOUNT</Text>
+			<View style={styles.containerPhotos}>
+			<BannerUploadComponent imageUri={imageUri} setImageUri={setImageUri} />
 			<ImageUploadComponent imageUri={imageUri} setImageUri={setImageUri} />
+			</View>
 			<Text style={styles.label}>USERNAME*</Text>
 			<TextInput
 				style={styles.input}
@@ -85,12 +90,32 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.nip05} // Display the NIP05 from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} // Update the UserProfile on input change
 			/>
-			<Button title="Create Account" style={styles.button} onPress={handleCreateAccount} />
+			<Text style={styles.label}>ABOUT ME</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={userProfile.about_me}
+				value={userProfile.about_me} // Display the ABOUT ME from the UserProfile
+				onChangeText={(text) => setUserProfile({ ...userProfile, about_me: text })} // Update the UserProfile on input change
+			/>
+			<View style={styles.button}>
+			<Button title="NEXT"
+			onPress={handleCreateAccount} />
+			</View>
 		</View>
 	)
 }
-
+//
 const styles = StyleSheet.create({
+	containerPhotos: {
+		flex: 0,
+		width:'100%',
+		height:130,
+		backgroundColor: '#333A4A',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		marginBottom: 80,
+		marginTop:20,
+	  },
 	container: {
 		flex: 1,
 		backgroundColor: PRIMARY_COLOR,
@@ -111,34 +136,22 @@ const styles = StyleSheet.create({
 		padding: 10,
 		marginBottom: 10,
 	},
-	button: {
-		width: '100%',
-		height: 50,
-		backgroundColor: '#0000FF', // This is a placeholder color. Adjust it to match the exact shade you want.
-		borderRadius: 10,
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	buttonText: {
-	fontSize: 16,
-	color: '#FFFFFF',
-	fontWeight: 'bold',
-	},
 	label: {
 		alignSelf: 'flex-start',  // Aligns text to the left
 		marginLeft: '10%',
 		color: '#B0B0B0',
 		marginBottom: 8,  // Adjust as per spacing required between label and input
 	},
-	photoIcon: {
-		width: 100,
-		height: 100,
-		backgroundColor: '#282828',
-		borderRadius: 50,
-		justifyContent: 'center',
-		alignItems: 'flex-start',
-		marginBottom: 20,
-	  }
+	button: {
+		position:'absolute',
+		borderRadius: 25, 
+		backgroundColor: '#3282B8', // Color of the button
+		width:'80%',
+		height:50,
+		alignSelf: 'center', 
+		overflow: 'hidden',
+		bottom: 20,
+	  },
 })
 
 export default CreateAccountScreen
