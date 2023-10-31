@@ -8,6 +8,9 @@ import { useAuth } from '@src/context/AuthContext'; // Import the AuthContext
 import { l, err } from '@log';
 import { IProfileContent } from '@src/model/nostr';
 import { useNDK } from '@src/context/NDKContext';
+import CreateAccountWrap from "@comps/account/CreateAccountWrap";
+import ConfirmButton from '@comps/ConfirmButton';
+
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
   const { setUserIsLoggedIn } = useAuth();
@@ -41,35 +44,34 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     await AsyncStorage.setItem('userIsLoggedIn', 'true');
     setUserIsLoggedIn(true);
 
-    // Publish the user profile to Nostr
-    // Publish the user profile to Nostr
-    l("NPUB:", npub)
-    try {
-      const nostrUser = ndk.getUser({
-        npub: npub,
-      });
+    const publishNostrProfile = async () => {
+      l("NPUB:", npub)
+      try {
+        const nostrUser = ndk.getUser({
+          npub: npub,
+        });
 
-      // Fetch the existing profile
-      await nostrUser.fetchProfile();
-      l('Nostr user profile:', nostrUser.profile);
+        // Fetch the existing profile
+        await nostrUser.fetchProfile();
+        l('Nostr user profile:', nostrUser.profile);
 
-      // Update the profile fields
-      nostrUser.profile.name = userProfile.name;
-      nostrUser.profile.about = userProfile.about;
-      nostrUser.profile.banner = userProfile.banner;
-      nostrUser.profile.lud16 = userProfile.lud16;
-      nostrUser.profile.nip05 = userProfile.nip05;
+        // Update the profile fields
+        nostrUser.profile.name = userProfile.name;
+        nostrUser.profile.about = userProfile.about;
+        nostrUser.profile.banner = userProfile.banner;
+        nostrUser.profile.lud16 = userProfile.lud16;
+        nostrUser.profile.nip05 = userProfile.nip05;
 
-      // Publish the updated profile
-      await nostrUser.publish();
-      console.log('Nostr user profile updated:', nostrUser.profile);
-      l('Nostr user profile updated!', nostrUser.profile);
-    } catch (error) {
-      // Handle any errors that occur during the update
-      console.error('Error updating Nostr profile:', error);
-      err('Error updating Nostr profile:', error);
+        // Publish the updated profile
+        await nostrUser.publish();
+        l('Nostr user profile updated!', nostrUser.profile);
+      } catch (error) {
+        err('Error updating Nostr profile:', error);
+      }
     }
-
+    
+    // Publish the user profile to Nostr
+    await publishNostrProfile();
     // Save the user profile to AsyncStorage
     await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
 
@@ -79,14 +81,15 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>CONFIRM ACCOUNT</Text>
-      <View style={{ alignItems: 'center', flexDirection: 'row', padding: 16 }}>
-        <TouchableOpacity onPress={handleCreateAccount}>
-          <View style={styles.continueButton}>
-            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>CONFIRM</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+        <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
+        <View style={styles.cardContainer}>
+            <CreateAccountWrap />
+        </View>
+        <Text style={styles.noteTextt}>
+          This is a preview of your Nostr account.
+          You can always change your info from the profile settings.
+        </Text>
+        <ConfirmButton title="CREATE ACCOUNT" onPress={handleCreateAccount} />
     </View>
   );
 };
@@ -95,73 +98,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
+    padding: 20,
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
+  cardContainer:{
+      width:'100%',
+      borderWidth:3,
+      borderColor:'#83A3EE',
+      backgroundColor: PRIMARY_COLOR,
+      borderRadius: 10,
+      alignSelf:'flex-start',
+      marginBottom: 20,
+  },
+  headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
-  },
-  photoContainer: {
     marginBottom: 20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'light gray', // Replace with your desired background color
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  profileImage: {
-    position: 'absolute',
-    bottom: 0, // Positioned at the bottom
-    left: 10, // Positioned at the left with some spacing
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'darkgray', // Dark gray background color
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  photoIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backgroundImageContainer: {
-    width: '100%',
-    height: 100,
-    backgroundColor: 'darkgray', // Dark gray background color
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative', // Added relative positioning
-  },
-  backgroundImage: {
-    width: '100%',
-    height: 200,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  input: {
-    width: '80%',
-    height: 40,
+  noteTextt: {
     color: 'white',
-    borderWidth: 2,
-    borderColor: SECONDARY_COLOR, // Replace with your secondary color
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 20,
+    padding:30,
+    textAlign:'center',
+    fontSize:16,
   },
-  continueButton: {
-    backgroundColor: SECONDARY_COLOR,
-    borderRadius: 10,
-    paddingVertical: 12,
-    padding: 10,
-    alignItems: 'center',
-    // ALL WIDTH
-
+  button: {
+  position:'absolute',
+  borderRadius: 25, 
+  backgroundColor: '#3282B8', // Color of the button
+  width:'90%',
+  height:50,
+  alignSelf: 'center', 
+  overflow: 'hidden',
+  bottom: 20,
   },
 });
 
