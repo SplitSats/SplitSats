@@ -81,7 +81,7 @@ const CreateAccountScreen = ({ navigation }) => {
 		</View>
 	)
 }
-//
+
 const styles = StyleSheet.create({
 	containerPhotos: {
 		flex: 0,

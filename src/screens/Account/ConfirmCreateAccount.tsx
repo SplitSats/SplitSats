@@ -83,7 +83,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     <View style={styles.container}>
         <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
         <View style={styles.cardContainer}>
-            <CreateAccountWrap />
+            <CreateAccountWrap userProfile={userProfile} />
         </View>
         <Text style={styles.noteTextt}>
           This is a preview of your Nostr account.
