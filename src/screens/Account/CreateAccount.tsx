@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
-import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
+import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
@@ -12,9 +12,11 @@ import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
 
 const CreateAccountScreen = ({ navigation }) => {
-	const [imageUri, setImageUri] = useState<string | ''>('');
-	const [username, setUsername] = useState('')
-	
+
+	const [bannerImageUri, setBannerImageUri] = useState(null);
+  	const [profileImageUri, setProfileImageUri] = useState(null);
+
+
 	const initialProfile: IProfileContent = {
 		about: 'A new SplitSats User',
 		banner: '',
@@ -36,17 +38,20 @@ const CreateAccountScreen = ({ navigation }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<ScrollView contentContainerStyle={styles.container}>
+
+		{/* <View style={styles.container}> */}
 			<Text style={styles.title}>NEW ACCOUNT</Text>
 			<View style={styles.containerPhotos}>
-				<BannerUploadComponent imageUri={imageUri} setImageUri={setImageUri} />
-				<ImageUploadComponent imageUri={imageUri} setImageUri={setImageUri} />
+      			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
+				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
+      
 			</View>
 			<Text style={styles.label}>USERNAME*</Text>
 			<TextInput
 				style={styles.input}
-				placeholder={username}
-				value={username}
+				placeholder={userProfile.username}
+				value={userProfile.username}
 				onChangeText={(text) => setUserProfile({ ...userProfile, username: text })} // Update the UserProfile on input change
 			/>
 			<Text style={styles.label}>DISPLAY NAME</Text>
@@ -78,7 +83,9 @@ const CreateAccountScreen = ({ navigation }) => {
 				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
 			/>
 			<ConfirmButton title="NEXT" onPress={handleNextButton} />
-		</View>
+		{/* </View> */}
+		</ScrollView>
+		
 	)
 }
 

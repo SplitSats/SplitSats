@@ -7,11 +7,11 @@ type ImageUploadComponentProps = {
   imageUri: string | null;
   setImageUri: React.Dispatch<React.SetStateAction<string | " ">>;
 };
+
 const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   imageUri,
   setImageUri,
 }) => {
-  const [image, setImage] = useState("");
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -24,25 +24,26 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImageUri(result.assets[0].uri);
     }
   };
-  //    <View style={styles.container}>
   return (
     <View style={styles.PhotoContainer}>
-    <IconButton
-      icon="camera-plus"
-      iconColor={MD3Colors.neutral90}
-      style={styles.photoIcon}
-      size={30}
-      onPress={pickImage}
-    />
-    {image && <Image source={{ uri: image }} />}
-  </View>
+      {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.photoIcon} />
+          ) : (
+      <IconButton
+        icon="camera-plus"
+        iconColor={MD3Colors.neutral90}
+        style={styles.photoIcon}
+        size={30}
+        onPress={pickImage}
+      />)}
+    </View>
     
   );
 };
-//<Button title = 'add' onPress={pickImage} />
+
 const styles = StyleSheet.create({
   photoIcon: {
     width: 90,
