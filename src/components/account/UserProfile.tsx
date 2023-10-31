@@ -19,15 +19,13 @@ const UserProfile = ({ }) => {
 					throw new Error('NDK not initialized')
 				}
             
-				const userPublicKey = AsyncStorage.getItem('userPublicKey')
-				if (!userPublicKey){
+				const userNpub = AsyncStorage.getItem('userNpub')
+				if (!userNpub){
 					console.log('UserPublicKey not found in local storage')
 					l('UserPublicKey not found in local storage')
 				}
-				console.log('UserPublicKey:', userPublicKey)
-				l('USERPUBLICKEY:')
-				l('UserPublicKey:', userPublicKey)
-				const userNpub = nip19.npubEncode(userPublicKey)
+				console.log('userNpub:', userNpub)
+				l('userNpub:', userNpub)
 				const user = ndk.getUser({ npub: userNpub })
 				const userProfile = await user.fetchProfile()
 				if (!userProfile) {

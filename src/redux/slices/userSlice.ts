@@ -1,22 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { PayloadAction } from "@reduxjs/toolkit";
+import { IProfileContent } from "@src/model/nostr";
 
-interface UserState {
-  displayName: string;
-  userName: string;
-  profileImg: string;
-  description: string;
-  nostrAddress: string;
-  lnAddress: string;
-}
-
-const initialState: UserState = {
-  displayName: "",
-  userName: "",
-  profileImg: "",
-  description: "",
-  nostrAddress: "",
-  lnAddress: "",
+const initialState: IProfileContent = {
+  about='',
+	banner='',
+	displayName='',
+	display_name='',
+	lud06='',
+	lud16='',
+	nip05='',
+	picture='',
+	username='',
+	website='',
 };
 
 const userSlice = createSlice({
@@ -24,7 +20,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     // temp reducer
-    updateUser: (state, action: PayloadAction<Partial<UserState>>) => {
+    updateUser: (state, action: PayloadAction<Partial<IProfileContent>>) => {
       return { ...state, ...action.payload };
     },
   },

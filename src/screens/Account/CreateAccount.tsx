@@ -7,20 +7,30 @@ import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { IProfileContent } from '@src/model/nostr';
-
+import { l } from '@log';
 
 const CreateAccountScreen = ({ navigation }) => {
 	const [imageUri, setImageUri] = useState<string | ''>('');
 	const [username, setUsername] = useState('')
-	const [userProfile, setUserProfile] = useState<UserProfile>({
-		name: 'walter',
-		nip05: 'walter@nostr.com',
-		lud16: 'wally@getalby.com',
-	})
 	
-	const handleNextButton = async (userProfile) => {
+	const initialProfile: IProfileContent = {
+		about: 'A new SplitSats User',
+		banner: '',
+		displayName: 'SplitSats User',
+		lud06: 'LNURL',
+		lud16: 'splitsats@getalby.com',
+		name: 'splitsats',
+		nip05: 'splitsats@nostr.com',
+		picture: '',
+		username: 'splitsats01',
+		website: '',
+	};
 
-		navigation.replace('ConfirmCreateAccount', userProfile)
+	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
+	
+	const handleNextButton = async () => {
+		l('User profile create Account:', userProfile)
+		navigation.replace('ConfirmCreateAccount', { userProfile })
 	}
 
 	return (
@@ -32,13 +42,13 @@ const CreateAccountScreen = ({ navigation }) => {
 				style={styles.input}
 				placeholder={username}
 				value={username}
-				onChangeText={setUsername}
+				onChangeText={(text) => setUserProfile({ ...userProfile, username: text })} // Update the UserProfile on input change
 			/>
 			<Text style={styles.label}>DISPLAY NAME</Text>
 			<TextInput
 				style={styles.input}
-				placeholder={userProfile.lud16}
-				value={userProfile.lud16} // Display the name from the UserProfile
+				placeholder={userProfile.name}
+				value={userProfile.name} // Display the name from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
 			/>
 			<Text style={styles.label}>LN URL</Text>
@@ -55,7 +65,7 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.nip05} // Display the NIP05 from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} // Update the UserProfile on input change
 			/>
-			<Button title="NEXT" style={styles.button} onPress={() => handleNextButton({...userProfile})} />
+			<Button title="NEXT" style={styles.button} onPress={handleNextButton} />
 			{/* <TouchableOpacity onPress={() => console.log('Next button pressed')}>
 				<View style={styles.continueButton}>
 					<Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>NEXT</Text>

@@ -2,7 +2,9 @@ import NDK from '@nostr-dev-kit/ndk'
 import React, { createContext, useContext, useEffect,useState } from 'react'
 import { Text } from 'react-native'
 import { RELAYS } from '../consts/config'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { NDKPrivateKeySigner } from '@nostr-dev-kit/ndk/'
+import { l } from '@log'
 // Create a context for NDK
 const NDKContext = createContext()
 
@@ -17,11 +19,15 @@ function useNDK() {
 
 function NDKProvider({ children }) {
 	const [ndk, setNDK] = useState(null)
+	const [nSec, setNsec] = useState('');
   
 	useEffect(() => {
 		const initializeNDK = async () => {
-			const ndkInstance = new NDK({ explicitRelayUrls: RELAYS })
-			ndkInstance.connect()
+			const privateKey = await AsyncStorage.getItem('userPrivateKey') as string
+			l('privateKey:', privateKey)
+			const signer = new NDKPrivateKeySigner(privateKey);
+			const ndkInstance = new NDK({ explicitRelayUrls: RELAYS, signer: signer })
+			await ndkInstance.connect()
 			setNDK(ndkInstance)
 		}
   

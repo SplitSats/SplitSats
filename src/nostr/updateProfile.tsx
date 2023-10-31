@@ -4,13 +4,13 @@ import { l } from '@log'
 import { IProfileContent } from '@model/nostr'
 
 // Function to update and publish the Nostr profile
-const updateNostrProfile = async (userPublicKey: string, userProfile: IProfileContent) => {
+const updateNostrProfile = async (userNpub: string, userProfile: IProfileContent) => {
     const ndk = useNDK();
     
     try {
         // Get the Nostr user using the public key
         const nostrUser = ndk.getUser({
-        npub: userPublicKey,
+        npub: userNpub,
     });
     l('Nostr user:', nostrUser)
     console.log('Nostr user:', nostrUser)

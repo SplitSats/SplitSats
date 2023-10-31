@@ -5,22 +5,21 @@ import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
 import updateNostrProfile from '@nostr/updateProfile';
 import { useAuth } from '@src/context/AuthContext'; // Import the AuthContext
-import { l } from '@log';
+import { l, err } from '@log';
 import { IProfileContent } from '@src/model/nostr';
-// Define the user profile interface
+import { useNDK } from '@src/context/NDKContext';
 
-
-const ConfirmCreateAccountScreen = ({ navigation, userProfile }) => {
+const ConfirmCreateAccountScreen = ({ navigation, route }) => {
   const { setUserIsLoggedIn } = useAuth();
-
-  const [username, setUsername] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
+  const { userProfile } = route.params;
   const [publicKey, setPublicKey] = useState('');
 
   const handleCreateAccount = async () => {
     // Generate a private key for the user
     const userPrivateKey = generatePrivateKey();
     const nsec = nip19.nsecEncode(userPrivateKey);
+    const ndk = useNDK(nsec);
+
     // Extract the public key from the private key
     const userPublicKey = getPublicKey(userPrivateKey);
     const npub = nip19.npubEncode(userPublicKey);
@@ -28,15 +27,51 @@ const ConfirmCreateAccountScreen = ({ navigation, userProfile }) => {
     l('userPrivateKey:', nsec);
     console.log('userPublicKey:', npub);
     l('userPublicKey:', npub);
+    
+    l('userProfile on Confirm:', userProfile);
+    if (!userProfile) {
+      l('userProfile is null');
+      return;
+    }
 
     // Store the private key securely, such as in AsyncStorage
     await AsyncStorage.setItem('userPrivateKey', userPrivateKey);
-    await AsyncStorage.setItem('userPublicKey', userPublicKey);
+    await AsyncStorage.setItem('userNsec', nsec);
+    await AsyncStorage.setItem('userNpub', npub);
     await AsyncStorage.setItem('userIsLoggedIn', 'true');
     setUserIsLoggedIn(true);
 
     // Publish the user profile to Nostr
-    updateNostrProfile(publicKey, userProfile); // Call the updateNostrProfile function
+    // Publish the user profile to Nostr
+    l("NPUB:", npub)
+    try {
+      const nostrUser = ndk.getUser({
+        npub: npub,
+      });
+
+      // Fetch the existing profile
+      await nostrUser.fetchProfile();
+      l('Nostr user profile:', nostrUser.profile);
+
+      // Update the profile fields
+      nostrUser.profile.name = userProfile.name;
+      nostrUser.profile.about = userProfile.about;
+      nostrUser.profile.banner = userProfile.banner;
+      nostrUser.profile.lud16 = userProfile.lud16;
+      nostrUser.profile.nip05 = userProfile.nip05;
+
+      // Publish the updated profile
+      await nostrUser.publish();
+      console.log('Nostr user profile updated:', nostrUser.profile);
+      l('Nostr user profile updated!', nostrUser.profile);
+    } catch (error) {
+      // Handle any errors that occur during the update
+      console.error('Error updating Nostr profile:', error);
+      err('Error updating Nostr profile:', error);
+    }
+
+    // Save the user profile to AsyncStorage
+    await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
 
     // Navigate to the HomeScreen
     navigation.replace('Groups');
