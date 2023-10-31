@@ -14,7 +14,6 @@ import ContactsScreen from '@screens/Contacts'
 import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
-import ConfirmationAccount from '@screens/Account/ConfimationAccount'
 
 
 const Stack = createNativeStackNavigator()
@@ -32,7 +31,6 @@ export default function App() {
 						<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
 						<Stack.Screen name="LogIn" component={LogInScreen} /> 
 						<Stack.Screen name="Groups" component={GroupsScreen} />
-						<Stack.Screen name="Confrim" component={ConfirmationAccount}/>
 						<Stack.Screen name="Contacts" component={ContactsScreen} />
 						<Stack.Screen name="History" component={HistoryScreen} />
 						<Stack.Screen name="Account" component={AccountScreen} />
