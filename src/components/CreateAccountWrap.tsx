@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import { IProfileContent } from '@src/model/nostr'
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 
 
@@ -13,16 +11,12 @@ interface userInputs {
     email: string
     description: string
   }
- // /home/shahwb/splitsats/SplitSats/assets/logo/Splitsats_name_W.png
 const CreateAccountWrap = () => {
-    const [imageUri, setImageUri] = useState<string | ''>('');
-	const { setUserIsLoggedIn } = useAuth()
-	const [username, setUsername] = useState('')
-	const [privateKey, setPrivateKey] = useState('')
-	const [publicKey, setPublicKey] = useState('')
+  // profileImage: '@assets/logo/Splitsats_Logo_B.png'
+
 	const [userInputs, setUserProfile] = useState<userInputs>({
         name:'SplitSats',
-		profileImage: 'https://reactnative.dev/img/tiny_logo.png',
+		    profileImage: 'https://reactnative.dev/img/tiny_logo.png',
         bannerImage: 'https://reactnative.dev/img/tiny_logo.png',
         username: '@splitsats',
         email: 'tip@splitsats.com',

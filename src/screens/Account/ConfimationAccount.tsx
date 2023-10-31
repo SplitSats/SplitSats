@@ -1,34 +1,15 @@
 import CreateAccountWrap from "@comps/CreateAccountWrap";
 import React, { useState } from 'react'
-import { IProfileContent } from '@src/model/nostr'
-import { View, Text, StyleSheet, Image, Button } from 'react-native';
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { PRIMARY_COLOR } from '@styles/styles'
 
-interface userInputs {
-    name:string
-    profileImage: string
-    bannerImage: string
-    username: string
-    email: string
-    description: string
-  }
+
 
 const ConfirmationAccount = ({navigation}) => {
-
-    const [imageUri, setImageUri] = useState<string | ''>('');
-	const { setUserIsLoggedIn } = useAuth()
-	const [username, setUsername] = useState('')
-	const [privateKey, setPrivateKey] = useState('')
-	const [publicKey, setPublicKey] = useState('')
-	const [userInputs, setUserProfile] = useState<userInputs>({
-        name:'SplitSats',
-		profileImage: 'URL_TO_PROFILE_IMAGE',
-        bannerImage: '/home/shahwb/splitsats/SplitSats/assets/logo/Splitsats_name_W.png',
-        username: '@splitsats',
-        email: 'tip@splitsats.com',
-        description: 'Expense sharing app',
-	})
+  
+  const handleCreateAccount = async () => {
+    navigation.replace('AccountCreated')
+}
 return(
     <View style={styles.container}>
          <Text style={styles.headerText}>CONFIRM</Text>
@@ -40,9 +21,10 @@ return(
         You can always change your info from the profile settings.
         </Text>
         <View style={styles.button}>
-			<Button title="CREATE ACCOUNT"
-			  />
-		</View>
+          <Button title="CREATE ACCOUNT"
+            onPress={handleCreateAccount}
+            />
+		    </View>
     </View>
 
 )
