@@ -58,12 +58,12 @@ const config: ExpoConfig = {
 	version: `${version}${!IS_PROD ? `-${_appVariant}` : ''}`,
 	scheme: 'cashu',
 	orientation: 'portrait',
-	icon: './assets/icon.png',
+	icon: './assets/logo/Splitsats_Logo_W.png',
 	userInterfaceStyle: 'automatic',
 	splash: {
-		image: './assets/splash.png',
+		image: './assets/logo/Splitsats-nobg_B.png',
 		resizeMode: 'contain',
-		backgroundColor: '#5DB075'
+		backgroundColor: '#FFFFFF'
 	},
 	assetBundlePatterns: ['**/*'],
 	plugins: [
