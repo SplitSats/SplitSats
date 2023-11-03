@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
@@ -13,9 +13,9 @@ import ConfirmButton from '@comps/ConfirmButton'
 
 const CreateAccountScreen = ({ navigation }) => {
 
-	const [bannerImageUri, setBannerImageUri] = useState(null);
-  	const [profileImageUri, setProfileImageUri] = useState(null);
-
+	const [bannerImageUri, setBannerImageUri] = useState('');
+  	const [profileImageUri, setProfileImageUri] = useState('');
+	
 
 	const initialProfile: IProfileContent = {
 		about: 'A new SplitSats User',
@@ -33,10 +33,16 @@ const CreateAccountScreen = ({ navigation }) => {
 	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
 	
 	const handleNextButton = async () => {
+		// Set the banner and profile images in the user profile
+		userProfile.banner = bannerImageUri;
+		userProfile.picture = profileImageUri;
+		
 		l('User profile create Account:', userProfile)
 		navigation.replace('ConfirmCreateAccount', { userProfile })
 	}
-
+	
+	l("CreateAccountScreen")
+	
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 

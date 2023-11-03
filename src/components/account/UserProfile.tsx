@@ -7,10 +7,13 @@ import { AsyncStore } from '@src/storage/store/AsyncStore'
 import { useNDK } from '@src/context/NDKContext'
 import { l } from '@log'
 import { IProfileContent } from '@src/model/nostr'
+import { store } from '@store'	
+import { STORE_KEYS } from '@store/consts'
+import { NDKUser } from '@nostr-dev-kit/ndk'
 
 const UserProfile = ({ }) => {
 	const ndk = useNDK()
-	const [userProfile, setUserProfile] = useState<IProfileContent | null>(null);
+	const [userProfile, setUserProfile] = useState<NDKUser | null>(null);
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -18,15 +21,14 @@ const UserProfile = ({ }) => {
 				if (!ndk) {
 					throw new Error('NDK not initialized')
 				}
-            
-				const userNpub = AsyncStorage.getItem('userNpub')
+				const userNpub = await store.get(STORE_KEYS.npub)
 				if (!userNpub){
 					console.log('UserPublicKey not found in local storage')
 					l('UserPublicKey not found in local storage')
 				}
 				console.log('userNpub:', userNpub)
 				l('userNpub:', userNpub)
-				const user = ndk.getUser({ npub: userNpub })
+				const user = ndk.getUser({ npub: userNpub || '' })
 				const userProfile = await user.fetchProfile()
 				if (!userProfile) {
 					throw new Error('User profile not found')

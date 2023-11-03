@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Button, Image, StyleSheet, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { IconButton, MD3Colors } from "react-native-paper";
+import { l } from "@log";
 
 type ImageUploadComponentProps = {
   imageUri: string | null;
@@ -12,6 +13,17 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   imageUri,
   setImageUri,
 }) => {
+  
+  const generateRandomRobotImage = async () => {
+	  // Replace 'robohash.org' with 'robohash.io' if you prefer the newer version.
+	  const text = Math.random().toString(36).substring(2);
+	  const baseUrl = 'https://robohash.org/';
+	  const imageUrl = `${baseUrl}${text}.png`;
+	  l('New profile robot imageUrl:', imageUrl);
+	  setImageUri(imageUrl);
+	  return imageUrl;
+	};
+
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -37,7 +49,7 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
         iconColor={MD3Colors.neutral90}
         style={styles.photoIcon}
         size={30}
-        onPress={pickImage}
+        onPress={generateRandomRobotImage}
       />)}
     </View>
     

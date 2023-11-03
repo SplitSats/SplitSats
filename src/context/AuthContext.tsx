@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useContext, useEffect,useState } from 'react'
+import { store } from '@store'
+import { STORE_KEYS } from '@store/consts'
+
 
 const AuthContext = createContext()
 
@@ -9,7 +12,7 @@ export function AuthProvider({ children }) {
 	useEffect(() => {
 		// Check AsyncStorage for the user's login status
 		const checkLoginStatus = async () => {
-			const loggedIn = await AsyncStorage.getItem('userIsLoggedIn')
+			const loggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
 			setUserIsLoggedIn(!!loggedIn) // Convert to boolean
 		}
 

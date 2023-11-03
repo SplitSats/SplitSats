@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Button, Image, StyleSheet, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { IconButton, MD3Colors } from "react-native-paper";
+import axios from "axios";
+
 
 type BannerUploadComponentProps = {
   imageUri: string | null;
@@ -11,7 +13,8 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
   imageUri,
   setImageUri,
 }) => {
-    
+  
+  
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,6 +32,19 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
     
   };
   
+  const getRandomBannerImage = async () => {
+    const url = 'https://source.unsplash.com/random/800x200';
+    try {
+      await axios.get(url).then((response) => {
+        setImageUri(response.request.responseURL);
+      });
+    } catch (error) { 
+      console.error('Error fetching random banner image:', error)
+    }
+
+  };
+  
+
   return (
     
   <View style={styles.BannerContainer}> 
@@ -40,22 +56,13 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
         style={styles.BannerIcon}
         iconColor={MD3Colors.neutral90}
         size={60}
-        onPress={pickImage}
+        onPress={getRandomBannerImage}
       />)}
   </View>
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    flex: 0,
-    width: "100%",
-    height: 130,
-    backgroundColor: "#333A4A",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    marginBottom: 80,
-    marginTop: 20,
-  },
+  
   BannerContainer: {
     width: "100%",
     height: 80,
@@ -65,6 +72,10 @@ const styles = StyleSheet.create({
   BannerIcon: {
     paddingTop: 10,
     alignSelf: "center",
+    width: 90,
+    height: 90,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

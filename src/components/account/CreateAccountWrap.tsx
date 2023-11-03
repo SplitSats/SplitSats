@@ -1,23 +1,51 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { IProfileContent } from '@src/model/nostr'
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
+import { store } from '@store'
+import { STORE_KEYS } from '@store/consts'
+import { truncateNpub } from '@nostr/util'
+
 
 const CreateAccountWrap = ({ userProfile }) => {
   
 	const [userInputs, setUserProfile] = useState<IProfileContent>(userProfile);
+	const [userNpub, setUserNpub] = useState('');
+
+  useEffect(() => {
+    const fetchUserNpub = async () => {
+      try {
+        const userNpub = await store.get(STORE_KEYS.npub);
+        if (!userNpub){
+          console.log('UserPublicKey not found in local storage')
+        }
+        const truncatedNpub = truncateNpub(userNpub);
+        setUserNpub(truncatedNpub || 'npbu....');
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      }
+    }
+    fetchUserNpub()
+  }
+  , [])
+
 
   return (
       <View>
         <View style={styles.photoContainer} >
-          <Image source={{ uri: userInputs.bannerImage }} style={styles.bannerImage} />
-          <Image source={{ uri: userInputs.profileImage }} style={styles.profileImage} />
+
+          {userInputs.banner ? (
+            <Image source={{ uri: userInputs.banner }} style={styles.bannerImage} />
+          ) : (
+            <Image source={require('@assets/logo/Splitsats_name_W.png')} style={styles.bannerImage} />
+          )}
+          <Image source={{ uri: userInputs.picture }} style={styles.profileImage} />
         </View>
-          <Text style={styles.noteText}>{userInputs.name}  {userInputs.username}</Text>
-          <Text style={styles.noteText}>npbu....</Text>
-          <Text style={styles.noteText}>{userInputs.email}</Text>
-          <Text style={styles.noteText}>{userInputs.description}</Text>
+          <Text style={styles.noteText}>{userInputs.username}</Text>
+          <Text style={styles.noteText}>{userNpub}</Text>
+          <Text style={styles.noteText}>{userInputs.lud16}</Text>
+          <Text style={styles.noteText}>{userInputs.about}</Text>
       </View>
     );
 }  
@@ -49,6 +77,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 60,
     alignSelf: 'flex-start',
+    borderWidth:2,
+    borderColor:'#0F172A'
   },
   noteText: {
     color: 'white',

@@ -5,21 +5,30 @@ import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
 
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-
+import { secureStore, store } from '@store'
+import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
 
 const LogInScreen = ({ navigation }) => {
 	const { setUserIsLoggedIn } = useAuth()
-	const [Nsec, setNsec] = useState('nsec1fea6y6p99mt299zflvtw9m24eun68q3gg7ghqzajrt2w79spflcsmvwe4l')
+	const [Nsec, setNsec] = useState(INIT_KEY)
+	const [nPub, setNpub] = useState('')
 
 	const handleLogIn = async () => {
 		// Perform user authentication logic using the provided private key
 		try {
 			const userPrivateKey = nip19.decode(Nsec).data as string
 			const userPublicKey = getPublicKey(userPrivateKey)
+			const npub = nip19.npubEncode(userPublicKey);
+			await setNpub(npub)
 			// After successful authentication, set the user as logged in
-			await AsyncStorage.setItem('userIsLoggedIn', 'true')
-			await AsyncStorage.setItem('userPrivateKey', userPrivateKey)
-			await AsyncStorage.setItem('userPublicKey', userPublicKey)
+			// Store the private key securely
+			await Promise.all([
+				secureStore.set(SECRET, userPrivateKey),
+			  ])
+			// Store the public key in AsyncStorage
+			await store.set(STORE_KEYS.npubHex, userPublicKey);
+			await store.set(STORE_KEYS.npub, npub);
+			await store.set(STORE_KEYS.userLoggedIn, 'true')
 		}
 		catch (err) {
 			console.log(err)
@@ -46,7 +55,11 @@ const LogInScreen = ({ navigation }) => {
 				/>
 
 			</View>
+
 			<Button title="Log In" style={styles.loginButton} onPress={handleLogIn} />
+
+
+
 		</View>
 	)
 }

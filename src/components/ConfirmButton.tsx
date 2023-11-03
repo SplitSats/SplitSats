@@ -3,10 +3,14 @@ import { Pressable, Text, StyleSheet } from 'react-native';
 import { SECONDARY_COLOR } from '@styles/styles';
 
 
-const ConfirmButton = ({ title, onPress }) => {
+const ConfirmButton = ({ title, onPress, disabled }) => {
   return (
-    <Pressable style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>{title}</Text>
+    <Pressable
+      style={[styles.button, disabled && styles.disabledButton]}
+      onPress={onPress}
+      disabled={disabled}
+    >
+      <Text style={[styles.buttonText, disabled && styles.disabledText]}>{title}</Text>
     </Pressable>
   );
 }
@@ -29,7 +33,14 @@ const styles = StyleSheet.create({
     color: 'black', // Text color
     fontSize: 18, // Adjust the font size as needed
     fontWeight: 'bold', // Adjust the font weight as needed
-  }
+  },
+  disabledButton: {
+    backgroundColor: '#ccc', // You can change the color when the button is disabled
+  },
+  disabledText: {
+    color: '#999', // You can change the text color when the button is disabled
+  },
+
 });
 
 export default ConfirmButton;
