@@ -8,7 +8,7 @@ import GroupsScreen from '@screens/Groups'
 import ContactsScreen from '@screens/Contacts'
 import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
-
+import TabBarIcon from '@comps/nav/TabBarIcon'
 
 // Import your icon components
 const Tab = createBottomTabNavigator()
@@ -19,10 +19,8 @@ const Navigation = () => (
 			name="Groups"
 			component={GroupsScreen}
 			options={{
-				tabBarIcon: () => (
-					// Add your Groups icon component here
-					// <GroupIcon />
-					<View style={{width: 24, height: 24, backgroundColor: 'red'}} />
+				tabBarIcon: ({ focused }) => (
+				  <TabBarIcon name="lightning" focused={focused}/>
 				),
 			}}
 		/>
@@ -30,10 +28,8 @@ const Navigation = () => (
 			name="Friends"
 			component={ContactsScreen}
 			options={{
-				tabBarIcon: () => (
-					// Add your Friends icon component here
-					<View style={{width: 24, height: 24, backgroundColor: 'red'}} />
-
+				tabBarIcon: ({ focused }) => (
+				  <TabBarIcon name="lightning" focused={focused}/>
 				),
 			}}
 		/>
@@ -41,9 +37,8 @@ const Navigation = () => (
 			name="Account"
 			component={AccountScreen}
 			options={{
-				tabBarIcon: () => (
-					// Add your History icon component here
-					<View style={{width: 24, height: 24, backgroundColor: 'red'}} />
+				tabBarIcon: ({ focused }) => (
+				  <TabBarIcon name="lightning" focused={focused}/>
 				),
 			}}
 		/>
@@ -52,9 +47,8 @@ const Navigation = () => (
 			name="History"
 			component={HistoryScreen}
 			options={{
-				tabBarIcon: () => (
-					// Add your History icon component here
-					<View style={{width: 24, height: 24, backgroundColor: 'red'}} />
+				tabBarIcon: ({ focused }) => (
+				  <TabBarIcon name="lightning" focused={focused}/>
 				),
 			}}
 		/>

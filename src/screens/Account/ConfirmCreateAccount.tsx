@@ -93,8 +93,6 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
     // Publish the user profile to Nostr
     await publishNostrProfile(npub, userProfile);
-    // wait for 2 seconds
-    await new Promise(resolve => setTimeout(resolve, 2000));
 		setLoading(false)
 
     // Navigate to the HomeScreen
