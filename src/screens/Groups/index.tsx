@@ -10,12 +10,6 @@ const GroupsScreen = ({ navigation }) => (
       
 		<UserProfile />
       
-		{/* User's groups list */}
-		<View style={styles.groupsList}>
-			{/* List of user's groups */}
-			<Text style={styles.header}>Groups</Text>
-		</View>
-		
 	</View>
 )
 

@@ -1,6 +1,7 @@
 export const STORE_KEYS = {
 	explainer: 'init_skipped',
 	userLoggedIn: 'userLoggedIn',
+	userProfile: 'userProfile',
 	// nostr
 	nostrexplainer: 'nostr_explainer',
 	npub: 'nostr_npub',

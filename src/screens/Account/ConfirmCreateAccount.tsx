@@ -88,14 +88,14 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     await store.set(STORE_KEYS.npubHex, userPublicKey);
     await store.set(STORE_KEYS.npub, npub);
     await store.set(STORE_KEYS.userLoggedIn, 'true')
+    await store.set(STORE_KEYS.userProfile, JSON.stringify(userProfile))
     setUserIsLoggedIn(true);
 
     // Publish the user profile to Nostr
     await publishNostrProfile(npub, userProfile);
+    // wait for 2 seconds
+    await new Promise(resolve => setTimeout(resolve, 2000));
 		setLoading(false)
-
-    // Save the user profile to AsyncStorage
-    await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
 
     // Navigate to the HomeScreen
     navigation.replace('Groups');
