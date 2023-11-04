@@ -15,6 +15,7 @@ import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import Navigation from '@src/navigation/MyBottomTabNavigation'
+import FinalConfirmation from '@screens/Account/FinalConfirmation'
 
 
 const Stack = createNativeStackNavigator()
@@ -34,6 +35,7 @@ export default function App() {
 						<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
 						<Stack.Screen name="LogIn" component={LogInScreen} /> 
 						<Stack.Screen name="Groups" component={GroupsScreen} />
+						<Stack.Screen name="AccountCreated" component={FinalConfirmation}/>
 						<Stack.Screen name="Contacts" component={ContactsScreen} />
 						<Stack.Screen name="History" component={HistoryScreen} />
 						<Stack.Screen name="Account" component={AccountScreen} />
