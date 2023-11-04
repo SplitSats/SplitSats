@@ -88,6 +88,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     await store.set(STORE_KEYS.npubHex, userPublicKey);
     await store.set(STORE_KEYS.npub, npub);
     await store.set(STORE_KEYS.userLoggedIn, 'true')
+    await AsyncStorage.setItem('userIsLoggedIn', 'true')
     await store.set(STORE_KEYS.userProfile, JSON.stringify(userProfile))
     setUserIsLoggedIn(true);
 

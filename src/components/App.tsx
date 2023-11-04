@@ -14,6 +14,7 @@ import ContactsScreen from '@screens/Contacts'
 import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
+import Navigation from '@src/navigation/MyBottomTabNavigation'
 
 
 const Stack = createNativeStackNavigator()
@@ -24,6 +25,8 @@ export default function App() {
 		<NavigationContainer>
 			<NDKProvider>
 				<AuthProvider> 
+					{/* <Navigation /> */}
+					
 					<Stack.Navigator initialRouteName="Loading">
 						<Stack.Screen name="Loading" component={LoadingScreen} />
 						<Stack.Screen name="Authentication" component={AuthenticationScreen} />

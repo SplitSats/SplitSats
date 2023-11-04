@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Button, Image, StyleSheet, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { IconButton, MD3Colors } from "react-native-paper";
@@ -24,6 +24,11 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 	  return imageUrl;
 	};
 
+  useEffect(() => {
+    generateRandomRobotImage();
+  }
+  , []);
+  
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({

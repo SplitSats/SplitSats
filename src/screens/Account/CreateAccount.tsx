@@ -46,7 +46,6 @@ const CreateAccountScreen = ({ navigation }) => {
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
 
-		{/* <View style={styles.container}> */}
 			<Text style={styles.title}>NEW ACCOUNT</Text>
 			<View style={styles.containerPhotos}>
       			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
@@ -89,7 +88,6 @@ const CreateAccountScreen = ({ navigation }) => {
 				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
 			/>
 			<ConfirmButton title="NEXT" onPress={handleNextButton} />
-		{/* </View> */}
 		</ScrollView>
 		
 	)

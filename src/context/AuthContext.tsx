@@ -12,7 +12,8 @@ export function AuthProvider({ children }) {
 	useEffect(() => {
 		// Check AsyncStorage for the user's login status
 		const checkLoginStatus = async () => {
-			const loggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
+			const loggedIn = await AsyncStorage.getItem('userIsLoggedIn')
+			// const loggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
 			setUserIsLoggedIn(!!loggedIn) // Convert to boolean
 		}
 

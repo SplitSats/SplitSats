@@ -34,12 +34,12 @@ const AuthenticationScreen = ({ navigation }) => {
 				</View>
 				<View style={styles.buttonsContainer}>
 					<AuthButton
-						label="Create Account"
+						label="CREATE ACCOUNT"
 						description="Your new account will be ready in seconds."
 						onPress={() => navigation.navigate('CreateAccount')}
 					/>
 					<AuthButton
-						label="Log In"
+						label="SIGN IN"
 						description="Sign in using your Nostr Key!"
 						onPress={() => navigation.navigate('LogIn')}
 					/>

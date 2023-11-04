@@ -10,7 +10,7 @@ import Navigation from '@src/navigation/MyBottomTabNavigation'
 const GroupsScreen = ({ navigation }) => (
 	<View style={styles.mainView}>
       
-		<UserProfile />
+		<UserProfile dataStore={'nostr'}/>
 
 	{/* <Navigation /> */}
 
