@@ -45,9 +45,10 @@ const UserProfile = ({ dataStore }) => {
 						err('User profile not found');
 					}
 					await setUserProfile(JSON.parse(storedUserProfile));
-				} else if (dataStore === 'storage') {
+				} else if (dataStore === 'store') {
 					// Use AsyncStorage
-					const storedUserProfile = await AsyncStorage.getItem('userProfile');
+					const storedUserProfile = await store.getItem(STORE_KEYS.userProfile);
+					// const storedUserProfile = await AsyncStorage.getItem('userProfile');
 					l('Stored user profile:', storedUserProfile);
 					if (!storedUserProfile) {
 						err('User profile not found');

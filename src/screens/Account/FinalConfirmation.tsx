@@ -1,34 +1,55 @@
-import React, { useState } from "react";
-import CreateAccountWrap from "@comps/CreateAccountWrap";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, Button} from "react-native";
 import { PRIMARY_COLOR } from "@styles/styles";
 import { IconButton } from 'react-native-paper';
 import * as Clipboard from 'expo-clipboard'
 import Checkbox from 'expo-checkbox';
+import CreateAccountWrap from "@comps/account/CreateAccountWrap";
+import { SECRET, STORE_KEYS } from '@store/consts';
+import { store, secureStore } from "@store";
+import ConfirmButton from '@comps/ConfirmButton';
+import { nip19 } from 'nostr-tools';
 
 
-
-
-const FinalConfirmation = ({ navigation }) => {
-  //Hardcode the properties just for test
+const FinalConfirmation = ({ navigation, route }) => {
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [isCheckboxChecked, setCheckboxChecked] = useState(false);
-  const privateKey = "npub1jvwer7w272as2eaneruv3pg8h";
-  const publicKey = "npub1jvwer7w272as2eaneruv3pg8h";
+  const { userProfile } = route.params;
+  const [npub, setNpub] = useState("");
+  const [nsec, setNsec] = useState("");
+  
 
   const copyPublicKeyToClipboard = async() => {
-    await Clipboard.setStringAsync(publicKey);
+    await Clipboard.setStringAsync(npub);
+    alert('Public key copied to clipboard');
   };
 
+  const copyPrivateKeyToClipboard = async() => {
+    await Clipboard.setStringAsync(nsec);
+    alert('Private key copied to clipboard');
+  };
 
+  useEffect(() => {
+    const fetchKeys = async () => {
+      const userPrivateKey = await secureStore.get(SECRET);
+      const nsec = nip19.nsecEncode(userPrivateKey);
+      setNsec(nsec);
+      const npub = await store.get(STORE_KEYS.npub);
+      setNpub(npub);
+    };
+    fetchKeys();
+  }, []);
 
-
+  const handleAddFriends = () => {
+    navigation.navigate("Groups");
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>ACCOUNT CREATED</Text>
       <View style={styles.cardContainer}>
-        <CreateAccountWrap />
+        <CreateAccountWrap userProfile={userProfile} />
+
         <View style={styles.checkOverlay}>
           <Image
             source={require("@assets/logo/Splitsats_Logo_B.png")}
@@ -47,14 +68,15 @@ const FinalConfirmation = ({ navigation }) => {
       {/* Private Key */}
       <Text style={styles.keyLabel}>Private key</Text>
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>{showPrivateKey ? privateKey : '*'.repeat(privateKey.length)}</Text>
+        <Text style={styles.keyText}>{showPrivateKey ? nsec : '*'.repeat(nsec.length)}</Text>
         <IconButton icon={showPrivateKey ? "eye-off" : "eye"} onPress={() => setShowPrivateKey(!showPrivateKey)} />
+        <IconButton icon="content-copy" onPress={copyPrivateKeyToClipboard} />
       </View>
 
       {/* Public Key */}
       <Text style={styles.keyLabel}>Public key</Text>
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>{publicKey}</Text>
+        <Text style={styles.keyText}>{npub}</Text>
         <IconButton icon="content-copy" onPress={copyPublicKeyToClipboard} />
       </View>
 
@@ -63,10 +85,12 @@ const FinalConfirmation = ({ navigation }) => {
         <Checkbox value={isCheckboxChecked} onValueChange={setCheckboxChecked} />
         <Text style={styles.textCheckBox}>I've backed up my Private key</Text>
       </View> 
-
-      {/* Add Friends Button */}
-      <Button title="ADD FRIENDS" disabled={!isCheckboxChecked} onPress={() => {/* handle add friends logic here */}} />
-
+      <ConfirmButton
+          title="ADD FRIENDS"
+          onPress={handleAddFriends}
+          disabled={!isCheckboxChecked} // Disable the button when loading
+      />
+      
     </View>
   );
 };

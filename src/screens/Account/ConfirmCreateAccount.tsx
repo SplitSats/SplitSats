@@ -82,7 +82,6 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     // Store the private key securely
     await Promise.all([
       secureStore.set(SECRET, userPrivateKey),
-      
     ])
     // Store the public key in AsyncStorage
     await store.set(STORE_KEYS.npubHex, userPublicKey);
@@ -96,8 +95,8 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     await publishNostrProfile(npub, userProfile);
 		setLoading(false)
 
-    // Navigate to the HomeScreen
-    navigation.replace('Groups');
+		navigation.replace('FinalConfirmation', { userProfile })
+
   };
 
   return (
