@@ -5,3 +5,5 @@ export const RELAYS: string[] = [
 	'wss://relay.damus.io',
 	'wss://purplepag.es'
 ]
+
+export const STORAGE = 'sqlite'

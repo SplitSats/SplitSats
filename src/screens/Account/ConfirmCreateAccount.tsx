@@ -89,6 +89,8 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     await store.set(STORE_KEYS.userLoggedIn, 'true')
     await AsyncStorage.setItem('userIsLoggedIn', 'true')
     await store.set(STORE_KEYS.userProfile, JSON.stringify(userProfile))
+    await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile))
+
     setUserIsLoggedIn(true);
 
     // Publish the user profile to Nostr

@@ -5,17 +5,14 @@ import { Button, Image, StyleSheet,Text, View } from 'react-native'
 import { styles } from '@styles/styles'
 import UserProfile from '@comps/account/UserProfile'
 import Navigation from '@src/navigation/MyBottomTabNavigation'
-
+import { STORAGE } from '@src/consts/config'
 
 const GroupsScreen = ({ navigation }) => (
 	<View style={styles.mainView}>
       
-		<UserProfile dataStore={'store'}/>
-
-	{/* <Navigation /> */}
-
+		<UserProfile dataStore={STORAGE}/>
+		{/* <Navigation/> */}
 	</View>
-
 
 )
 

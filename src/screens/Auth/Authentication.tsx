@@ -13,7 +13,9 @@ const AuthenticationScreen = ({ navigation }) => {
   
 	useEffect(() => {
 		const checkLoginStatus = async () => {
-			const userLoggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
+			// const userLoggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
+			const userLoggedIn = AsyncStorage.getItem('userIsLoggedIn')
+			
 			if (userLoggedIn === 'true') {
 				console.log('User logged in')
 				navigation.navigate('Groups')

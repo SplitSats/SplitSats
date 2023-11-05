@@ -10,13 +10,13 @@ import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
 import ConfirmButton from '@comps/ConfirmButton'
 import { ActivityIndicator } from 'react-native';
 import { l } from '@log';
-
+import { useNavigation } from '@react-navigation/native';
 
 const LogInScreen = ({ navigation }) => {
 	const { setUserIsLoggedIn } = useAuth()
 	const [Nsec, setNsec] = useState(INIT_KEY)
 	const [loading, setLoading] = useState(false); 
-	
+	// const navigation = useNavigation();
 	const handleLogIn = async () => {
 		// Perform user authentication logic using the provided private key
 		setLoading(true)
@@ -25,7 +25,7 @@ const LogInScreen = ({ navigation }) => {
 			const userPrivateKey = nip19.decode(Nsec).data as string
 			const userPublicKey = getPublicKey(userPrivateKey)
 			const npub = nip19.npubEncode(userPublicKey);
-			l('User npub:', npub)
+			l('Login user npub:', npub)
 			// After successful authentication, set the user as logged in
 			// Store the private key securely
 			await Promise.all([
@@ -36,7 +36,6 @@ const LogInScreen = ({ navigation }) => {
 			// await store.set(STORE_KEYS.npub, npub);
 			// await store.set(STORE_KEYS.userLoggedIn, 'true')
 			await AsyncStorage.setItem('userIsLoggedIn', 'true')
-			await AsyncStorage.setItem('userPrivateKey', userPrivateKey)
 			await AsyncStorage.setItem('userPublicKey', userPublicKey)
 		}
 		catch (err) {
@@ -47,7 +46,9 @@ const LogInScreen = ({ navigation }) => {
 		setUserIsLoggedIn(true)
 		setLoading(false)
 		// Navigate to the HomeScreen
-		navigation.replace('Groups')
+		// navigation.navigate('Home', { screen: 'Groups' });
+		navigation.navigate('Groups');
+		
 	}
 
 	return (
