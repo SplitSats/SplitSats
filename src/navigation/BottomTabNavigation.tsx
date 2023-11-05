@@ -26,62 +26,20 @@ function BottomTabBar({ navigation, state }) {
 		  <BottomNavigationTab icon={(props) => <Icon {...props} name="home-outline" />} />
 		  <BottomNavigationTab icon={(props) => <Icon {...props} name="bell-outline" />} />
 		  <BottomNavigationTab icon={(props) => <Icon {...props} name="settings-outline" />} />
-		  <BottomNavigationTab icon={(props) => <Icon {...props} name="add" />} />
 		  <BottomNavigationTab icon={(props) => <Icon {...props} name="history" />} />
 		</BottomNavigation>
 	  </>
 	)
   }
-
-  
-export function BottomTabNavigator() {
+  export function BottomTabNavigator() {
 	return (
-	<Navigator tabBar={(props) => <BottomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-		<Screen
-			name="Groups"
-			component={GroupsScreen}
-			// options={{
-			// 	tabBarIcon: ({ focused }) => (
-			// 	  <TabBarIcon name="lightning" focused={focused}/>
-			// 	),
-			// }}
-		/>
-		<Screen
-			name="Friends"
-			component={ContactsScreen}
-			// options={{
-			// 	tabBarIcon: ({ focused }) => (
-			// 	  <TabBarIcon name="lightning" focused={focused}/>
-			// 	),
-			// }}
-		/>
-		<Screen
-			name="Add"
-			component={GroupsScreen}
-			// options={{
-			// 	tabBarIcon: ({ focused }) => (
-			// 		<TabBarIcon name="lightning" focused={focused}/>
-			// 	),
-			// }}
-		/>
-		<Screen
-			name="History"
-			component={HistoryScreen}
-			// options={{
-			// 	tabBarIcon: ({ focused }) => (
-			// 	  <TabBarIcon name="lightning" focused={focused}/>
-			// 	),
-			// }}
-		/>
-		<Screen
-			name="Account"
-			component={AccountScreen}
-			// options={{
-			// 	tabBarIcon: ({ focused }) => (
-			// 	  <TabBarIcon name="lightning" focused={focused}/>
-			// 	),
-			// }}
-		/>
-	</Navigator>
-	)
-}
+    <Navigator tabBar={(props) => <BottomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+
+		<Screen name="Groups" component={GroupsScreen} />
+		<Screen name="Friends" component={ContactsScreen} />
+		<Screen name="History" component={HistoryScreen} />
+		<Screen name="Account" component={AccountScreen} />
+	  </Navigator>
+	);
+  }
+  
