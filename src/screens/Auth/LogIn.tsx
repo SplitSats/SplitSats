@@ -5,20 +5,37 @@ import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
 
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-
+import { secureStore, store } from '@store'
+import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
+import ConfirmButton from '@comps/ConfirmButton'
+import { ActivityIndicator } from 'react-native';
+import { l } from '@log';
+import { useNavigation } from '@react-navigation/native';
 
 const LogInScreen = ({ navigation }) => {
 	const { setUserIsLoggedIn } = useAuth()
-	const [Nsec, setNsec] = useState('nsec1fea6y6p99mt299zflvtw9m24eun68q3gg7ghqzajrt2w79spflcsmvwe4l')
-
+	const [Nsec, setNsec] = useState(INIT_KEY)
+	const [loading, setLoading] = useState(false); 
+	// const navigation = useNavigation();
 	const handleLogIn = async () => {
 		// Perform user authentication logic using the provided private key
+		setLoading(true)
+		l('LogInScreen handleLogIn')
 		try {
 			const userPrivateKey = nip19.decode(Nsec).data as string
 			const userPublicKey = getPublicKey(userPrivateKey)
+			const npub = nip19.npubEncode(userPublicKey);
+			l('Login user npub:', npub)
 			// After successful authentication, set the user as logged in
+			// Store the private key securely
+			await Promise.all([
+				secureStore.set(SECRET, userPrivateKey),
+			  ])
+			// Store the public key in AsyncStorage
+			// await store.set(STORE_KEYS.npubHex, userPublicKey);
+			// await store.set(STORE_KEYS.npub, npub);
+			// await store.set(STORE_KEYS.userLoggedIn, 'true')
 			await AsyncStorage.setItem('userIsLoggedIn', 'true')
-			await AsyncStorage.setItem('userPrivateKey', userPrivateKey)
 			await AsyncStorage.setItem('userPublicKey', userPublicKey)
 		}
 		catch (err) {
@@ -27,9 +44,11 @@ const LogInScreen = ({ navigation }) => {
 		}
     
 		setUserIsLoggedIn(true)
-
+		setLoading(false)
 		// Navigate to the HomeScreen
-		navigation.replace('Groups')
+		// navigation.navigate('Home', { screen: 'Groups' });
+		navigation.navigate('Groups');
+		
 	}
 
 	return (
@@ -46,7 +65,12 @@ const LogInScreen = ({ navigation }) => {
 				/>
 
 			</View>
-			<Button title="Log In" style={styles.loginButton} onPress={handleLogIn} />
+			<ConfirmButton
+				title="PASTE YOUR KEY"
+				onPress={handleLogIn}
+				disabled={loading} // Disable the button when loading
+    		/>
+      		{loading && <ActivityIndicator size="large" color="#0000ff" />} 
 		</View>
 	)
 }

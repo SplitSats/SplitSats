@@ -4,13 +4,18 @@ import { Image,Text, View } from 'react-native'
 
 import { styles } from '@styles/styles'
 import AuthButton from '@comps/ButtonAuth'
+import { l } from '@log'
+import { store } from '@store'
+import { STORE_KEYS } from '@store/consts'
 
 const AuthenticationScreen = ({ navigation }) => {
 	const [userLoggedIn, setUserLoggedIn] = useState(null)
   
 	useEffect(() => {
 		const checkLoginStatus = async () => {
-			const userLoggedIn = await AsyncStorage.getItem('userIsLoggedIn')
+			// const userLoggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
+			const userLoggedIn = AsyncStorage.getItem('userIsLoggedIn')
+			
 			if (userLoggedIn === 'true') {
 				console.log('User logged in')
 				navigation.navigate('Groups')
@@ -23,7 +28,7 @@ const AuthenticationScreen = ({ navigation }) => {
 	}, [])
 	console.log('User logged in:', userLoggedIn)
 	if (!userLoggedIn || userLoggedIn === 'false') {
-		// User is logged in
+		// User is not logged in
 		return (
 			<View style={styles.mainView}>
 				<View style={styles.logoContainer}>
@@ -31,12 +36,12 @@ const AuthenticationScreen = ({ navigation }) => {
 				</View>
 				<View style={styles.buttonsContainer}>
 					<AuthButton
-						label="Create Account"
+						label="CREATE ACCOUNT"
 						description="Your new account will be ready in seconds."
 						onPress={() => navigation.navigate('CreateAccount')}
 					/>
 					<AuthButton
-						label="Log In"
+						label="SIGN IN"
 						description="Sign in using your Nostr Key!"
 						onPress={() => navigation.navigate('LogIn')}
 					/>

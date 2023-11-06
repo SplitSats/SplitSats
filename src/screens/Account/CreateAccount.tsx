@@ -1,91 +1,109 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
-import React, { useState } from 'react'
-import { Button, Image, StyleSheet,Text, TextInput, View } from 'react-native'
-
+import React, { useContext, useState } from 'react'
+import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
+import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import AddImageButton from '@comps/ButtonAddImage'
-
-
-// Define the user profile interface
-interface UserProfile {
-  name: string;
-  nip05: string;
-  lud16: string;
-}
-
+import { IProfileContent } from '@src/model/nostr';
+import { l } from '@log';
+import BannerUploadComponent from '@comps/BannerUploadComponent'
+import ConfirmButton from '@comps/ConfirmButton'
 
 const CreateAccountScreen = ({ navigation }) => {
-	const { setUserIsLoggedIn } = useAuth()
-	const [username, setUsername] = useState('')
-	const [privateKey, setPrivateKey] = useState('')
-	const [publicKey, setPublicKey] = useState('')
-	const [userProfile, setUserProfile] = useState<UserProfile>({
-		name: 'walter',
-		nip05: 'walter@nostr.com',
-		lud16: 'wally@getalby.com',
-	})
 
+	const [bannerImageUri, setBannerImageUri] = useState('');
+  	const [profileImageUri, setProfileImageUri] = useState('');
+	
 
-	const handleCreateAccount = async () => {
-		// Generate a private key for the user
-		const userPrivateKey = generatePrivateKey()  
-		const nsec = nip19.nsecEncode(userPrivateKey)
-		// Extract the public key from the private key
-		const userPublicKey = getPublicKey(userPrivateKey)
-		const npub = nip19.npubEncode(userPublicKey)
-		console.log('userPrivateKey:', nsec)
-		console.log('userPublicKey:', npub)
-    
-		// Store the private key securely, such as in AsyncStorage
-		await AsyncStorage.setItem('userPrivateKey', userPrivateKey)
-		await AsyncStorage.setItem('userPublicKey', userPublicKey)
-		await AsyncStorage.setItem('userIsLoggedIn', 'true')
-		setUserIsLoggedIn(true)
+	const initialProfile: IProfileContent = {
+		about: 'A new SplitSats User',
+		banner: '',
+		displayName: 'SplitSats User',
+		lud06: 'LNURL',
+		lud16: 'splitsats@getalby.com',
+		name: 'splitsats',
+		nip05: 'splitsats@nostr.com',
+		picture: '',
+		username: 'splitsats01',
+		website: '',
+	};
 
-		// Publish the user profile to Nostr
-		updateNostrProfile(publicKey, userProfile) // Call the updateNostrProfile function
-
-		// Navigate to the HomeScreen
-		navigation.replace('Groups')
+	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
+	
+	const handleNextButton = async () => {
+		// Set the banner and profile images in the user profile
+		userProfile.banner = bannerImageUri;
+		userProfile.picture = profileImageUri;
+		
+		l('User profile create Account:', userProfile)
+		navigation.replace('ConfirmCreateAccount', { userProfile })
 	}
-
+	
+	l("CreateAccountScreen")
+	
 	return (
-		<View style={styles.container}>
+		<ScrollView contentContainerStyle={styles.container}>
+
 			<Text style={styles.title}>NEW ACCOUNT</Text>
-			<AddImageButton/>
+			<View style={styles.containerPhotos}>
+      			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
+				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
+      
+			</View>
+			<Text style={styles.label}>USERNAME*</Text>
 			<TextInput
 				style={styles.input}
-				placeholder={username}
-				value={username}
-				onChangeText={setUsername}
+				placeholder={userProfile.username}
+				value={userProfile.username}
+				onChangeText={(text) => setUserProfile({ ...userProfile, username: text })} // Update the UserProfile on input change
 			/>
+			<Text style={styles.label}>DISPLAY NAME</Text>
 			<TextInput
 				style={styles.input}
-				placeholder={userProfile.lud16}
-				value={userProfile.lud16} // Display the name from the UserProfile
+				placeholder={userProfile.name}
+				value={userProfile.name} // Display the name from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
 			/>
+			<Text style={styles.label}>LN URL</Text>
 			<TextInput
 				style={styles.input}
 				placeholder={userProfile.lud16}
 				value={userProfile.lud16} // Display the LN Address from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, lud16: text })} // Update the UserProfile on input change
 			/>
+			<Text style={styles.label}>NOSTR VERIFICATION (NIP05)</Text>
 			<TextInput
 				style={styles.input}
 				placeholder={userProfile.nip05}
 				value={userProfile.nip05} // Display the NIP05 from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, nip05: text })} // Update the UserProfile on input change
 			/>
-			<Button title="Create Account" style={styles.createAccountButton} onPress={handleCreateAccount} />
-		</View>
+			<Text style={styles.label}>ABOUT ME</Text>
+			<TextInput
+				style={styles.input}
+				placeholder={userProfile.about}
+				value={userProfile.about} // Display the ABOUT ME from the UserProfile
+				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
+			/>
+			<ConfirmButton title="NEXT" onPress={handleNextButton} />
+		</ScrollView>
+		
 	)
 }
 
 const styles = StyleSheet.create({
+	containerPhotos: {
+		flex: 0,
+		width:'100%',
+		height:130,
+		backgroundColor: '#333A4A',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		marginBottom: 80,
+		marginTop:20,
+	  },
 	container: {
 		flex: 1,
 		backgroundColor: PRIMARY_COLOR,
@@ -97,32 +115,36 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: 'white',
 	},
-	photoContainer: {
-		marginBottom: 20,
-	},
-	photoIcon: {
-		width: 80,
-		height: 80,
-		borderRadius: 40,
-		backgroundColor: 'light gray', // Replace with your desired background color
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 	input: {
 		width: '80%',
 		height: 40,
 		color: 'white',
-		borderWidth: 2,
-		borderColor: SECONDARY_COLOR, // Replace with your secondary color
+		backgroundColor: '#333A4A',
 		borderRadius: 10,
 		padding: 10,
-		marginBottom: 20,
+		marginBottom: 10,
 	},
-	createAccountButton: {
-		backgroundColor: SECONDARY_COLOR, // Replace with your secondary color
-		color: 'white',
-		borderRadius: 10,
+	label: {
+		alignSelf: 'flex-start',  // Aligns text to the left
+		marginLeft: '10%',
+		color: '#B0B0B0',
+		marginBottom: 8,  // Adjust as per spacing required between label and input
 	},
+	button: {
+		position: 'absolute',
+		borderRadius: 25,
+		backgroundColor: '#3282B8', // Background color of the button
+		width: '80%',
+		height: 50,
+		alignSelf: 'center',
+		overflow: 'hidden',
+		bottom: 20,
+		justifyContent: 'center', // Center vertically
+		alignItems: 'center', // Center horizontally
+		color: '#000000', // Text color
+	}
+
+	  
 })
 
 export default CreateAccountScreen

@@ -22,6 +22,8 @@ const fn: ConfigFunction = (api: ConfigAPI): TransformOptions => {
 					'@wallet': './src/wallet',
 					'@db': './src/storage/db',
 					'@util': './src/util',
+					'@redux': './src/redux',
+					'@hooks': './src/hooks',
 					'@modal': './src/components/modal',
 					'@store': './src/storage/store',
 					'@consts': './src/consts',

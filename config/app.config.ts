@@ -58,18 +58,19 @@ const config: ExpoConfig = {
 	version: `${version}${!IS_PROD ? `-${_appVariant}` : ''}`,
 	scheme: 'cashu',
 	orientation: 'portrait',
-	icon: './assets/icon.png',
+	icon: './assets/logo/Splitsats_Logo_W.png',
 	userInterfaceStyle: 'automatic',
 	splash: {
-		image: './assets/splash.png',
+		image: './assets/logo/Splitsats-nobg_B.png',
 		resizeMode: 'contain',
-		backgroundColor: '#5DB075'
+		backgroundColor: '#FFFFFF'
 	},
 	assetBundlePatterns: ['**/*'],
 	plugins: [
 		'expo-localization',
 		['expo-barcode-scanner', { cameraPermission }],
 		['expo-camera', { cameraPermission }],
+		["expo-image-picker", { "photosPermission": "The app accesses your photos to let you share them with your friends." }],
 		'sentry-expo',
 		'expo-updates'
 	],
@@ -95,7 +96,7 @@ const config: ExpoConfig = {
 		favicon: './assets/favicon.png'
 	},
 	extra: {
-		eas: { projectId: '3f48ee8a-fdef-479b-8503-77b50fdde22f' },
+		eas: { projectId: '5816ef53-b3c2-4139-8278-70faaeec8980' },
 		DEBUG: process?.env?.DEBUG,
 		APP_VARIANT: _appVariant,
 		NODE_ENV: process?.env?.NODE_ENV,
@@ -117,7 +118,7 @@ const config: ExpoConfig = {
 	},
 	updates: {
 		enabled: false,
-		url: 'https://u.expo.dev/3f48ee8a-fdef-479b-8503-77b50fdde22f'
+		url: 'https://u.expo.dev/5816ef53-b3c2-4139-8278-70faaeec8980'
 	},
 	runtimeVersion: {
 		policy: 'sdkVersion'
