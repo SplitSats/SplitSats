@@ -13,7 +13,6 @@ const initialState: IProfileContent = {
 	picture='',
 	username='',
 	website='',
-};
 
 const userSlice = createSlice({
   name: "user",
@@ -21,6 +20,7 @@ const userSlice = createSlice({
   reducers: {
     // temp reducer
     updateUser: (state, action: PayloadAction<Partial<IProfileContent>>) => {
+
       return { ...state, ...action.payload };
     },
   },
