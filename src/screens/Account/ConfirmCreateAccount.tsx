@@ -14,7 +14,6 @@ import ConfirmButton from '@comps/ConfirmButton';
 import { SECRET, STORE_KEYS } from '@store/consts';
 import { ActivityIndicator } from 'react-native';
 
-
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
   const { setUserIsLoggedIn } = useAuth();
   const ndk = useNDK();

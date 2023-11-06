@@ -15,7 +15,9 @@ import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
-import { BottomTabNavigator } from '@src/navigation/BottomTabNavigation'
+
+import Navigation from '@src/navigation/MyBottomTabNavigation'
+
 
 const Stack = createNativeStackNavigator()
 
@@ -33,10 +35,20 @@ export default function App() {
 							<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
 							<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
 							<Stack.Screen name="LogIn" component={LogInScreen} /> 
-							<Stack.Screen name="Groups" component={GroupsScreen} />
+							<Stack.Screen
+								name="Groups"
+								component={Navigation}
+								options={{ headerShown: false }} // Usually, you hide the header for the bottom tab navigator
+								/>
+							{/* <Stack.Screen name="Groups" component={GroupsScreen} />
 							<Stack.Screen name="Contacts" component={ContactsScreen} />
 							<Stack.Screen name="History" component={HistoryScreen} />
 							<Stack.Screen name="Account" component={AccountScreen} /> 
+							<Stack.Screen
+								name="MainApp"
+								component={Navigation}
+								options={{ headerShown: false }} // Usually, you hide the header for the bottom tab navigator
+								/> */}
 						</Stack.Navigator>
 					{/* </SafeAreaView> */}
 				</AuthProvider>
