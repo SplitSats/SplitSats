@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import CreateAccountWrap from "@comps/CreateAccountWrap";
-import { View, Text, StyleSheet, Image, Button} from "react-native";
+import { View, Text, StyleSheet, Image, Button } from "react-native";
 import { PRIMARY_COLOR } from "@styles/styles";
-import { IconButton } from 'react-native-paper';
-import * as Clipboard from 'expo-clipboard'
-import Checkbox from 'expo-checkbox';
-
-
-
+import { IconButton } from "react-native-paper";
+import * as Clipboard from "expo-clipboard";
+import Checkbox from "expo-checkbox";
 
 const FinalConfirmation = ({ navigation }) => {
   //Hardcode the properties just for test
@@ -16,13 +13,9 @@ const FinalConfirmation = ({ navigation }) => {
   const privateKey = "npub1jvwer7w272as2eaneruv3pg8h";
   const publicKey = "npub1jvwer7w272as2eaneruv3pg8h";
 
-  const copyPublicKeyToClipboard = async() => {
+  const copyPublicKeyToClipboard = async () => {
     await Clipboard.setStringAsync(publicKey);
   };
-
-
-
-
 
   return (
     <View style={styles.container}>
@@ -40,15 +33,20 @@ const FinalConfirmation = ({ navigation }) => {
       <Text style={styles.title}>Nostr account successfully created!</Text>
       {/* Emojis and Info Text */}
       <Text style={styles.noteText}>
-        🔑 Your keys are stored locally. {'\n'}
-        ❗ REMEMBER TO SECURELY SAVE YOUR KEYS AND BACKUP THEM!
+        🔑 Your keys are stored locally. {"\n"}❗ REMEMBER TO SECURELY SAVE YOUR
+        KEYS AND BACKUP THEM!
       </Text>
 
       {/* Private Key */}
       <Text style={styles.keyLabel}>Private key</Text>
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>{showPrivateKey ? privateKey : '*'.repeat(privateKey.length)}</Text>
-        <IconButton icon={showPrivateKey ? "eye-off" : "eye"} onPress={() => setShowPrivateKey(!showPrivateKey)} />
+        <Text style={styles.keyText}>
+          {showPrivateKey ? privateKey : "*".repeat(privateKey.length)}
+        </Text>
+        <IconButton
+          icon={showPrivateKey ? "eye-off" : "eye"}
+          onPress={() => setShowPrivateKey(!showPrivateKey)}
+        />
       </View>
 
       {/* Public Key */}
@@ -60,13 +58,22 @@ const FinalConfirmation = ({ navigation }) => {
 
       {/* Checkbox */}
       <View style={styles.checkboxContainer}>
-        <Checkbox value={isCheckboxChecked} onValueChange={setCheckboxChecked} />
+        <Checkbox
+          value={isCheckboxChecked}
+          onValueChange={setCheckboxChecked}
+        />
         <Text style={styles.textCheckBox}>I've backed up my Private key</Text>
-      </View> 
-
-      {/* Add Friends Button */}
-      <Button title="ADD FRIENDS" disabled={!isCheckboxChecked} onPress={() => {/* handle add friends logic here */}} />
-
+      </View>
+      <View style={styles.button}>
+        {/* Add Friends Button */}
+        <Button
+          title="ADD FRIENDS"
+          disabled={!isCheckboxChecked}
+          onPress={() => {
+            /* handle add friends logic here */
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -115,7 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    position: "absolute",
+    marginTop:7,
     borderRadius: 25,
     backgroundColor: "#3282B8",
     width: "90%",
@@ -129,29 +136,29 @@ const styles = StyleSheet.create({
     height: 100,
   },
   title: {
-    color:'white',
+    color: "white",
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
   keyContainer: {
-    width: '100%',
-		height: 40,
-    backgroundColor:'#333A4A',
-    borderRadius:20,
+    width: "100%",
+    height: 40,
+    backgroundColor: "#333A4A",
+    borderRadius: 20,
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
   },
   keyLabel: {
-    color:'white',
+    color: "white",
     fontWeight: "bold",
-    alignSelf:'flex-start',
-    marginBottom:8,
+    alignSelf: "flex-start",
+    marginBottom: 8,
   },
   keyText: {
-    marginLeft:15,
-    color:'white',
+    marginLeft: 15,
+    color: "white",
     flex: 3,
     marginRight: 10,
   },
@@ -159,12 +166,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+  
+
   },
-  textCheckBox:{
-    marginLeft:10,
-    color:'white',
-    textAlign:'center'
-  }
+  textCheckBox: {
+    marginLeft: 10,
+    color: "white",
+    textAlign: "center",
+  },
 });
 
 export default FinalConfirmation;
