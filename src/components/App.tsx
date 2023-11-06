@@ -16,32 +16,40 @@ import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import { BottomTabNavigator } from '@src/navigation/BottomTabNavigation'
+import { Provider, useSelector } from "react-redux"
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
+import { store, persistor } from "@store"
+
 
 const Stack = createNativeStackNavigator()
 
 export default function App() {
   
 	return (
-		<NavigationContainer>
-			<NDKProvider>
-				<AuthProvider> 
-					{/* <SafeAreaView style={styles.safeContainer}> */}
-						<Stack.Navigator initialRouteName="Loading">
-							<Stack.Screen name="Loading" component={LoadingScreen} />
-							<Stack.Screen name="Authentication" component={AuthenticationScreen} />
-							<Stack.Screen name="CreateAccount" component={CreateAccountScreen} /> 
-							<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
-							<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
-							<Stack.Screen name="LogIn" component={LogInScreen} /> 
-							<Stack.Screen name="Groups" component={GroupsScreen} />
-							<Stack.Screen name="Contacts" component={ContactsScreen} />
-							<Stack.Screen name="History" component={HistoryScreen} />
-							<Stack.Screen name="Account" component={AccountScreen} /> 
-						</Stack.Navigator>
-					{/* </SafeAreaView> */}
-				</AuthProvider>
-			</NDKProvider>
-		</NavigationContainer>
+	  <View style={{ flex: 1, backgroundColor: "080808" }}>
+        <Provider store={store}>
+	    <SafeAreaProvider>
+		<NDKProvider>
+		<AuthProvider> 
+			<NavigationContainer>
+				<Stack.Navigator initialRouteName="Loading">
+					<Stack.Screen name="Loading" component={LoadingScreen} />
+					<Stack.Screen name="Authentication" component={AuthenticationScreen} />
+					<Stack.Screen name="CreateAccount" component={CreateAccountScreen} /> 
+					<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
+					<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
+					<Stack.Screen name="LogIn" component={LogInScreen} /> 
+					<Stack.Screen name="Groups" component={GroupsScreen} />
+					<Stack.Screen name="Contacts" component={ContactsScreen} />
+					<Stack.Screen name="History" component={HistoryScreen} />
+					<Stack.Screen name="Account" component={AccountScreen} /> 
+				</Stack.Navigator>
+			</NavigationContainer>
+		</AuthProvider>
+		</NDKProvider>
+		</SafeAreaProvider>
+		</Provider>
+	  </View>
 	)
 }
 
