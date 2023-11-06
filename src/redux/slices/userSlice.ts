@@ -13,7 +13,6 @@ const initialState: IProfileContent = {
 	picture='',
 	username='',
 	website='',
-};
 
 const userSlice = createSlice({
   name: "user",
