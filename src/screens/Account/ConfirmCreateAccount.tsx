@@ -13,6 +13,9 @@ import CreateAccountWrap from "@comps/account/CreateAccountWrap";
 import ConfirmButton from '@comps/ConfirmButton';
 import { SECRET, STORE_KEYS } from '@store/consts';
 import { ActivityIndicator } from 'react-native';
+import { useUser } from '@hooks'
+import { useDispatch } from "@store"
+import { doUpdateProfile } from '@src/redux/slices/profilesSlice'
 
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
@@ -21,6 +24,11 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
   const { userProfile } = route.params;
   const [loading, setLoading] = useState(false); 
+
+
+  const user = useUser()
+	const dispatch = useDispatch()
+
   useEffect(() => {
     if (loading) {
       // Perform loading-related actions, e.g., disable UI elements
@@ -51,6 +59,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       nostrUser.profile.banner = userProfile.banner;
       nostrUser.profile.lud16 = userProfile.lud16;
       nostrUser.profile.nip05 = userProfile.nip05;
+
 
       // Publish the updated profile
       await Promise.all([nostrUser.publish()]);
@@ -94,11 +103,14 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     setUserIsLoggedIn(true);
 
     // Publish the user profile to Nostr
-    await publishNostrProfile(npub, userProfile);
-		setLoading(false)
-
-		navigation.replace('FinalConfirmation', { userProfile })
-
+    // await publishNostrProfile(npub, userProfile);
+		
+    dispatch(
+			doUpdateProfile(userProfile, () => {
+		    setLoading(false)
+        navigation.replace('FinalConfirmation', { userProfile })
+			})
+		)
   };
 
   return (

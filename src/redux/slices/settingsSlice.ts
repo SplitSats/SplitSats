@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { PayloadAction } from "@reduxjs/toolkit"
 import type { Relay } from "nostr-tools"
 import { relayInit } from "nostr-tools"
-import type { AppDispatch, GetState } from "store"
-import { connectToRelay, defaultRelays } from "core/nostr"
+import type { AppDispatch, GetState } from "@store"
+import { connectToRelay, defaultRelays } from "@nostr"
 
 type theme = "light" | "dark" | "system"
 
@@ -11,7 +11,6 @@ export interface SettingsState {
   theme: theme
   user: {
     pubkey?: string
-    privateKey?: string
   }
   relaysByUrl: Record<string, Relay>
   relaysLoadingByUrl: Record<string, boolean>

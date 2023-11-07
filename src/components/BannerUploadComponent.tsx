@@ -51,13 +51,15 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
     {imageUri ? (
           <Image source={{ uri: imageUri }} style={styles.BannerIcon} />
           ) : (
-      <IconButton
-        icon="camera-plus"
-        style={styles.BannerIcon}
-        iconColor={MD3Colors.neutral90}
-        size={60}
-        onPress={getRandomBannerImage}
-      />)}
+      // <IconButton
+      //   icon="camera-plus"
+      //   style={styles.BannerIcon}
+      //   iconColor={MD3Colors.neutral90}
+      //   size={60}
+      //   onPress={getRandomBannerImage}
+      // />)}
+      <Image source={require('@assets/logo/Splitsats_name_W.png')} style={styles.bannerImage} />
+    )}
   </View>
   );
 };
@@ -76,6 +78,10 @@ const styles = StyleSheet.create({
     height: 90,
     justifyContent: "center",
     alignItems: "center",
+  },
+  bannerImage: {
+    width: '100%',
+    height: 100,
   },
 });
 

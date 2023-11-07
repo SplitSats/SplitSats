@@ -10,7 +10,7 @@ import { truncateNpub } from '@nostr/util'
 
 const CreateAccountWrap = ({ userProfile }) => {
   
-	const [userInputs, setUserProfile] = useState<IProfileContent>(userProfile);
+	const [userInputs, setUserProfile] = useState<NostrProfileContent>(userProfile);
 	const [userNpub, setUserNpub] = useState('');
 
   useEffect(() => {

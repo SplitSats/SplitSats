@@ -9,7 +9,8 @@ const selectProfiles = (state: RootState) => state.profiles
 const selectSettings = (state: RootState) => state.settings
 
 export const selectUser = createSelector(selectSettings, (settings) => {
-  return settings.user
+  return settings ? settings.user : undefined;
+
 })
 
 export const selectProfilesByPubkey = createSelector(selectProfiles, (profiles) => {

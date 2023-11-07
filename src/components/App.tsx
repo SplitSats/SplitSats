@@ -19,9 +19,28 @@ import { BottomTabNavigator } from '@src/navigation/BottomTabNavigation'
 import { Provider, useSelector } from "react-redux"
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 import { store, persistor } from "@store"
+import { PersistGate } from "redux-persist/integration/react"
+import { StatusBar, KeyboardAvoidingView } from "react-native"
+import { PRIMARY_COLOR } from '@src/styles/colors'
 
 
 const Stack = createNativeStackNavigator()
+
+
+function AppWrapper({ children }) {
+	const insets = useSafeAreaInsets()
+	const backgroundColor: string = PRIMARY_COLOR
+  
+	return (
+	  <PersistGate loading={<View style={{ flex: 1, backgroundColor }} />} persistor={persistor}>
+		<View style={{ flex: 1, backgroundColor, paddingTop: insets.top, paddingBottom: insets.bottom }}>
+		  <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+			{children}
+		  </KeyboardAvoidingView>
+		</View>
+	  </PersistGate>
+	)
+  }
 
 export default function App() {
   
@@ -31,6 +50,8 @@ export default function App() {
 	    <SafeAreaProvider>
 		<NDKProvider>
 		<AuthProvider> 
+		<AppWrapper>
+
 			<NavigationContainer>
 				<Stack.Navigator initialRouteName="Loading">
 					<Stack.Screen name="Loading" component={LoadingScreen} />
@@ -45,6 +66,7 @@ export default function App() {
 					<Stack.Screen name="Account" component={AccountScreen} /> 
 				</Stack.Navigator>
 			</NavigationContainer>
+		</AppWrapper>
 		</AuthProvider>
 		</NDKProvider>
 		</SafeAreaProvider>

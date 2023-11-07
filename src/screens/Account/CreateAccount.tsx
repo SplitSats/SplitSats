@@ -6,7 +6,6 @@ import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import { IProfileContent } from '@src/model/nostr';
 import { l } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
@@ -16,21 +15,18 @@ const CreateAccountScreen = ({ navigation }) => {
 	const [bannerImageUri, setBannerImageUri] = useState('');
   	const [profileImageUri, setProfileImageUri] = useState('');
 	
-
-	const initialProfile: IProfileContent = {
+	const initialProfile: NostrProfileContent = {
 		about: 'A new SplitSats User',
 		banner: '',
-		displayName: 'SplitSats User',
-		lud06: 'LNURL',
+		display_name: 'SplitSats User',
 		lud16: 'splitsats@getalby.com',
 		name: 'splitsats',
 		nip05: 'splitsats@nostr.com',
 		picture: '',
 		username: 'splitsats01',
-		website: '',
 	};
 
-	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
+	const [userProfile, setUserProfile] = useState<NostrProfileContent>(initialProfile);
 	
 	const handleNextButton = async () => {
 		// Set the banner and profile images in the user profile
@@ -42,10 +38,11 @@ const CreateAccountScreen = ({ navigation }) => {
 	}
 	
 	l("CreateAccountScreen")
-	
-	return (
-		<ScrollView contentContainerStyle={styles.container}>
 
+	return (
+		<View style={{ flex: 1 }}>
+			
+		<ScrollView contentContainerStyle={styles.container}>
 			<Text style={styles.title}>NEW ACCOUNT</Text>
 			<View style={styles.containerPhotos}>
       			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
@@ -66,7 +63,7 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.name} // Display the name from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
 			/>
-			<Text style={styles.label}>LN URL</Text>
+			<Text style={styles.label}>LN ADDRESS</Text>
 			<TextInput
 				style={styles.input}
 				placeholder={userProfile.lud16}
@@ -87,9 +84,11 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.about} // Display the ABOUT ME from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
 			/>
-			<ConfirmButton title="NEXT" onPress={handleNextButton} />
 		</ScrollView>
+		<ConfirmButton title="NEXT" onPress={handleNextButton} disabled={false}/>
 		
+	</View>
+	
 	)
 }
 
@@ -105,10 +104,11 @@ const styles = StyleSheet.create({
 		marginTop:20,
 	  },
 	container: {
-		flex: 1,
+		flexGrow: 1,
 		backgroundColor: PRIMARY_COLOR,
 		alignItems: 'center',
 		justifyContent: 'center',
+		height: '100%',
 	},
 	title: {
 		fontSize: 24,

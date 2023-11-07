@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux"
-import { nostrEventKinds } from "@nostr"
-
-import type { RootState } from "./index"
+// import { nostrEventKinds } from "@nostr"
+// import type { RootState } from "./index"
 import {
   selectUser,
   selectRelaysByUrl,
@@ -13,12 +12,9 @@ import {
   makeSelectSubscriptionByFeedId,
   makeSelectUserHasRepostedByNoteId,
   makeSelectRepostCountByNoteId,
-  makeSelectionReactionsByNoteId,
-  makeSelectUserHasReactedToNoteId,
   makeSelectFeedById,
-  makeSelectThreadByNoteId,
   makeSelectNip05ByPubkey,
-} from "./selectors"
+} from "@hooks/redux/selectors"
 
 export const useProfile = (pubkey?: string) => {
   const profile = useSelector(makeSelectProfileByPubkey(pubkey))
@@ -40,11 +36,6 @@ export const useFeed = (feedIdOrPubkey: string) => {
   return feed
 }
 
-export const useThread = (noteId: string) => {
-  const thread = useSelector(makeSelectThreadByNoteId(noteId))
-  return thread
-}
-
 export const useNote = (
   noteId: string
 ): (NostrNoteEvent | NostrRepostEvent) & {
@@ -55,12 +46,6 @@ export const useNote = (
   return note
 }
 
-export const useReactions = (noteId: string) => {
-  const reactions = useSelector(makeSelectionReactionsByNoteId(noteId))
-  const liked = useSelector(makeSelectUserHasReactedToNoteId(noteId))
-
-  return { reactions, liked }
-}
 
 export const useReposted = (noteId: string) => {
   const userHasReposted = useSelector(makeSelectUserHasRepostedByNoteId(noteId))
@@ -91,6 +76,5 @@ export const useSubscriptionsByFeedId = (feedId) => {
 
 export const useNip05 = (pubkey: string) => {
   const nip05 = useSelector(makeSelectNip05ByPubkey(pubkey))
-
   return nip05
 }

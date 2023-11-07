@@ -40,14 +40,14 @@ declare enum NostrEventKind {
   declare type NostrEvent = NostrNoteEvent | NostrProfileEvent | NostrContactListEvent | NostrRepostEvent
   
   declare type NostrProfileContent = {
-    picture?: string
-    name?: string
-    display_name?: string
     about?: string
-    nip05?: string
-    website?: string
     banner?: string
+    display_name?: string
     lud16?: string
+    name?: string
+    nip05?: string
+    picture?: string
+    username?: string
   }
   
   declare type NostrProfile = NostrProfileEvent & {

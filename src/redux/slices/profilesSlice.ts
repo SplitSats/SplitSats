@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit"
 import type { AppDispatch, GetState } from "@store"
 
 import { getProfile, publishNote, nostrEventKinds } from "@nostr"
+import { l } from "@log"
 
 export interface ProfilesStateState {
   profilesByPubkey: Record<string, NostrProfile>
@@ -70,6 +71,7 @@ export const doUpdateProfile =
 
     if (!pubkey || !privateKey) {
       console.log("no user found")
+      l("no user found")
       return
     }
 
