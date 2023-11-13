@@ -8,7 +8,7 @@ import {
   Image,
   Text,
   ScrollView,
-  Button
+  Button,
 } from "react-native";
 import UserCardComponent from "@comps/UserCardComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
@@ -16,16 +16,19 @@ import CancelIcon from "@assets/icon/Cancel.png";
 import QRIcon from "@assets/icon/QR-code.png";
 import SearchIcon from "@assets/icon/Search.png";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import UserProfile from "@comps/account/UserProfile";
 import ConfirmButton from "@comps/ConfirmButton";
 
-const AddFriendScreen = ({navigation}) => {
+const AddFriendScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasPermission, setHasPermission] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-    const user = {name : 'SplitSatS' , profileImage : 'https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'}
+  const user = {
+    name: "SplitSatS",
+    profileImage:
+      "https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  };
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -68,12 +71,15 @@ const AddFriendScreen = ({navigation}) => {
   };
   return (
     <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.headerText}>ADD FRIENDS</Text>
+      <Text style={styles.headerText}>ADD FRIENDS</Text>
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome {user.name}</Text>
-        <Image source={{uri : user.profileImage}} style={styles.profileImage} />
+        <Image
+          source={{ uri: user.profileImage }}
+          style={styles.profileImage}
+        />
       </View>
-      
+
       <View style={styles.searchSection}>
         <Image source={SearchIcon} style={styles.searchIcon} />
         <TextInput
@@ -96,11 +102,21 @@ const AddFriendScreen = ({navigation}) => {
         )}
       </View>
       {isScannerOpen ? (
-        <BarCodeScanner
-          style={styles.preview}
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
-        ></BarCodeScanner>
+        <View style={styles.cameraContainer}>
+          <BarCodeScanner
+            style={StyleSheet.absoluteFillObject}
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          />
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setScannerOpen(false)}
+          >
+            <Image
+              style={styles.qrCodeIcon}
+              source={CancelIcon}
+            />
+          </TouchableOpacity>
+        </View>
       ) : (
         <FlatList
           data={users}
@@ -113,11 +129,12 @@ const AddFriendScreen = ({navigation}) => {
             />
           )}
         />
-
       )}
-        <ConfirmButton title="FINISH"
-        onPress={() => navigation.navigate("Groups")} />
-
+      <ConfirmButton
+        disabled={false}
+        title="FINISH"
+        onPress={() => navigation.navigate("Groups")}
+      />
     </ScrollView>
   );
 };
@@ -153,16 +170,12 @@ const styles = StyleSheet.create({
   },
   preview: {
     flex: 1,
-    justifyContent: "flex-end",
-    alignItems: "center",
-    height: "100%",
-    width: "100%",
   },
   qrCodeIcon: {
     marginRight: 20,
     padding: 10,
-    width: 15, 
-    height: 15, 
+    width: 15,
+    height: 15,
   },
   headerText: {
     fontSize: 24,
@@ -172,22 +185,33 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginLeft:'10%',
-    marginRight:'10%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginLeft: "10%",
+    marginRight: "10%",
     marginTop: 10,
   },
   welcomeText: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: 'white', 
+    fontWeight: "bold",
+    color: "white",
   },
   profileImage: {
-    width: 70, 
-    height: 70, 
-    borderRadius: 35, 
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+  },
+  cameraContainer: {
+    flex:1,
+    backgroundColor:'black'
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 45,
+    right: 20,
+    backgroundColor: 'transparent',
+    padding: 10,
   },
 
 });
