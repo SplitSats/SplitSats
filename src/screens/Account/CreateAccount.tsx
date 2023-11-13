@@ -9,21 +9,24 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { l } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
+import {generateRandomHumanReadableUserName} from './utils'
 
 const CreateAccountScreen = ({ navigation }) => {
 
 	const [bannerImageUri, setBannerImageUri] = useState('');
   	const [profileImageUri, setProfileImageUri] = useState('');
 	
+	const randomUserName = generateRandomHumanReadableUserName(2);
+
 	const initialProfile: NostrProfileContent = {
-		about: 'A new SplitSats User',
-		banner: '',
-		display_name: 'SplitSats User',
-		lud16: 'splitsats@getalby.com',
-		name: 'splitsats',
-		nip05: 'splitsats@nostr.com',
-		picture: '',
-		username: 'splitsats01',
+	about: 'A new SplitSats User',
+	banner: '',
+	display_name: 'SplitSats User',
+	lud16: `${randomUserName}@getalby.com`,
+	name: randomUserName,
+	nip05: `${randomUserName}@splitsats.io`,
+	picture: '',
+	username: `${randomUserName}`,
 	};
 
 	const [userProfile, setUserProfile] = useState<NostrProfileContent>(initialProfile);
@@ -38,6 +41,14 @@ const CreateAccountScreen = ({ navigation }) => {
 	}
 	
 	l("CreateAccountScreen")
+	const form = [
+		{ label: "Handle", key: "username" },
+		{ label: "Display Name", key: "name" },
+		{ label: "Bio", key: "about", multiline: true },
+		{ label: "NIP-05 Verification", key: "nip05" },
+		{ label: "Lightning Address", key: "lud16" },
+	]
+
 
 	return (
 		<View style={{ flex: 1 }}>

@@ -16,18 +16,22 @@ import { ActivityIndicator } from 'react-native';
 import { useUser } from '@hooks'
 import { useDispatch } from "@store"
 import { doUpdateProfile } from '@src/redux/slices/profilesSlice'
+import { updateUser } from "@redux/slices/settingsSlice"
 
+// When user confirm the account, we need to save the profile to redux and send it to nostr
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
+
   const { setUserIsLoggedIn } = useAuth();
-  const ndk = useNDK();
+  // const ndk = useNDK();
 
   const { userProfile } = route.params;
   const [loading, setLoading] = useState(false); 
 
+  const [npub, setNpub] = useState("");
 
   const user = useUser()
-	const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (loading) {
@@ -70,45 +74,40 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     }
   }
   
+  useEffect(() => {
+    const createNostrKeys = async () => {
+      // Generate a private key for the user
+      const userPrivateKey = generatePrivateKey();
+      // Extract the public key from the private key
+      const userPublicKey = getPublicKey(userPrivateKey);
+      const npub = nip19.npubEncode(userPublicKey);
+      setNpub(npub);
+      l('New nostr keys generated! npub:', npub);
+      l('New nostr keys generated! userPublicKey:', userPublicKey);
+      // Store the private key securely
+      await Promise.all([
+        secureStore.set(SECRET, userPrivateKey),
+      ]);
+      dispatch(updateUser({ pubkey: userPublicKey, privateKey: userPrivateKey, npub: npub }))
+    };
+    createNostrKeys();
+  }, []);
+
   const handleCreateAccount = async () => {
 		setLoading(true);
-
-    // Generate a private key for the user
-    const userPrivateKey = generatePrivateKey();
-    // Extract the public key from the private key
-    const userPublicKey = getPublicKey(userPrivateKey);
-    const nsec = nip19.nsecEncode(userPrivateKey);
-    const npub = nip19.npubEncode(userPublicKey);
-    l('userPrivateKey:', nsec);
-    l('userPublicKey:', npub);
-    
-    l('userProfile on Confirm:', userProfile);
     if (!userProfile) {
       l('userProfile is null');
       return;
     }
 
-    // Store the private key securely
-    await Promise.all([
-      secureStore.set(SECRET, userPrivateKey),
-    ])
-    // Store the public key in AsyncStorage
-    await store.set(STORE_KEYS.npubHex, userPublicKey);
-    await store.set(STORE_KEYS.npub, npub);
-    await store.set(STORE_KEYS.userLoggedIn, 'true')
     await AsyncStorage.setItem('userIsLoggedIn', 'true')
-    await store.set(STORE_KEYS.userProfile, JSON.stringify(userProfile))
-    await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile))
-
     setUserIsLoggedIn(true);
-
+    
     // Publish the user profile to Nostr
-    // await publishNostrProfile(npub, userProfile);
-		
     dispatch(
 			doUpdateProfile(userProfile, () => {
 		    setLoading(false)
-        navigation.replace('FinalConfirmation', { userProfile })
+        navigation.replace('FinalConfirmation')
 			})
 		)
   };
@@ -117,7 +116,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     <View style={styles.container}>
         <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
         <View style={styles.cardContainer}>
-            <CreateAccountWrap userProfile={userProfile} />
+          <CreateAccountWrap userProfile={userProfile} npub={npub}/>
         </View>
         <Text style={styles.noteTextt}>
           This is a preview of your Nostr account.

@@ -6,29 +6,38 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { store } from '@store'
 import { STORE_KEYS } from '@store/consts'
 import { truncateNpub } from '@nostr/util'
+import { l } from '@log'
+import  QRCodeScreen from '@comps/account/QRCode' 
 
-
-const CreateAccountWrap = ({ userProfile }) => {
+const CreateAccountWrap = ({ userProfile, npub }) => {
   
-	const [userInputs, setUserProfile] = useState<NostrProfileContent>(userProfile);
-	const [userNpub, setUserNpub] = useState('');
+  // TODO: Show a QR code of the npub, so friends can add you yet
 
+	const [userInputs, setUserProfile] = useState<NostrProfileContent>(userProfile);
+  
+  const [userNpub, setUserNpub] = useState('');
+	const [truncatedNpub, setTruncatedNpub] = useState('');
+  
   useEffect(() => {
     const fetchUserNpub = async () => {
-      try {
-        const userNpub = await store.get(STORE_KEYS.npub);
-        if (!userNpub){
-          console.log('UserPublicKey not found in local storage')
-        }
-        const truncatedNpub = truncateNpub(userNpub);
-        setUserNpub(truncatedNpub || 'npbu....');
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
+      if (npub){
+        setUserNpub(npub)
       }
+      if (!userNpub){
+        console.log('userNpub not found in local storage')
+      }
+      let truncated = ''
+      try {
+        truncated = truncateNpub(userNpub);
+      } catch (e) {
+        console.log('Error truncating npub:', e)
+      }
+      l('truncatedNpub:', truncated)
+      setTruncatedNpub(userNpub !== "" ? truncated : 'npub...')
     }
     fetchUserNpub()
   }
-  , [])
+  , [userNpub])
 
 
   return (
@@ -42,8 +51,8 @@ const CreateAccountWrap = ({ userProfile }) => {
           )}
           <Image source={{ uri: userInputs.picture }} style={styles.profileImage} />
         </View>
-          <Text style={styles.noteText}>{userInputs.username}</Text>
-          <Text style={styles.noteText}>{userNpub}</Text>
+          <Text style={styles.noteText}>{userInputs.username}</Text>     
+          {npub && <Text style={styles.noteText}>{truncatedNpub}</Text>}
           <Text style={styles.noteText}>{userInputs.lud16}</Text>
           <Text style={styles.noteText}>{userInputs.about}</Text>
       </View>

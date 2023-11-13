@@ -43,7 +43,7 @@ function AppWrapper({ children }) {
   }
 
 export default function App() {
-  
+	
 	return (
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
         <Provider store={store}>

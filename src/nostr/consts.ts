@@ -3,6 +3,9 @@
  */
 export const defaultRelays = [
 	'wss://relay.damus.io',
+	'wss://relay.nostrss.re', 
+	'wss://relay.nostrich.de',
+	'wss://relay.plebstr.com',
 	'wss://nostr-pub.wellorder.net',
 	'wss://nostr.mom',
 	'wss://4.up.railway.app',

@@ -1,14 +1,16 @@
 import {
     relayInit,
     getEventHash,
-    signEvent,
-    generatePrivateKey,
-    getPublicKey,
+    getSignature,
+    finishEvent,
     validateEvent,
     verifySignature,
     Relay,
-  } from "nostr-tools"
-  
+    SimplePool
+} from "nostr-tools"
+import { l } from "@log"
+import { sign } from "crypto"
+
   export const nostrEventKinds = {
     profile: 0,
     note: 1,
@@ -16,13 +18,27 @@ import {
     repost: 6,
     reaction: 7,
   }
-  
   export const defaultRelays = [
-    "wss://relay.damus.io",
-    "wss://relay.snort.social",
-    "wss://nostr-pub.wellorder.net",
-    "wss://nostr.oxtr.dev",
-    "wss://nostr-pub.semisol.dev",
+    'wss://relay.damus.io',
+    'wss://relay.nostrss.re', 
+    'wss://relay.nostrich.de',
+    'wss://relay.plebstr.com',
+    'wss://nostr-pub.wellorder.net',
+    'wss://nostr.mom',
+    'wss://4.up.railway.app',
+    'wss://eden.nostr.land',
+    'wss://nostr-relay.untethr.me',
+    'wss://nostr.zebedee.social',
+    'wss://offchain.pub',
+    'wss://nostr.fmt.wiz.biz',
+    'wss://nostr-relay.wlvs.space',
+    'wss://nostr.fly.dev',
+    'wss://nostr.nostr.band',
+    'wss://relay.realsearch.cc',
+    'wss://relay.nostrgraph.net',
+    'wss://relay.minds.com/nostr/v1/ws',
+    'wss://nos.lol/',
+    'wss://relay.snort.social',
   ]
   
   const GET_EVENTS_LIMIT = 50
@@ -183,54 +199,60 @@ import {
       content,
       tags,
     }
-  
-    // @ts-expect-error
-    event.id = getEventHash(event)
-    // @ts-expect-error
-    event.sig = signEvent(event, user.privateKey)
-  
-    // console.log("event", event)
-    // let ok = validateEvent(event)
-    // let veryOk = verifySignature(event)
-    // console.log("ok?", ok)
-    // console.log("veryOk?", veryOk)
-    // return
-  
+    const signedEvent = finishEvent(event, user.privateKey)
+    
+    console.log("signedEvent", signedEvent)
+    
+    const usePool = true
     let returned = false
+
     return new Promise((resolve) => {
-      relays.forEach((relay) => {
-        if (!relay.publish) {
-          return
-        }
-  
-        const pub = relay.publish(event)
-  
-        pub.on("ok", () => {
-          if (!returned) {
-            // @ts-expect-error
-            resolve(event)
-            returned = true
+
+      if (usePool){
+        const pool = new SimplePool()
+        let pubs = pool.publish(defaultRelays, signedEvent)
+        l("pubs", pubs)
+        // await Promise.all(pubs)
+        resolve(event)
+      } else {
+
+        relays.forEach((relay) => {
+        
+          if (!relay.publish) {
+            return
           }
+    
+          const pub = relay.publish(signedEvent)
+          console.log("relay", relay)
+        // console.log("pub", pub)
+
+        // pub.on("ok", () => {
+        //   if (!returned) {
+        //     // @ts-expect-error
+        //     resolve(event)
+        //     returned = true
+        //   }
   
-          console.log(`${relay.url} has accepted our event`)
-        })
-        pub.on("seen", () => {
-          console.log(`we saw the event on ${relay.url}`)
-        })
-        pub.on("failed", (reason) => {
-          console.log(`failed to publish to ${relay.url}: ${reason}`)
-        })
+        //   console.log(`${relay.url} has accepted our event`)
+        // })
+        // pub.on("seen", () => {
+        //   console.log(`we saw the event on ${relay.url}`)
+        // })
+        // pub.on("failed", (reason) => {
+        //   console.log(`failed to publish to ${relay.url}: ${reason}`)
+        // })
       })
-  
-      setTimeout(() => {
-        if (!returned) {
-          resolve(undefined)
-          returned = true
-        }
-      }, 5000)
+    }
+    setTimeout(() => {
+      if (!returned) {
+        resolve(undefined)
+        returned = true
+      }
+    }, 5000)
     })
-  }
-  
+}
+
+
   export const getProfile = async (
     relays: Relay[],
     pubkey: string

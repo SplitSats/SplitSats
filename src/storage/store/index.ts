@@ -6,6 +6,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit"
 import { useDispatch as useReactReduxDispatch } from "react-redux"
 import { persistStore, persistReducer } from "redux-persist"
 import { profilesSlice } from "@src/redux/slices/profilesSlice"
+import { settingsSlice } from "@src/redux/slices/settingsSlice"
 
 
 // Choose here which store to use [AsyncStorage or SQLite]
@@ -18,6 +19,7 @@ const persistConfig = {
   }
   
   const rootReducer = combineReducers({
+    settings: settingsSlice.reducer,
     profiles: profilesSlice.reducer,
   })
   

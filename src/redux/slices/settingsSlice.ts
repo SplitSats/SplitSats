@@ -4,6 +4,7 @@ import type { Relay } from "nostr-tools"
 import { relayInit } from "nostr-tools"
 import type { AppDispatch, GetState } from "@store"
 import { connectToRelay, defaultRelays } from "@nostr"
+import { l } from "@log"
 
 type theme = "light" | "dark" | "system"
 
@@ -11,6 +12,8 @@ export interface SettingsState {
   theme: theme
   user: {
     pubkey?: string
+    privateKey?: string
+    npub?: string
   }
   relaysByUrl: Record<string, Relay>
   relaysLoadingByUrl: Record<string, boolean>
@@ -54,6 +57,7 @@ export const settingsSlice = createSlice({
 export const { updateRelays, deleteRelay, updateRelaysLoadingByUrl, updateTheme, updateUser, logout } =
   settingsSlice.actions
 
+
 export const initRelays = () => async (dispatch: AppDispatch, getState: GetState) => {
   const {
     settings: { relaysByUrl },
@@ -88,7 +92,7 @@ export const initRelays = () => async (dispatch: AppDispatch, getState: GetState
       await relay.connect()
 
       relay.on("connect", () => {
-        console.log("connected to: ", relay.url)
+        l("connected to: ", relay.url)
         handled = true
         handledRelays[relay.url] = relay
         handledCount++
@@ -97,7 +101,7 @@ export const initRelays = () => async (dispatch: AppDispatch, getState: GetState
       })
 
       relay.on("error", (e) => {
-        console.log("relay.on error: ", relay.url, e)
+        l("relay.on error: ", relay.url, e)
         relay.close()
         handled = true
         handledCount++
@@ -106,7 +110,7 @@ export const initRelays = () => async (dispatch: AppDispatch, getState: GetState
         dispatch(updateRelaysLoadingByUrl({ [relay.url]: false }))
       })
     } catch (e) {
-      console.log("error with init relay", relayUrl, e)
+      l("error with init relay", relayUrl, e)
 
       handled = true
       handledCount++
@@ -197,7 +201,7 @@ export const doRemoveRelay = (relayUrl: string) => async (dispatch: AppDispatch,
     try {
       relay.close()
     } catch (e) {
-      console.log("error closing relay", e)
+      l("error closing relay", e)
     }
   }
 
@@ -222,7 +226,7 @@ export const doCycleRelays = () => async (dispatch: AppDispatch, getState: GetSt
     try {
       relay.close()
     } catch (e) {
-      console.log("error closing relay", e)
+      l("error closing relay", e)
     } finally {
       count++
 

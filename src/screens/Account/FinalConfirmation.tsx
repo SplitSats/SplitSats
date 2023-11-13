@@ -9,16 +9,28 @@ import { SECRET, STORE_KEYS } from '@store/consts';
 import { store, secureStore } from "@store";
 import ConfirmButton from '@comps/ConfirmButton';
 import { nip19 } from 'nostr-tools';
+import { useUser } from '@hooks'
+import { useProfile } from "@hooks";
+import { l } from "@log";
 
 
-const FinalConfirmation = ({ navigation, route }) => {
+const FinalConfirmation = ({ navigation }) => {
+	const { reset } = navigation
+
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [isCheckboxChecked, setCheckboxChecked] = useState(false);
-  const { userProfile } = route.params;
+  // const { userProfile } = route.params;
   const [npub, setNpub] = useState("");
   const [nsec, setNsec] = useState("");
-  
+  const user = useUser()
+  const profile = useProfile(user?.pubkey)
+  const profileContent = profile?.content || {}
 
+  l("FinalConfirmation")
+  l("user", user)
+  l("userProfile", profile)
+  l("profileContent", profileContent)
+  
   const copyPublicKeyToClipboard = async() => {
     await Clipboard.setStringAsync(npub);
     alert('Public key copied to clipboard');
@@ -31,24 +43,25 @@ const FinalConfirmation = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchKeys = async () => {
-      const userPrivateKey = await secureStore.get(SECRET);
+      const userPrivateKey = user?.privateKey || await secureStore.get(SECRET);
       const nsec = nip19.nsecEncode(userPrivateKey);
       setNsec(nsec);
-      const npub = await store.get(STORE_KEYS.npub);
-      setNpub(npub);
+      // const npub = await store.get(STORE_KEYS.npub);
+      setNpub(user.npub);
     };
     fetchKeys();
   }, []);
 
   const handleAddFriends = () => {
-    navigation.navigate("Groups");
+		reset({index: 0, routes: [{ name: "Groups" }]})
+    // navigation.navigate("Groups");
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>ACCOUNT CREATED</Text>
       <View style={styles.cardContainer}>
-        <CreateAccountWrap userProfile={userProfile} />
+        <CreateAccountWrap userProfile={profileContent} />
 
         <View style={styles.checkOverlay}>
           <Image

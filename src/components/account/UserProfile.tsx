@@ -3,17 +3,24 @@ import { StatusBar } from 'expo-status-bar';
 import { nip19 } from 'nostr-tools';
 import React, { useEffect, useState } from 'react';
 import { Button, Image, StyleSheet, Text, View } from 'react-native';
-import { AsyncStore } from '@src/storage/store/AsyncStore';
-import { useNDK } from '@src/context/NDKContext';
+// import { AsyncStore } from '@src/storage/store/AsyncStore';
+// import { useNDK } from '@src/context/NDKContext';
 import { l, err } from '@log';
 import { IProfileContent } from '@src/model/nostr';
 import { store } from '@store';	
 import { STORE_KEYS } from '@store/consts';
-import { NDKUser } from '@nostr-dev-kit/ndk';
+// import { NDKUser } from '@nostr-dev-kit/ndk';
+import { useUser } from '@hooks'
+import { useProfile } from "@hooks";
 
 const UserProfile = ({ dataStore }) => {
-	const ndk = useNDK();
+	// const ndk = useNDK();
 	const [userProfile, setUserProfile] = useState<IProfileContent | null>(null);
+	const [ndk, setNdk] = useState(null);
+	const user = useUser()
+	const profile = useProfile(user?.pubkey)
+	const profileContent = profile?.content || {}
+
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -38,13 +45,11 @@ const UserProfile = ({ dataStore }) => {
 					setUserProfile(userProfile);
 					console.log(user.profile);
 				} else if (dataStore === 'redux') {
-					// TODO: Add Redux store
-					const storedUserProfile = await store.get(STORE_KEYS.userProfile);
-					l('Stored user profile:', storedUserProfile);
-					if (!storedUserProfile) {
+					
+					if (!profileContent) {
 						err('User profile not found');
 					}
-					await setUserProfile(JSON.parse(storedUserProfile));
+					await setUserProfile(profileContent);
 				} else if (dataStore === 'sqlite') {
 					// Use AsyncStorage
 					// const storedUserProfile = await store.getItem(STORE_KEYS.userProfile);

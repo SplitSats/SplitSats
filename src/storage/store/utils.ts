@@ -1,11 +1,16 @@
 import { Db } from '@db/Db'
 import * as SQLite from 'expo-sqlite'
-
+import { secureStore } from '.';
+import { SECRET } from '@store/consts';
 
 /* const _storeDbs: { [k: string]: SimpleKeyValueStore } = {} */
 
 export function getDb(name: string) {
 	return new Db(SQLite.openDatabase(`${name}.db`))
+}
+
+export async function getPrivateKey() {
+	await secureStore.get(SECRET);
 }
 
 /* export function getStore(name: string) {

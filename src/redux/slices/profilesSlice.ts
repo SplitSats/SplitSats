@@ -2,8 +2,9 @@ import { createSlice } from "@reduxjs/toolkit"
 import type { PayloadAction } from "@reduxjs/toolkit"
 import type { AppDispatch, GetState } from "@store"
 
-import { getProfile, publishNote, nostrEventKinds } from "@nostr"
+import { getProfile, publishNote, nostrEventKinds, defaultRelays } from "@nostr"
 import { l } from "@log"
+import { SimplePool } from 'nostr-tools'
 
 export interface ProfilesStateState {
   profilesByPubkey: Record<string, NostrProfile>
@@ -59,6 +60,7 @@ export const doFetchProfile = (pubkey: string) => async (dispatch: AppDispatch, 
   }
 }
 
+
 export const doUpdateProfile =
   (profile: NostrProfileContent, onSuccess: () => void) =>
   async (dispatch: AppDispatch, getState: GetState) => {
@@ -78,13 +80,14 @@ export const doUpdateProfile =
     const relays = Object.values(relaysByUrl).filter(
       (relay) => relaysLoadingByUrl[relay.url] !== true && relay.status === 1
     )
-
+    l("Starting publishing event")
     const profileResponse = (await publishNote(
       relays,
       { pubkey, privateKey },
       nostrEventKinds.profile,
       JSON.stringify(profile)
     )) as unknown
+    l("Event published!")
 
     const updatedProfile = profileResponse as NostrProfile
     try {
