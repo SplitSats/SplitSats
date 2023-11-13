@@ -39,7 +39,7 @@ const FinalConfirmation = ({ navigation, route }) => {
   }, []);
 
   const handleAddFriends = () => {
-    navigation.navigate("Groups");
+    navigation.navigate("AddFriend");
   };
 
   return (

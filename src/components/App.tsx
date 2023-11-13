@@ -15,7 +15,7 @@ import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
-
+import AddFriendScreen from '@screens/Account/AddFriendsScreen'
 import Navigation from '@src/navigation/MyBottomTabNavigation'
 
 
@@ -35,6 +35,7 @@ export default function App() {
 							<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
 							<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
 							<Stack.Screen name="LogIn" component={LogInScreen} /> 
+							<Stack.Screen name="AddFriend" component={AddFriendScreen}/>
 							<Stack.Screen
 								name="Groups"
 								component={Navigation}
