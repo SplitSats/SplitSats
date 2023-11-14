@@ -10,13 +10,14 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import UserCardComponent from "@comps/UserCardComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import CancelIcon from "@assets/icon/Cancel.png";
 import QRIcon from "@assets/icon/QR-code.png";
 import SearchIcon from "@assets/icon/Search.png";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import ConfirmButton from "@comps/ConfirmButton";
+import QRCodeScreen from "@comps/account/QRcode";
+import UserCardComponent from "@comps/UserCardComponent";
 
 const AddFriendScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -69,7 +70,14 @@ const AddFriendScreen = ({ navigation }) => {
     setIsTyping(false);
     setScanned(false);
   };
-  return (
+  return isScannerOpen ? (
+    <QRCodeScreen 
+    scanned = {scanned}
+    handleFunc = {handleBarCodeScanned}
+    setScannerOpen={setScannerOpen}
+    />
+    
+    ) : (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.headerText}>ADD FRIENDS</Text>
       <View style={styles.header}>
@@ -101,23 +109,7 @@ const AddFriendScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      {isScannerOpen ? (
-        <View style={styles.cameraContainer}>
-          <BarCodeScanner
-            style={StyleSheet.absoluteFillObject}
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          />
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setScannerOpen(false)}
-          >
-            <Image
-              style={styles.qrCodeIcon}
-              source={CancelIcon}
-            />
-          </TouchableOpacity>
-        </View>
-      ) : (
+      
         <FlatList
           data={users}
           keyExtractor={(item) => item.id}
@@ -129,7 +121,6 @@ const AddFriendScreen = ({ navigation }) => {
             />
           )}
         />
-      )}
       <ConfirmButton
         disabled={false}
         title="FINISH"
@@ -202,18 +193,6 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
   },
-  cameraContainer: {
-    flex:1,
-    backgroundColor:'black'
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 45,
-    right: 20,
-    backgroundColor: 'transparent',
-    padding: 10,
-  },
-
 });
 
 export default AddFriendScreen;
