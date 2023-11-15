@@ -17,7 +17,7 @@ import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import AddFriendScreen from '@screens/Account/AddFriendsScreen'
 import Navigation from '@src/navigation/MyBottomTabNavigation'
-
+import CreateNewGroup from '@screens/Groups/CreateNewGroup'
 
 const Stack = createNativeStackNavigator()
 
@@ -37,10 +37,12 @@ export default function App() {
 							<Stack.Screen name="LogIn" component={LogInScreen} /> 
 							<Stack.Screen name="AddFriend" component={AddFriendScreen}/>
 							<Stack.Screen
-								name="Groups"
+								name="Dashboard"
 								component={Navigation}
 								options={{ headerShown: false }} // Usually, you hide the header for the bottom tab navigator
 								/>
+
+							<Stack.Screen name="CreateGroup" component={CreateNewGroup}/>
 							{/* <Stack.Screen name="Groups" component={GroupsScreen} />
 							<Stack.Screen name="Contacts" component={ContactsScreen} />
 							<Stack.Screen name="History" component={HistoryScreen} />

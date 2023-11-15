@@ -124,7 +124,7 @@ const AddFriendScreen = ({ navigation }) => {
       <ConfirmButton
         disabled={false}
         title="FINISH"
-        onPress={() => navigation.navigate("Groups")}
+        onPress={() => navigation.navigate("Dashboard")}
       />
     </ScrollView>
   );
