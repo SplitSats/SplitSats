@@ -13,8 +13,6 @@ import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
-// When user confirm the account, we need to save the profile to redux and send it to nostr
-
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
   // const { setUserIsLoggedIn } = useAuth();
