@@ -4,7 +4,6 @@ import { TouchableOpacity, Text, View, StyleSheet } from "react-native";
 
 const TabBarIcon = ({ name, focused }) => {
 
-
   const svg = require('@assets/icon/lightning.svg');
   const activeColor = focused ? "blue" : "gray";
 

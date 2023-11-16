@@ -1,25 +1,28 @@
 /**
  * Default bootstrap relays
  */
-export const defaultRelays = [
-	'wss://relay.damus.io',
-	'wss://nostr-pub.wellorder.net',
-	'wss://nostr.mom',
-	'wss://4.up.railway.app',
-	'wss://eden.nostr.land',
-	'wss://nostr-relay.untethr.me',
-	'wss://nostr.zebedee.social',
-	'wss://offchain.pub',
-	'wss://nostr.fmt.wiz.biz',
-	'wss://nostr-relay.wlvs.space',
-	'wss://nostr.fly.dev',
-	'wss://nostr.nostr.band',
-	'wss://relay.realsearch.cc',
-	'wss://relay.nostrgraph.net',
-	'wss://relay.minds.com/nostr/v1/ws',
-	'wss://nos.lol/',
-	'wss://relay.snort.social',
-]
+// export const defaultRelays = [
+// 	'wss://relay.damus.io',
+// 	'wss://relay.nostrss.re', 
+// 	'wss://relay.nostrich.de',
+// 	'wss://relay.plebstr.com',
+// 	'wss://nostr-pub.wellorder.net',
+// 	'wss://nostr.mom',
+// 	'wss://4.up.railway.app',
+// 	'wss://eden.nostr.land',
+// 	'wss://nostr-relay.untethr.me',
+// 	'wss://nostr.zebedee.social',
+// 	'wss://offchain.pub',
+// 	'wss://nostr.fmt.wiz.biz',
+// 	'wss://nostr-relay.wlvs.space',
+// 	'wss://nostr.fly.dev',
+// 	'wss://nostr.nostr.band',
+// 	'wss://relay.realsearch.cc',
+// 	'wss://relay.nostrgraph.net',
+// 	'wss://relay.minds.com/nostr/v1/ws',
+// 	'wss://nos.lol/',
+// 	'wss://relay.snort.social',
+// ]
 
 export enum EventKind {
 	Unknown = -1,

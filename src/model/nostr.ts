@@ -4,7 +4,6 @@ export interface IProfileContent {
 	about: string
 	banner: string
 	displayName: string
-	lud06: string
 	lud16: string
 	name: string
 	nip05: string

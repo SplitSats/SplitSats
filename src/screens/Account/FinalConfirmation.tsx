@@ -5,19 +5,27 @@ import { IconButton } from "react-native-paper";
 import * as Clipboard from "expo-clipboard";
 import Checkbox from "expo-checkbox";
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
-import { SECRET, STORE_KEYS } from "@store/consts";
-import { store, secureStore } from "@store";
-import ConfirmButton from "@comps/ConfirmButton";
-import { nip19 } from "nostr-tools";
+import ConfirmButton from '@comps/ConfirmButton';
+import { l } from "@log";
+import { useUserProfileStore } from '@store'
+import { toPrivateKeyHex } from '@nostr/util';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
-const FinalConfirmation = ({ navigation, route }) => {
+
+const FinalConfirmation = ({ navigation }) => {
+	const { reset } = navigation
+
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [isCheckboxChecked, setCheckboxChecked] = useState(false);
-  const { userProfile } = route.params;
   const [npub, setNpub] = useState("");
   const [nsec, setNsec] = useState("");
+  
+  const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
-  const copyPublicKeyToClipboard = async () => {
+  l("FinalConfirmation")
+  l("userProfile", userProfile)
+  
+  const copyPublicKeyToClipboard = async() => {
     await Clipboard.setStringAsync(npub);
     alert("Public key copied to clipboard");
   };
@@ -29,17 +37,17 @@ const FinalConfirmation = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchKeys = async () => {
-      const userPrivateKey = await secureStore.get(SECRET);
-      const nsec = nip19.nsecEncode(userPrivateKey);
+      const nsec = await getWallet(NSEC);
       setNsec(nsec);
-      const npub = await store.get(STORE_KEYS.npub);
+      const npub = await getWallet(NPUB);
       setNpub(npub);
     };
     fetchKeys();
   }, []);
 
   const handleAddFriends = () => {
-    navigation.navigate("Groups");
+		reset({index: 0, routes: [{ name: "Groups" }]})
+    // navigation.navigate("Groups");
   };
 
   return (
@@ -76,12 +84,13 @@ const FinalConfirmation = ({ navigation, route }) => {
           <IconButton icon="content-copy" onPress={copyPrivateKeyToClipboard} />
         </View>
 
-        {/* Public Key */}
-        <Text style={styles.keyLabel}>Public key</Text>
-        <View style={styles.keyContainer}>
-          <Text style={styles.keyText}>{npub}</Text>
-          <IconButton icon="content-copy" onPress={copyPublicKeyToClipboard} />
-        </View>
+      {/* Public Key */}
+      <Text style={styles.keyLabel}>Public key</Text>
+      <View style={styles.keyContainer}>
+        
+        <Text style={styles.keyText}>{npub}</Text>
+        <IconButton icon="content-copy" onPress={copyPublicKeyToClipboard} />
+      </View>
 
         {/* Checkbox */}
         <View style={styles.checkboxContainer}>
@@ -99,7 +108,7 @@ const FinalConfirmation = ({ navigation, route }) => {
     </ScrollView>
   );
 };
-//            <Image source={require('@assets/logo/check 1.png')}/>
+
 const styles = StyleSheet.create({
   container: {
     position: "relative",

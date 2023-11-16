@@ -4,30 +4,33 @@ import { Image,Text, View } from 'react-native'
 
 import { styles } from '@styles/styles'
 import AuthButton from '@comps/ButtonAuth'
+import { getWallet, NPUB } from '@store/secure';
 import { l } from '@log'
-import { store } from '@store'
-import { STORE_KEYS } from '@store/consts'
+import { SKIP_AUTH } from '@consts/config'
 
 const AuthenticationScreen = ({ navigation }) => {
-	const [userLoggedIn, setUserLoggedIn] = useState(null)
-  
+	const { reset } = navigation
+	const [userLoggedIn, setUserLoggedIn] = useState(false)
+	
 	useEffect(() => {
-		const checkLoginStatus = async () => {
-			// const userLoggedIn = await store.get(STORE_KEYS.userIsLoggedIn)
-			const userLoggedIn = AsyncStorage.getItem('userIsLoggedIn')
-			
-			if (userLoggedIn === 'true') {
-				console.log('User logged in')
-				navigation.navigate('Groups')
-			} else {
-				console.log('User not logged in')
+		const checkUserLogin = async () => {
+			const npub = await getWallet(NPUB);
+			l("[AUTH] User npub present in storage: ", npub)
+			l('User logged in')
+			if (!SKIP_AUTH && npub) {
+				reset({index: 0, routes: [{ name: "Groups" }]})
+				setUserLoggedIn(true)
+			}
+			else {
+				l('User not logged in')
 			}
 		}
 
-		checkLoginStatus()
+		checkUserLogin()
 	}, [])
-	console.log('User logged in:', userLoggedIn)
-	if (!userLoggedIn || userLoggedIn === 'false') {
+	
+	
+	if (!userLoggedIn) {
 		// User is not logged in
 		return (
 			<View style={styles.mainView}>

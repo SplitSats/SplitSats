@@ -1,36 +1,40 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import { IProfileContent } from '@src/model/nostr';
 import { l } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
+import {generateRandomHumanReadableUserName} from './utils'
+import { useUserProfileStore } from '@store'
+
 
 const CreateAccountScreen = ({ navigation }) => {
 
 	const [bannerImageUri, setBannerImageUri] = useState('');
   	const [profileImageUri, setProfileImageUri] = useState('');
 	
+	const randomUserName = generateRandomHumanReadableUserName(2);
 
-	const initialProfile: IProfileContent = {
-		about: 'A new SplitSats User',
-		banner: '',
-		displayName: 'SplitSats User',
-		lud06: 'LNURL',
-		lud16: 'splitsats@getalby.com',
-		name: 'splitsats',
-		nip05: 'splitsats@nostr.com',
-		picture: '',
-		username: 'splitsats01',
-		website: '',
+	const initialProfile: NostrProfileContent = {
+	about: 'A new SplitSats User',
+	banner: '',
+	display_name: 'SplitSats User',
+	lud16: `${randomUserName}@getalby.com`,
+	name: randomUserName,
+	nip05: `${randomUserName}@splitsats.io`,
+	picture: '',
+	username: `${randomUserName}`,
 	};
 
-	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+
+	useEffect(() => {
+		setUserProfile(initialProfile);
+	}, [])
 	
 	const handleNextButton = async () => {
 		// Set the banner and profile images in the user profile
@@ -38,20 +42,23 @@ const CreateAccountScreen = ({ navigation }) => {
 		userProfile.picture = profileImageUri;
 		
 		l('User profile create Account:', userProfile)
+		setUserProfile(userProfile);
 		navigation.replace('ConfirmCreateAccount', { userProfile })
 	}
 	
 	l("CreateAccountScreen")
 	
 	return (
+		<View style={{ flex: 1 }}>
+			
 		<ScrollView contentContainerStyle={styles.container}>
-
 			<Text style={styles.title}>NEW ACCOUNT</Text>
 			<View style={styles.containerPhotos}>
       			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
 				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
       
 			</View>
+			{/* TODO: Refactor using form map */}
 			<Text style={styles.label}>USERNAME*</Text>
 			<TextInput
 				style={styles.input}
@@ -66,7 +73,7 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.name} // Display the name from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
 			/>
-			<Text style={styles.label}>LN URL</Text>
+			<Text style={styles.label}>LN ADDRESS</Text>
 			<TextInput
 				style={styles.input}
 				placeholder={userProfile.lud16}
@@ -87,9 +94,11 @@ const CreateAccountScreen = ({ navigation }) => {
 				value={userProfile.about} // Display the ABOUT ME from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
 			/>
-			<ConfirmButton title="NEXT" onPress={handleNextButton} />
 		</ScrollView>
+		<ConfirmButton title="NEXT" onPress={handleNextButton} disabled={false}/>
 		
+	</View>
+	
 	)
 }
 
@@ -105,10 +114,11 @@ const styles = StyleSheet.create({
 		marginTop:20,
 	  },
 	container: {
-		flex: 1,
+		flexGrow: 1,
 		backgroundColor: PRIMARY_COLOR,
 		alignItems: 'center',
 		justifyContent: 'center',
+		height: '100%',
 	},
 	title: {
 		fontSize: 24,

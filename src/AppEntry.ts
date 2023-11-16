@@ -2,7 +2,7 @@
 import './shim'
 import './i18n'
 
-import App from '@comps/App'
+import App from '@src/App'
 import { isReactNativeDevMode } from '@consts'
 import { l } from '@log'
 import { setupReactotron } from '@log/reactotron'

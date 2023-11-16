@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     height: 50,
     alignSelf: 'center',
     overflow: 'hidden',
-    bottom: 40,
+    bottom: 10,
     justifyContent: 'center', // Center vertically
     alignItems: 'center', // Center horizontally
     color: 'black', // Text color

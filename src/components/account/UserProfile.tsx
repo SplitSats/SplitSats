@@ -1,19 +1,17 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StatusBar } from 'expo-status-bar';
-import { nip19 } from 'nostr-tools';
 import React, { useEffect, useState } from 'react';
 import { Button, Image, StyleSheet, Text, View } from 'react-native';
-import { AsyncStore } from '@src/storage/store/AsyncStore';
-import { useNDK } from '@src/context/NDKContext';
 import { l, err } from '@log';
-import { IProfileContent } from '@src/model/nostr';
-import { store } from '@store';	
-import { STORE_KEYS } from '@store/consts';
-import { NDKUser } from '@nostr-dev-kit/ndk';
+import { useUserProfileStore } from '@store'
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
 const UserProfile = ({ dataStore }) => {
-	const ndk = useNDK();
-	const [userProfile, setUserProfile] = useState<IProfileContent | null>(null);
+	// const ndk = useNDK();
+	const [ndk, setNdk] = useState(null);
+	// const user = useUser()
+	// const profile = useProfile(user?.pubkey)
+	// const profileContent = profile?.content || {}
+
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
@@ -23,12 +21,10 @@ const UserProfile = ({ dataStore }) => {
 					if (!ndk) {
 						throw new Error('NDK not initialized');
 					}
-					const userNpub = await store.get(STORE_KEYS.npub);
+					const userNpub = await getWallet(NPUB);
 					if (!userNpub) {
-						console.log('UserPublicKey not found in local storage');
 						l('UserPublicKey not found in local storage');
 					}
-					console.log('userNpub:', userNpub);
 					l('userNpub:', userNpub);
 					const user = ndk.getUser({ npub: userNpub });
 					const userProfile = await user.fetchProfile();
@@ -37,31 +33,14 @@ const UserProfile = ({ dataStore }) => {
 					}
 					setUserProfile(userProfile);
 					console.log(user.profile);
-				} else if (dataStore === 'redux') {
-					// TODO: Add Redux store
-					const storedUserProfile = await store.get(STORE_KEYS.userProfile);
-					l('Stored user profile:', storedUserProfile);
-					if (!storedUserProfile) {
-						err('User profile not found');
-					}
-					await setUserProfile(JSON.parse(storedUserProfile));
-				} else if (dataStore === 'sqlite') {
-					// Use AsyncStorage
-					// const storedUserProfile = await store.getItem(STORE_KEYS.userProfile);
-					const storedUserProfile = await AsyncStorage.getItem('userProfile');
-					l('Stored user profile:', storedUserProfile);
-					if (!storedUserProfile) {
-						err('User profile not found');
-					}
-					await setUserProfile(JSON.parse(storedUserProfile));
-				}
+				} 
 			} catch (error) {
 				console.error('Error fetching user profile:', error);
 			}
 		};
 
 		fetchUserProfile();
-	}, [ndk]);
+	}, []);
 
 	return (
 		<View style={styles.header}>

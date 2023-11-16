@@ -6,4 +6,8 @@ export const RELAYS: string[] = [
 	'wss://purplepag.es'
 ]
 
-export const STORAGE = 'sqlite'
+export const STORAGE = 'redux'
+
+export const USE_POOL = false
+export const SKIP_AUTH = true
+
