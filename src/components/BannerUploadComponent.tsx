@@ -4,7 +4,6 @@ import * as ImagePicker from "expo-image-picker";
 import { IconButton, MD3Colors } from "react-native-paper";
 import axios from "axios";
 
-
 type BannerUploadComponentProps = {
   imageUri: string | null;
   setImageUri: React.Dispatch<React.SetStateAction<string | " ">>;

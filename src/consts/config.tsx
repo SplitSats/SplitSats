@@ -7,3 +7,7 @@ export const RELAYS: string[] = [
 ]
 
 export const STORAGE = 'redux'
+
+export const USE_POOL = false
+export const SKIP_AUTH = true
+

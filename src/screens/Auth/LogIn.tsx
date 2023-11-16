@@ -10,20 +10,24 @@ import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
 import ConfirmButton from '@comps/ConfirmButton'
 import { ActivityIndicator } from 'react-native';
 import { l, err } from '@log';
-import { useUser } from '@hooks'
-import { useDispatch } from "@store"
-import { updateUser } from "@redux"
+// import { useUser } from '@hooks'
+// import { useDispatch } from "@store"
+// import { updateUser } from "@redux/slices/settingsSlice"
+// import { useUserProfileStore } from '@store'
+// import { toPrivateKeyHex } from '@nostr/util';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
+
 
 import * as secp from "@noble/secp256k1"
 
 const LogInScreen = ({ navigation }) => {
-	const { setUserIsLoggedIn } = useAuth()
+	// const { setUserIsLoggedIn } = useAuth()
 	const [Nsec, setNsec] = useState(INIT_KEY)
 	const [loading, setLoading] = useState(false); 
 	const [privateKey, setPrivateKey] = useState("")
-	const dispatch = useDispatch()
+	// const dispatch = useDispatch()
 	const [error, setError] = useState("")
-	const user = useUser()
+	// const user = useUser()
 
 	
 	const handlePrivateKeySubmit = async () => {
@@ -35,7 +39,7 @@ const LogInScreen = ({ navigation }) => {
 		try {
 			let validPrivateKey: string
 			let validPubkey: string
-	  
+			// TODO: Use to privateKeyHex function 
 			if (privateKey.startsWith("nsec")) {
 			  const { data } = nip19.decode(privateKey)
 			  const hexPrivateKey = data as string
@@ -52,25 +56,16 @@ const LogInScreen = ({ navigation }) => {
 				throw new Error("Invalid private key")
 			  }
 			}
-			await Promise.all([
-				secureStore.set(SECRET, privateKey),
-			])
-			
-			await AsyncStorage.setItem('userIsLoggedIn', 'true')
-			await AsyncStorage.setItem('userPublicKey', hexPubkey)
-
-			dispatch(updateUser({ pubkey: validPubkey, privateKey: validPrivateKey }))
+			await createWallet(PRIVATE_KEY_HEX, validPrivateKey);
+			await createWallet(PUBLIC_KEY_HEX, validPubkey);
 		} catch (e) {
 			err(e)
 			setError("Invalid private key")
 		}
-		
-		setUserIsLoggedIn(true)
+
 		setLoading(false)
 		// Navigate to the HomeScreen
-		// navigation.navigate('Home', { screen: 'Groups' });
 		navigation.navigate('Groups');
-		
 	}
 
 	return (

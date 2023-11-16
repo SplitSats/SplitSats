@@ -4,80 +4,33 @@ import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View } fr
 import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
 import updateNostrProfile from '@nostr/updateProfile';
-import { useAuth } from '@src/context/AuthContext'; // Import the AuthContext
 import { l, err } from '@log';
-import { secureStore, store } from '@store'
-import { IProfileContent } from '@src/model/nostr';
 import { useNDK } from '@src/context/NDKContext';
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
 import ConfirmButton from '@comps/ConfirmButton';
-import { SECRET, STORE_KEYS } from '@store/consts';
 import { ActivityIndicator } from 'react-native';
-import { useUser } from '@hooks'
-import { useDispatch } from "@store"
-import { doUpdateProfile } from '@src/redux/slices/profilesSlice'
-import { updateUser } from "@redux/slices/settingsSlice"
+import { useUserProfileStore } from '@store'
+import { toPrivateKeyHex } from '@nostr/util';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
 // When user confirm the account, we need to save the profile to redux and send it to nostr
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
-  const { setUserIsLoggedIn } = useAuth();
+  // const { setUserIsLoggedIn } = useAuth();
   // const ndk = useNDK();
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
-  const { userProfile } = route.params;
+  // const { userProfile } = route.params;
   const [loading, setLoading] = useState(false); 
 
   const [npub, setNpub] = useState("");
 
-  const user = useUser()
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    if (loading) {
-      // Perform loading-related actions, e.g., disable UI elements
-    } else {
-      // Perform actions when loading is completed
-    }
-  }, [loading]);
-
-
-  const publishNostrProfile = async ( npub: string, userProfile: IProfileContent ) => {
-    l("Publishing Profile for npub:", npub)
-    try {
-      const nostrUser = ndk.getUser({
-        npub: npub,
-      });
-      if (!nostrUser) {
-        throw new Error('Nostr user not found');
-      }
-      // Fetch the existing profile
-      await nostrUser.fetchProfile();
-      l('Nostr user profile:', nostrUser.profile);
-
-      // Update the profile fields
-      nostrUser.profile.name = userProfile.name;
-      nostrUser.profile.displayName = userProfile.displayName;
-      nostrUser.profile.about = userProfile.about;
-      nostrUser.profile.image = userProfile.picture;
-      nostrUser.profile.banner = userProfile.banner;
-      nostrUser.profile.lud16 = userProfile.lud16;
-      nostrUser.profile.nip05 = userProfile.nip05;
-
-
-      // Publish the updated profile
-      await Promise.all([nostrUser.publish()]);
-      
-      l('Nostr user profile updated!', nostrUser.profile);
-    } catch (error) {
-      err('Error updating Nostr profile:', error);
-    }
-  }
-  
   useEffect(() => {
     const createNostrKeys = async () => {
       // Generate a private key for the user
       const userPrivateKey = generatePrivateKey();
+      const nsec = nip19.nsecEncode(userPrivateKey);
       // Extract the public key from the private key
       const userPublicKey = getPublicKey(userPrivateKey);
       const npub = nip19.npubEncode(userPublicKey);
@@ -85,10 +38,11 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       l('New nostr keys generated! npub:', npub);
       l('New nostr keys generated! userPublicKey:', userPublicKey);
       // Store the private key securely
-      await Promise.all([
-        secureStore.set(SECRET, userPrivateKey),
-      ]);
-      dispatch(updateUser({ pubkey: userPublicKey, privateKey: userPrivateKey, npub: npub }))
+      await createWallet(PRIVATE_KEY_HEX, userPrivateKey);
+      await createWallet(PUBLIC_KEY_HEX, userPublicKey);
+      await createWallet(NPUB, npub);
+      await createWallet(NSEC, nsec);
+
     };
     createNostrKeys();
   }, []);
@@ -99,24 +53,18 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       l('userProfile is null');
       return;
     }
-
-    await AsyncStorage.setItem('userIsLoggedIn', 'true')
-    setUserIsLoggedIn(true);
+    //TODO: Publish the user profile to Nostr
+    // await publishNostrProfile(npub, userProfile);
+    setLoading(false);
+    navigation.replace('FinalConfirmation');
     
-    // Publish the user profile to Nostr
-    dispatch(
-			doUpdateProfile(userProfile, () => {
-		    setLoading(false)
-        navigation.replace('FinalConfirmation')
-			})
-		)
   };
 
   return (
     <View style={styles.container}>
         <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
         <View style={styles.cardContainer}>
-          <CreateAccountWrap userProfile={userProfile} npub={npub}/>
+          <CreateAccountWrap userProfile={userProfile}/>
         </View>
         <Text style={styles.noteTextt}>
           This is a preview of your Nostr account.

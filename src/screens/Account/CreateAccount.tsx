@@ -1,15 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { l } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
 import {generateRandomHumanReadableUserName} from './utils'
+import { useUserProfileStore } from '@store'
+
 
 const CreateAccountScreen = ({ navigation }) => {
 
@@ -29,7 +30,11 @@ const CreateAccountScreen = ({ navigation }) => {
 	username: `${randomUserName}`,
 	};
 
-	const [userProfile, setUserProfile] = useState<NostrProfileContent>(initialProfile);
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+
+	useEffect(() => {
+		setUserProfile(initialProfile);
+	}, [])
 	
 	const handleNextButton = async () => {
 		// Set the banner and profile images in the user profile
@@ -37,19 +42,12 @@ const CreateAccountScreen = ({ navigation }) => {
 		userProfile.picture = profileImageUri;
 		
 		l('User profile create Account:', userProfile)
+		setUserProfile(userProfile);
 		navigation.replace('ConfirmCreateAccount', { userProfile })
 	}
 	
 	l("CreateAccountScreen")
-	const form = [
-		{ label: "Handle", key: "username" },
-		{ label: "Display Name", key: "name" },
-		{ label: "Bio", key: "about", multiline: true },
-		{ label: "NIP-05 Verification", key: "nip05" },
-		{ label: "Lightning Address", key: "lud16" },
-	]
-
-
+	
 	return (
 		<View style={{ flex: 1 }}>
 			
@@ -60,6 +58,7 @@ const CreateAccountScreen = ({ navigation }) => {
 				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
       
 			</View>
+			{/* TODO: Refactor using form map */}
 			<Text style={styles.label}>USERNAME*</Text>
 			<TextInput
 				style={styles.input}

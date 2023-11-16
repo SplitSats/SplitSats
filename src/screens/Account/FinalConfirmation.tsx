@@ -5,13 +5,11 @@ import { IconButton } from 'react-native-paper';
 import * as Clipboard from 'expo-clipboard'
 import Checkbox from 'expo-checkbox';
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
-import { SECRET, STORE_KEYS } from '@store/consts';
-import { store, secureStore } from "@store";
 import ConfirmButton from '@comps/ConfirmButton';
-import { nip19 } from 'nostr-tools';
-import { useUser } from '@hooks'
-import { useProfile } from "@hooks";
 import { l } from "@log";
+import { useUserProfileStore } from '@store'
+import { toPrivateKeyHex } from '@nostr/util';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
 
 const FinalConfirmation = ({ navigation }) => {
@@ -19,17 +17,13 @@ const FinalConfirmation = ({ navigation }) => {
 
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [isCheckboxChecked, setCheckboxChecked] = useState(false);
-  // const { userProfile } = route.params;
   const [npub, setNpub] = useState("");
   const [nsec, setNsec] = useState("");
-  const user = useUser()
-  const profile = useProfile(user?.pubkey)
-  const profileContent = profile?.content || {}
+  
+  const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
   l("FinalConfirmation")
-  l("user", user)
-  l("userProfile", profile)
-  l("profileContent", profileContent)
+  l("userProfile", userProfile)
   
   const copyPublicKeyToClipboard = async() => {
     await Clipboard.setStringAsync(npub);
@@ -43,11 +37,10 @@ const FinalConfirmation = ({ navigation }) => {
 
   useEffect(() => {
     const fetchKeys = async () => {
-      const userPrivateKey = user?.privateKey || await secureStore.get(SECRET);
-      const nsec = nip19.nsecEncode(userPrivateKey);
+      const nsec = await getWallet(NSEC);
       setNsec(nsec);
-      // const npub = await store.get(STORE_KEYS.npub);
-      setNpub(user.npub);
+      const npub = await getWallet(NPUB);
+      setNpub(npub);
     };
     fetchKeys();
   }, []);
@@ -61,7 +54,7 @@ const FinalConfirmation = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.headerText}>ACCOUNT CREATED</Text>
       <View style={styles.cardContainer}>
-        <CreateAccountWrap userProfile={profileContent} />
+        <CreateAccountWrap userProfile={userProfile} />
 
         <View style={styles.checkOverlay}>
           <Image
@@ -89,6 +82,7 @@ const FinalConfirmation = ({ navigation }) => {
       {/* Public Key */}
       <Text style={styles.keyLabel}>Public key</Text>
       <View style={styles.keyContainer}>
+        
         <Text style={styles.keyText}>{npub}</Text>
         <IconButton icon="content-copy" onPress={copyPublicKeyToClipboard} />
       </View>
@@ -107,7 +101,7 @@ const FinalConfirmation = ({ navigation }) => {
     </View>
   );
 };
-//            <Image source={require('@assets/logo/check 1.png')}/>
+
 const styles = StyleSheet.create({
   container: {
     position: "relative",

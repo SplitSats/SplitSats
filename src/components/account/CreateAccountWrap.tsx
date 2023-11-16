@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { IProfileContent } from '@src/model/nostr'
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import { store } from '@store'
-import { STORE_KEYS } from '@store/consts'
 import { truncateNpub } from '@nostr/util'
 import { l } from '@log'
 import  QRCodeScreen from '@comps/account/QRCode' 
+import { getWallet, NPUB } from '@store/secure';
 
-const CreateAccountWrap = ({ userProfile, npub }) => {
+const CreateAccountWrap = ({ userProfile }) => {
   
   // TODO: Show a QR code of the npub, so friends can add you yet
 
@@ -20,6 +17,8 @@ const CreateAccountWrap = ({ userProfile, npub }) => {
   
   useEffect(() => {
     const fetchUserNpub = async () => {
+
+      const npub = await getWallet(NPUB);
       if (npub){
         setUserNpub(npub)
       }
@@ -52,7 +51,7 @@ const CreateAccountWrap = ({ userProfile, npub }) => {
           <Image source={{ uri: userInputs.picture }} style={styles.profileImage} />
         </View>
           <Text style={styles.noteText}>{userInputs.username}</Text>     
-          {npub && <Text style={styles.noteText}>{truncatedNpub}</Text>}
+          <Text style={styles.noteText}>{truncatedNpub}</Text>
           <Text style={styles.noteText}>{userInputs.lud16}</Text>
           <Text style={styles.noteText}>{userInputs.about}</Text>
       </View>

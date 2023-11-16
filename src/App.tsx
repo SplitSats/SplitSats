@@ -16,12 +16,13 @@ import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import { BottomTabNavigator } from '@src/navigation/BottomTabNavigation'
-import { Provider, useSelector } from "react-redux"
+// import { Provider, useSelector } from "react-redux"
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 import { store, persistor } from "@store"
 import { PersistGate } from "redux-persist/integration/react"
 import { StatusBar, KeyboardAvoidingView } from "react-native"
 import { PRIMARY_COLOR } from '@src/styles/colors'
+import PolyfillCrypto from "react-native-webview-crypto";
 
 
 const Stack = createNativeStackNavigator()
@@ -46,11 +47,13 @@ export default function App() {
 	
 	return (
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
-        <Provider store={store}>
+        {/* <Provider > */}
 	    <SafeAreaProvider>
 		<NDKProvider>
+		<PolyfillCrypto />
+
 		<AuthProvider> 
-		<AppWrapper>
+		{/* <AppWrapper> */}
 
 			<NavigationContainer>
 				<Stack.Navigator initialRouteName="Loading">
@@ -66,11 +69,12 @@ export default function App() {
 					<Stack.Screen name="Account" component={AccountScreen} /> 
 				</Stack.Navigator>
 			</NavigationContainer>
-		</AppWrapper>
+		{/* </AppWrapper> */}
+
 		</AuthProvider>
 		</NDKProvider>
 		</SafeAreaProvider>
-		</Provider>
+		{/* </Provider> */}
 	  </View>
 	)
 }

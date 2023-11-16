@@ -8,8 +8,9 @@ import {
     Relay,
     SimplePool
 } from "nostr-tools"
-import { l } from "@log"
+import { l, err } from "@log"
 import { sign } from "crypto"
+import { USE_POOL } from "@consts/config"
 
   export const nostrEventKinds = {
     profile: 0,
@@ -19,6 +20,7 @@ import { sign } from "crypto"
     reaction: 7,
   }
   export const defaultRelays = [
+    'wss://127.0.0.1:8008',
     'wss://relay.damus.io',
     'wss://relay.nostrss.re', 
     'wss://relay.nostrich.de',
@@ -58,7 +60,7 @@ import { sign } from "crypto"
       await relay.connect()
   
       relay.on("connect", () => {
-        console.log("connected to: ", relay.url)
+        l("connected to: ", relay.url)
   
         handled = true
         return cb({ relay, success: true })
@@ -71,7 +73,7 @@ import { sign } from "crypto"
         return cb({ relay, success: false })
       })
     } catch (e) {
-      console.log("error with init relay", relayEndpoint, e)
+      l("error with init relay", relayEndpoint, e)
       handled = true
   
       cb({ relay: { url: relayEndpoint, status: 0 }, success: false })
@@ -118,8 +120,8 @@ import { sign } from "crypto"
                 const content = JSON.parse(possiblyStringifiedContent)
                 newEvent = { content, ...rest }
               } catch (e) {
-                console.log("error parsing content", e)
-                console.log("", nostrEvent)
+                l("error parsing content", e)
+                l("", nostrEvent)
               }
             }
           }
@@ -192,6 +194,7 @@ import { sign } from "crypto"
     content = "",
     tags = []
   ): Promise<NostrNoteEvent | undefined> => {
+    l("Publishing nostr event...")
     const event = {
       kind,
       pubkey: user.pubkey,
@@ -201,47 +204,47 @@ import { sign } from "crypto"
     }
     const signedEvent = finishEvent(event, user.privateKey)
     
-    console.log("signedEvent", signedEvent)
+    l("signedEvent", signedEvent)
     
-    const usePool = true
     let returned = false
 
     return new Promise((resolve) => {
 
-      if (usePool){
+      if (USE_POOL){
         const pool = new SimplePool()
-        let pubs = pool.publish(defaultRelays, signedEvent)
-        l("pubs", pubs)
-        // await Promise.all(pubs)
-        resolve(event)
-      } else {
 
-        relays.forEach((relay) => {
+        // Wrap in an async function to use await
+        (async () => {
+          let pubs = await pool.publish(defaultRelays, signedEvent);
+          l("pubs", pubs);
+          await Promise.all(pubs);
+          resolve(signedEvent);
+        })();
         
+        // let pubs = pool.publish(defaultRelays, signedEvent)
+        // l("pubs", pubs)
+        // await Promise.all(pubs)
+        // resolve(event)
+      } else {
+        const publishPromises = relays.map(async (relay) => {
+          l("publishing event using relay:", relay.url)
           if (!relay.publish) {
-            return
+            return;
           }
-    
-          const pub = relay.publish(signedEvent)
-          console.log("relay", relay)
-        // console.log("pub", pub)
-
-        // pub.on("ok", () => {
-        //   if (!returned) {
-        //     // @ts-expect-error
-        //     resolve(event)
-        //     returned = true
-        //   }
+          const pub = await relay.publish(signedEvent); // Use await here
+          if (!pub) {
+            err("Error publishing event using relay:", relay.url);
+          } else {
+            l("published event using relay:", relay.url)
+          }
+          return event; // Return the event for resolution
+        });
   
-        //   console.log(`${relay.url} has accepted our event`)
-        // })
-        // pub.on("seen", () => {
-        //   console.log(`we saw the event on ${relay.url}`)
-        // })
-        // pub.on("failed", (reason) => {
-        //   console.log(`failed to publish to ${relay.url}: ${reason}`)
-        // })
-      })
+        Promise.all(publishPromises)
+          .then(() => resolve(event))
+          .catch((error) => {
+            console.error("Error publishing events:", error);
+          });
     }
     setTimeout(() => {
       if (!returned) {
@@ -251,7 +254,6 @@ import { sign } from "crypto"
     }, 5000)
     })
 }
-
 
   export const getProfile = async (
     relays: Relay[],
