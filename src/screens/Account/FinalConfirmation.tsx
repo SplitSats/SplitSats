@@ -22,8 +22,6 @@ const FinalConfirmation = ({ navigation }) => {
   
   const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
-  l("FinalConfirmation")
-  l("userProfile", userProfile)
   
   const copyPublicKeyToClipboard = async() => {
     await Clipboard.setStringAsync(npub);
@@ -46,8 +44,7 @@ const FinalConfirmation = ({ navigation }) => {
   }, []);
 
   const handleAddFriends = () => {
-		reset({index: 0, routes: [{ name: "Groups" }]})
-    // navigation.navigate("Groups");
+    navigation.navigate("AddFriend");
   };
 
   return (

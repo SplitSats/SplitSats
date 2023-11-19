@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View } from 'react-native';
 import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
-import updateNostrProfile from '@nostr/updateProfile';
+import updateNostrProfileNDK from '@nostr/updateProfile';
 import { l, err } from '@log';
 import { useNDK } from '@src/context/NDKContext';
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
@@ -12,8 +12,10 @@ import { ActivityIndicator } from 'react-native';
 import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
-
-// When user confirm the account, we need to save the profile to redux and send it to nostr
+import { relay } from '@nostr/class/Relay'
+import { EventKind } from '@nostr/consts'
+import { USE_NDK } from '@nostr/consts'
+import NDKManager  from '@nostr'
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
@@ -28,6 +30,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const createNostrKeys = async () => {
+      setLoading(true);
       // Generate a private key for the user
       const userPrivateKey = generatePrivateKey();
       const nsec = nip19.nsecEncode(userPrivateKey);
@@ -36,16 +39,43 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       const npub = nip19.npubEncode(userPublicKey);
       setNpub(npub);
       l('New nostr keys generated! npub:', npub);
+      l('nsec:', nsec);
       l('New nostr keys generated! userPublicKey:', userPublicKey);
       // Store the private key securely
       await createWallet(PRIVATE_KEY_HEX, userPrivateKey);
       await createWallet(PUBLIC_KEY_HEX, userPublicKey);
       await createWallet(NPUB, npub);
       await createWallet(NSEC, nsec);
-
+      setLoading(false);
     };
     createNostrKeys();
   }, []);
+  
+  const publishNostrProfile = async (npub, userProfile) => {
+    const userPrivateKey = await getWallet(PRIVATE_KEY_HEX) || '';
+    const userPublicKey = await getWallet(PUBLIC_KEY_HEX);
+    let result = false;
+    if (USE_NDK) {
+      
+      const ndkManager = NDKManager.getInstance();
+      await ndkManager.initialize();
+      result = await ndkManager.updateNostrProfile(npub, userProfile);
+    }
+    else {
+      const event = {
+        kind: EventKind.SetMetadata,
+        tags: [],
+        content: JSON.stringify(userProfile),
+        created_at: Math.ceil(Date.now() / 1000),
+      }
+      result = await relay.publishEventToPool(event, userPrivateKey);
+    }
+    if (!result) {
+      err('Error publishing Nostr profile');
+      return;
+    }
+    l('Nostr profile published!');
+  }
 
   const handleCreateAccount = async () => {
 		setLoading(true);
@@ -54,10 +84,9 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       return;
     }
     //TODO: Publish the user profile to Nostr
-    // await publishNostrProfile(npub, userProfile);
+    await publishNostrProfile(npub, userProfile);
     setLoading(false);
     navigation.replace('FinalConfirmation');
-    
   };
 
   return (
