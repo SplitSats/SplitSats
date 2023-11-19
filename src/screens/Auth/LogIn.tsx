@@ -9,46 +9,63 @@ import { secureStore, store } from '@store'
 import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
 import ConfirmButton from '@comps/ConfirmButton'
 import { ActivityIndicator } from 'react-native';
-import { l } from '@log';
-import { useNavigation } from '@react-navigation/native';
+import { l, err } from '@log';
+// import { useUser } from '@hooks'
+// import { useDispatch } from "@store"
+// import { updateUser } from "@redux/slices/settingsSlice"
+// import { useUserProfileStore } from '@store'
+// import { toPrivateKeyHex } from '@nostr/util';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
+
+
+import * as secp from "@noble/secp256k1"
 
 const LogInScreen = ({ navigation }) => {
-	const { setUserIsLoggedIn } = useAuth()
+	// const { setUserIsLoggedIn } = useAuth()
 	const [Nsec, setNsec] = useState(INIT_KEY)
 	const [loading, setLoading] = useState(false); 
-	// const navigation = useNavigation();
-	const handleLogIn = async () => {
+	const [privateKey, setPrivateKey] = useState("")
+	// const dispatch = useDispatch()
+	const [error, setError] = useState("")
+	// const user = useUser()
+
+	
+	const handlePrivateKeySubmit = async () => {
 		// Perform user authentication logic using the provided private key
+		setError("")
 		setLoading(true)
+
 		l('LogInScreen handleLogIn')
 		try {
-			const userPrivateKey = nip19.decode(Nsec).data as string
-			const userPublicKey = getPublicKey(userPrivateKey)
-			const npub = nip19.npubEncode(userPublicKey);
-			l('Login user npub:', npub)
-			// After successful authentication, set the user as logged in
-			// Store the private key securely
-			await Promise.all([
-				secureStore.set(SECRET, userPrivateKey),
-			  ])
-			// Store the public key in AsyncStorage
-			// await store.set(STORE_KEYS.npubHex, userPublicKey);
-			// await store.set(STORE_KEYS.npub, npub);
-			// await store.set(STORE_KEYS.userLoggedIn, 'true')
-			await AsyncStorage.setItem('userIsLoggedIn', 'true')
-			await AsyncStorage.setItem('userPublicKey', userPublicKey)
+			let validPrivateKey: string
+			let validPubkey: string
+			// TODO: Use to privateKeyHex function 
+			if (privateKey.startsWith("nsec")) {
+			  const { data } = nip19.decode(privateKey)
+			  const hexPrivateKey = data as string
+			  const hexPubkey = getPublicKey(hexPrivateKey)
+			  validPrivateKey = hexPrivateKey
+			  validPubkey = hexPubkey
+			} else {
+			  if (secp.utils.isValidPrivateKey(privateKey)) {
+				const hexPrivateKey = privateKey
+				const hexPubkey = getPublicKey(hexPrivateKey)
+				validPrivateKey = hexPrivateKey
+				validPubkey = hexPubkey
+			  } else {
+				throw new Error("Invalid private key")
+			  }
+			}
+			await createWallet(PRIVATE_KEY_HEX, validPrivateKey);
+			await createWallet(PUBLIC_KEY_HEX, validPubkey);
+		} catch (e) {
+			err(e)
+			setError("Invalid private key")
 		}
-		catch (err) {
-			console.log(err)
-			return null
-		}
-    
-		setUserIsLoggedIn(true)
+
 		setLoading(false)
 		// Navigate to the HomeScreen
-		// navigation.navigate('Home', { screen: 'Groups' });
-		navigation.navigate('Groups');
-		
+		navigation.navigate('Dashboard');
 	}
 
 	return (
@@ -67,7 +84,7 @@ const LogInScreen = ({ navigation }) => {
 			</View>
 			<ConfirmButton
 				title="PASTE YOUR KEY"
-				onPress={handleLogIn}
+				onPress={handlePrivateKeySubmit}
 				disabled={loading} // Disable the button when loading
     		/>
       		{loading && <ActivityIndicator size="large" color="#0000ff" />} 

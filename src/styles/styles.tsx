@@ -4,6 +4,10 @@ import { StyleSheet } from 'react-native'
 export const PRIMARY_COLOR = '#0F172A'
 export const SECONDARY_COLOR = '#83A3EE'
 export const DARK_GREY = '#2B2B2B'
+export const FILL_CARD_COLOR = '#303444'
+export const SOFT_GREY = '#D9D9D9'
+
+
 
 export const styles = StyleSheet.create({
 	container: {

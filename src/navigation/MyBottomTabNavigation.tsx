@@ -67,7 +67,7 @@ const TabBarButton = ({ accessibilityState, children, onPress }) => {
   );
 };
 //--------------------------------------------------------------------------------------
-const ActionMenu = ({ isVisible, onClose }) => {
+const ActionMenu = ({ navigation,isVisible, onClose }) => {
   //this is the action for plus sign
   if (!isVisible) return null;
 
@@ -76,7 +76,7 @@ const ActionMenu = ({ isVisible, onClose }) => {
       <TouchableOpacity style={Instyles.overlay} onPress={onClose}>
         <View style={Instyles.menuContainer}>
           {/* Menu items go here */}
-          <TouchableOpacity onPress={() => console.log('Handle The Action')} style={Instyles.menuItem}>
+          <TouchableOpacity onPress={() => navigation.navigate('CreateGroup')} style={Instyles.menuItem}>
 
 
             <Ionicons name="people-outline" size={30} color={"white"} />
@@ -114,7 +114,7 @@ const ActionMenu = ({ isVisible, onClose }) => {
   );
 };
 //--------------------------------------------------------------------------------------
-const Navigation = () => {
+const Navigation = ({navigation}) => {
   const [isActionMenuVisible, setActionMenuVisible] = useState(false);
 
   const toggleActionMenu = () => {
@@ -152,7 +152,7 @@ const Navigation = () => {
             height: 70,
           },
         })}
-        tabBarOptions={{
+        screenOptions={{
           keyboardHidesTabBar: true,
         }}
       >
@@ -178,7 +178,7 @@ const Navigation = () => {
         <Tab.Screen name="Activity" component={ActivityScreen} />
         <Tab.Screen name="Account" component={AccountScreen} />
       </Tab.Navigator>
-      <ActionMenu isVisible={isActionMenuVisible} onClose={toggleActionMenu} />
+      <ActionMenu navigation={navigation} isVisible={isActionMenuVisible} onClose={toggleActionMenu} />
     </>
   );
 };

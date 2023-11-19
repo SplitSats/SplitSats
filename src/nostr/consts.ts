@@ -1,8 +1,19 @@
 /**
  * Default bootstrap relays
  */
-export const defaultRelays = [
+
+export const USE_NDK = true
+
+export const defaultRelays: string[] = [
 	'wss://relay.damus.io',
+	'wss://relay.nostr.band', 
+	'wss://purplepag.es',
+	'wss://relay.snort.social',
+]
+export const defaultRelays2: string[] = [
+	'wss://relay.nostrss.re', 
+	'wss://relay.nostrich.de',
+	'wss://relay.plebstr.com',
 	'wss://nostr-pub.wellorder.net',
 	'wss://nostr.mom',
 	'wss://4.up.railway.app',
