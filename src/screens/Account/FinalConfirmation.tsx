@@ -22,8 +22,6 @@ const FinalConfirmation = ({ navigation }) => {
   
   const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
-  l("FinalConfirmation")
-  l("userProfile", userProfile)
   
   const copyPublicKeyToClipboard = async() => {
     await Clipboard.setStringAsync(npub);

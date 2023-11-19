@@ -5,7 +5,6 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ZustandAsyncStorage } from '@store/persist';
 
-
 // Create a store to manage the user profile state
 export const useUserProfileStore = create(
   persist(

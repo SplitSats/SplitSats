@@ -65,7 +65,7 @@ const LogInScreen = ({ navigation }) => {
 
 		setLoading(false)
 		// Navigate to the HomeScreen
-		navigation.navigate('Groups');
+		navigation.navigate('Dashboard');
 	}
 
 	return (

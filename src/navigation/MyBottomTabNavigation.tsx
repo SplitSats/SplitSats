@@ -152,7 +152,7 @@ const Navigation = ({navigation}) => {
             height: 70,
           },
         })}
-        tabBarOptions={{
+        screenOptions={{
           keyboardHidesTabBar: true,
         }}
       >

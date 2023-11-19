@@ -19,12 +19,11 @@ const CreateAccountWrap = ({ userProfile }) => {
     const fetchUserNpub = async () => {
 
       const npub = await getWallet(NPUB);
-      if (npub){
-        setUserNpub(npub)
+      if (!npub){
+        console.log('No npub found')
+        return
       }
-      if (!userNpub){
-        console.log('userNpub not found in local storage')
-      }
+      setUserNpub(npub)
       let truncated = ''
       try {
         truncated = truncateNpub(userNpub);

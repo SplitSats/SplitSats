@@ -15,33 +15,19 @@ import AccountScreen from '@screens/Account'
 import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
-import { BottomTabNavigator } from '@src/navigation/BottomTabNavigation'
 // import { Provider, useSelector } from "react-redux"
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
-import { store, persistor } from "@store"
-import { PersistGate } from "redux-persist/integration/react"
-import { StatusBar, KeyboardAvoidingView } from "react-native"
+// import { store, persistor } from "@store"
+// import { PersistGate } from "redux-persist/integration/react"
+// import { StatusBar, KeyboardAvoidingView } from "react-native"
 import { PRIMARY_COLOR } from '@src/styles/colors'
 import PolyfillCrypto from "react-native-webview-crypto";
+import Navigation from '@src/navigation/MyBottomTabNavigation'
+import CreateNewGroup from '@screens/Groups/CreateNewGroup'
+import AddFriendScreen from '@screens/Account/AddFriendsScreen'
 
 
 const Stack = createNativeStackNavigator()
-
-
-function AppWrapper({ children }) {
-	const insets = useSafeAreaInsets()
-	const backgroundColor: string = PRIMARY_COLOR
-  
-	return (
-	  <PersistGate loading={<View style={{ flex: 1, backgroundColor }} />} persistor={persistor}>
-		<View style={{ flex: 1, backgroundColor, paddingTop: insets.top, paddingBottom: insets.bottom }}>
-		  <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-			{children}
-		  </KeyboardAvoidingView>
-		</View>
-	  </PersistGate>
-	)
-  }
 
 export default function App() {
 	
@@ -49,12 +35,8 @@ export default function App() {
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
         {/* <Provider > */}
 	    <SafeAreaProvider>
-		<NDKProvider>
 		<PolyfillCrypto />
-
 		<AuthProvider> 
-		{/* <AppWrapper> */}
-
 			<NavigationContainer>
 				<Stack.Navigator initialRouteName="Loading">
 					<Stack.Screen name="Loading" component={LoadingScreen} />
@@ -63,16 +45,19 @@ export default function App() {
 					<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} /> 
 					<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
 					<Stack.Screen name="LogIn" component={LogInScreen} /> 
-					<Stack.Screen name="Groups" component={GroupsScreen} />
-					<Stack.Screen name="Contacts" component={ContactsScreen} />
-					<Stack.Screen name="History" component={HistoryScreen} />
-					<Stack.Screen name="Account" component={AccountScreen} /> 
+					<Stack.Screen name="AddFriend" component={AddFriendScreen}/>
+					<Stack.Screen
+						name="Dashboard"
+						component={Navigation}
+						options={{ headerShown: false }} // Usually, you hide the header for the bottom tab navigator
+						/>
+
+					<Stack.Screen name="CreateGroup" component={CreateNewGroup}/>
+					
 				</Stack.Navigator>
 			</NavigationContainer>
-		{/* </AppWrapper> */}
 
 		</AuthProvider>
-		</NDKProvider>
 		</SafeAreaProvider>
 		{/* </Provider> */}
 	  </View>

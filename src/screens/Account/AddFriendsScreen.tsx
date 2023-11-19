@@ -10,7 +10,7 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
+import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import CancelIcon from "@assets/icon/Cancel.png";
 import QRIcon from "@assets/icon/QR-code.png";
 import SearchIcon from "@assets/icon/Search.png";
@@ -18,6 +18,9 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import ConfirmButton from "@comps/ConfirmButton";
 import QRCodeScreen from "@comps/account/QRcode";
 import UserCardComponent from "@comps/UserCardComponent";
+import { l } from "@log";
+import { nip05 } from 'nostr-tools'
+
 
 const AddFriendScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,6 +55,7 @@ const AddFriendScreen = ({ navigation }) => {
         "https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   ];
+
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
@@ -60,8 +64,13 @@ const AddFriendScreen = ({ navigation }) => {
     );
     // Handle your QR Code data here
   };
-  const handleInputChange = (text) => {
+  const handleInputChange = async (text) => {
     setSearchTerm(text);
+    l("text", text);
+
+    let profile = await nip05.queryProfile('jb55.com')
+    console.log(profile?.pubkey)
+
     setIsTyping(text.length > 0);
   };
 
@@ -70,15 +79,16 @@ const AddFriendScreen = ({ navigation }) => {
     setIsTyping(false);
     setScanned(false);
   };
+  
   return isScannerOpen ? (
     <QRCodeScreen 
-    scanned = {scanned}
-    handleFunc = {handleBarCodeScanned}
-    setScannerOpen={setScannerOpen}
+      scanned={scanned}
+      handleFunc={handleBarCodeScanned}
+      setScannerOpen={setScannerOpen}
     />
-    
-    ) : (
-    <ScrollView contentContainerStyle={styles.container}>
+  ) : (
+    <View style={styles.container}>
+    <View>
       <Text style={styles.headerText}>ADD FRIENDS</Text>
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome {user.name}</Text>
@@ -109,26 +119,29 @@ const AddFriendScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
       </View>
-      
-        <FlatList
-          data={users}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <UserCardComponent
-              userName={item.name}
-              userPublicKey={item.publicKey}
-              profileImage={item.profileImage}
-            />
-          )}
+    </View>
+
+    <FlatList
+      style={styles.userList}
+      data={users}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <UserCardComponent
+          userName={item.name}
+          userPublicKey={item.publicKey}
+          profileImage={item.profileImage}
         />
-      <ConfirmButton
+      )}
+    />
+    <ConfirmButton
         disabled={false}
         title="FINISH"
         onPress={() => navigation.navigate("Dashboard")}
       />
-    </ScrollView>
+  </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -144,7 +157,7 @@ const styles = StyleSheet.create({
   searchSection: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: DARK_GREY,
+    backgroundColor: FILL_CARD_COLOR,
     margin: 20,
     borderRadius: 20,
   },

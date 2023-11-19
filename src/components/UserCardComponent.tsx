@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
+import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import { useState } from "react";
 import { CheckBox } from "react-native-elements";
+
+
 const UserCardComponent = ({ userName, userPublicKey, profileImage,onSelectionChange, ...props  }) => {
   const [selected, setSelected] = useState(false);
   const handlePress = () => {
@@ -48,7 +50,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     padding: 10,
-    backgroundColor: DARK_GREY,
+    backgroundColor: FILL_CARD_COLOR,
     marginBottom: 10,
     borderRadius: 20,
     shadowColor: "black",
