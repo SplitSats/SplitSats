@@ -4,7 +4,7 @@ import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@sty
 import { CheckBox } from "react-native-elements";
 import { truncateNpub } from '@nostr/util'
 
-const UserCardComponent = ({
+const SearchCardComponent = ({
   contact,
   onSelectionChange,
   isSelected,
@@ -50,7 +50,7 @@ const UserCardComponent = ({
   );
 };
 
-// const UserCardComponent = ({ userName, userPublicKey, profileImage, onSelectionChange, ...props  }) => {
+// const SearchCardComponent = ({ userName, userPublicKey, profileImage, onSelectionChange, ...props  }) => {
 //   const [selected, setSelected] = useState(false);
 //   const handlePress = () => {
 //     const newSelectedState = !selected;
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserCardComponent;
+export default SearchCardComponent;
