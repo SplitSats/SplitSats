@@ -17,13 +17,15 @@ import SearchIcon from "@assets/icon/Search.png";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import ConfirmButton from "@comps/ConfirmButton";
 import QRCodeScreen from "@comps/account/QRcode";
-import UserCardComponent from "@comps/UserCardComponent";
+import SearchCardComponent from "@comps/SearchCardComponent";
 import { useUserProfileStore, useContactManagerStore } from '@store'
 
-import { l } from "@log";
+import { err, l } from "@log";
 import { nip05 } from 'nostr-tools'
 import NDKManager  from '@nostr'
 import { ContactManager, Contact } from '@src/managers/contact'
+import { defaultNpubs } from '@nostr/consts'
+
 
 const AddFriendScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,11 +43,37 @@ const AddFriendScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
+      await setContactManager(new ContactManager()); 
+
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     })();
   }, []);
   
+  useEffect(() => {
+    (async () => {
+      // Populate users with default npubs  
+      defaultNpubs.forEach(npub => {
+        addNpubContact(npub);
+      });  
+    })();
+  }, []);
+
+
+  const addNpubContact = async (npub: string) => {
+    const queryUserProfile = await ndkManager.queryNostrProfile(npub);
+    if (queryUserProfile) {
+        const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
+        l("contact", contact);
+        // Update the users array with the new contact
+        await setUsers(users => [...users, contact]);
+        return true;
+    }
+    err("Failed to add contact with npub: ", npub);
+    return false;
+  };
+
+
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
@@ -57,21 +85,13 @@ const AddFriendScreen = ({ navigation }) => {
 
   const handleInputChange = async (text) => {
     setSearchTerm(text);
-    l("text", text);
-    if (text.startsWith('npub')) {  
-      const queryUserProfile = await ndkManager.queryNostrProfile(text);
-      if (queryUserProfile) {
-        const contact = new Contact(queryUserProfile.name, text, queryUserProfile);
-        l("contact", contact);
-        // contactManager.addContact(contact);
-        // Update the users array with the new contact
-        setUsers([...users, contact]);
-      }
+    if (text.startsWith('npub')) { 
+      addNpubContact(text);
     }
     setIsTyping(text.length > 0);
   };
 
-  // Handler to handle selection change in UserCardComponent
+  // Handler to handle selection change in SearchCardComponent
   const handleSelectionChange = (contact, selectedState) => {
     if (selectedState) {
       setSelectedContacts(prevSelectedContacts => [...prevSelectedContacts, contact]);
@@ -88,6 +108,13 @@ const AddFriendScreen = ({ navigation }) => {
     selectedContacts.forEach(contact => {
       contactManager.addContact(contact);
     });
+    // Lets follow the selected contacts
+    const result = ndkManager.followNpubs(selectedContacts.map(contact => contact.npub));
+    if (!result) {
+      err("Failed to follow npubs: ", selectedContacts.map(contact => contact.npub));
+    }
+    l()
+
     // Save the updated contact manager to the store
     setContactManager(contactManager);
     navigation.navigate("Dashboard");
@@ -147,7 +174,7 @@ const AddFriendScreen = ({ navigation }) => {
       data={users}
       keyExtractor={(contact) => contact.npub}
       renderItem={({ item }) => (
-        <UserCardComponent
+        <SearchCardComponent
           contact={item}
           onSelectionChange={handleSelectionChange}
         />

@@ -10,13 +10,13 @@ import {
   Image
 } from "react-native";
 import SearchIcon from "@assets/icon/Search.png";
-import UserCardComponent from "@comps/UserCardComponent";
+import SearchCardComponent from "@comps/SearchCardComponent";
 import GroupHeaderComponent from "@comps/GroupHeaderComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import MemberCardComponent from "@comps/MemberCardComponent";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have expo/vector-icons installed
 
-// this is user type is same with UserCardComponent
+// this is user type is same with SearchCardComponent
 // For the sake of simplicity for Back-end developing
 
 type User = {
@@ -101,7 +101,7 @@ const CreateNewGroup = () => {
           </View>
         )}
         renderItem={({ item }) => (
-          <UserCardComponent
+          <SearchCardComponent
             userName={item.userName}
             profileImage={item.profileImage}
             userPublicKey={item.userPublicKey}
