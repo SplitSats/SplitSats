@@ -61,7 +61,7 @@ const FinalConfirmation = ({ navigation }) => {
           </View>
         </View>
         {/* Nostr Account Created Text */}
-        <Text style={styles.title}>Nostr account successfullyyy created!</Text>
+        <Text style={styles.title}>Nostr account successfully created!</Text>
         {/* Emojis and Info Text */}
         <Text style={styles.noteText}>
           🔑 Your keys are stored locally. {"\n"}❗ REMEMBER TO SECURELY SAVE
@@ -100,7 +100,7 @@ const FinalConfirmation = ({ navigation }) => {
         <ConfirmButton
           title="ADD FRIENDS"
           onPress={handleAddFriends}
-          disabled={isCheckboxChecked} // Disable the button when loading
+          disabled={!isCheckboxChecked} // Disable the button when loading
         />
     </ScrollView>
   );

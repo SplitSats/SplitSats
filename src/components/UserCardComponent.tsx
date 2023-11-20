@@ -1,34 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
-import { useState } from "react";
 import { CheckBox } from "react-native-elements";
+import { truncateNpub } from '@nostr/util'
 
+const UserCardComponent = ({
+  contact,
+  onSelectionChange,
+  isSelected,
+  ...props
+}) => {
+  const [selected, setSelected] = useState(isSelected);
 
-const UserCardComponent = ({ userName, userPublicKey, profileImage,onSelectionChange, ...props  }) => {
-  const [selected, setSelected] = useState(false);
   const handlePress = () => {
     const newSelectedState = !selected;
     setSelected(newSelectedState);
 
-    // Call the passed in onSelectionChange function with the new selected state
-    //We will use it inside CreatNewGroup when user click on a user to add
-    //here we will just return the user with all of it's profile and the newSelectedState
-    //this state will be check in CreateNewGroup to undrestand if the user is selected rn or deselected
     if (onSelectionChange) {
-      onSelectionChange({ userName, userPublicKey, profileImage }, newSelectedState);
+      onSelectionChange(contact, newSelectedState);
     }
   };
+  
+  // Render the component only if 'contact' exists and has a 'profile' property
+  if (!contact || !contact.profile) {
+    return null;
+  }
+
   return (
     <TouchableOpacity
       style={styles.cardContainer}
       onPress={handlePress}
       {...props}
     >
-      <Image source={{ uri: profileImage }} style={styles.profileImage} />
+      <Image source={{ uri: contact.profile.image }} style={styles.profileImage} />
       <View style={styles.userInfo}>
-        <Text style={styles.userName}>{userName}</Text>
-        <Text style={styles.userPublicKey}>{userPublicKey}</Text>
+        <Text style={styles.userName}>{contact.username}</Text>
+        <Text style={styles.userPublicKey}>{truncateNpub(contact.npub)}</Text>
       </View>
       <CheckBox
         center
@@ -37,11 +44,49 @@ const UserCardComponent = ({ userName, userPublicKey, profileImage,onSelectionCh
         uncheckedColor={'grey'}
         checkedColor={SECONDARY_COLOR}
         checked={selected}
-        onPress={() => setSelected(!selected)}
+        onPress={handlePress}
       />
     </TouchableOpacity>
   );
 };
+
+// const UserCardComponent = ({ userName, userPublicKey, profileImage, onSelectionChange, ...props  }) => {
+//   const [selected, setSelected] = useState(false);
+//   const handlePress = () => {
+//     const newSelectedState = !selected;
+//     setSelected(newSelectedState);
+
+//     // Call the passed in onSelectionChange function with the new selected state
+//     //We will use it inside CreatNewGroup when user click on a user to add
+//     //here we will just return the user with all of it's profile and the newSelectedState
+//     //this state will be check in CreateNewGroup to undrestand if the user is selected rn or deselected
+//     if (onSelectionChange) {
+//       onSelectionChange({ userName, userPublicKey, profileImage }, newSelectedState);
+//     }
+//   };
+//   return (
+//     <TouchableOpacity
+//       style={styles.cardContainer}
+//       onPress={handlePress}
+//       {...props}
+//     >
+//       <Image source={{ uri: profileImage }} style={styles.profileImage} />
+//       <View style={styles.userInfo}>
+//         <Text style={styles.userName}>{userName}</Text>
+//         <Text style={styles.userPublicKey}>{userPublicKey}</Text>
+//       </View>
+//       <CheckBox
+//         center
+//         checkedIcon="check-circle"
+//         uncheckedIcon="circle-o"
+//         uncheckedColor={'grey'}
+//         checkedColor={SECONDARY_COLOR}
+//         checked={selected}
+//         onPress={() => setSelected(!selected)}
+//       />
+//     </TouchableOpacity>
+//   );
+// };
 
 const styles = StyleSheet.create({
   cardContainer: {

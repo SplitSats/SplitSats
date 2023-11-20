@@ -30,6 +30,30 @@ class NDKManager {
     await this.ndk.connect();
   }
 
+  public async queryNostrProfile(query: string): Promise<IProfileContent | null> {
+    // Check if query is npub, hexPub, or nip05
+    if (!this.ndk) {
+      throw new Error('NDK not initialized');
+    }
+    // check if query string starts with npub 
+    if (query.startsWith('npub')) {
+      try {
+        const nostrUser = this.ndk.getUser({
+          npub: query,
+        });
+
+        await nostrUser.fetchProfile();
+        const userProfile = nostrUser.profile;
+        // l('Nostr user:', nostrUser);
+        // l('Nostr user profile:', userProfile);
+        return userProfile;
+      } catch (error) {
+        err('Error fetching Nostr profile:', error);
+        return null;
+      }
+    }
+  }
+
   public async updateNostrProfile(userNpub: string, userProfile: IProfileContent): Promise<boolean> {
     if (!this.ndk) {
       throw new Error('NDK not initialized');
