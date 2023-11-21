@@ -2,6 +2,7 @@ import type { IProfileContent } from '@model/nostr'
 import { cTo } from '@store/utils'
 import { Event as NostrEvent } from 'nostr-tools'
 import { getPublicKey, nip19, nip06 } from 'nostr-tools';
+import { l, err } from '@log';
 
 export function toPrivateKeyHex(anything: string): string {
   if (!anything || anything.length === 0) {
@@ -47,6 +48,28 @@ export async function getRelays() {
 export function nip05toURL(identifier: string) {
 	const [name, domain] = identifier.split('@')
 	return `https://${domain}/.well-known/nostr.json?name=${name}`
+}
+
+export async function nip05toNpub(identifier: string): Promise<string | null>{
+	const [name, domain] = identifier.split('@')
+  const url = `https://${domain}/.well-known/nostr.json?name=${name}`
+  try {
+    const res = await fetch(url)
+    const { names } = await res.json()
+    if (!names || !names[name]) {
+      return null;
+    }
+    const userPublicKey = names[name]
+    const npub = await nip19.npubEncode(userPublicKey)
+    // print nip05 -> npub in console
+    l(`${identifier} -> ${npub}`)
+    return npub
+  }
+  catch (e) {
+    // print error in console
+    err(e)
+    return null
+  }
 }
 
 /**

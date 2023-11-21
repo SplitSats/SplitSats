@@ -4,6 +4,21 @@ import { StateStorage } from 'zustand/middleware';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ZustandAsyncStorage } from '@store/persist';
+import { ContactManager } from '@src/managers/contact'
+
+export const useContactManagerStore = create(
+  persist(
+    (set) => ({
+      contactManager: new ContactManager(),
+      setContactManager: (manager) => set({ contactManager: manager }),
+      clearContactManager: () => set({ contactManager: new ContactManager() }),
+    }),
+    {
+      name: 'contactManager-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
 
 // Create a store to manage the user profile state
 export const useUserProfileStore = create(
@@ -15,7 +30,7 @@ export const useUserProfileStore = create(
     }),
     {
       name: 'userProfile-storage',
-      getStorage: () => AsyncStorage, 
+      storage: createJSONStorage(() => AsyncStorage),
     }
   )
 );

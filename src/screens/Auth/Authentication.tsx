@@ -18,14 +18,13 @@ const AuthenticationScreen = ({ navigation }) => {
 			l("[AUTH] User npub present in storage: ", npub)
 			l('User logged in')
 			if (!SKIP_AUTH && npub) {
-				reset({index: 0, routes: [{ name: "Groups" }]})
+				reset({index: 0, routes: [{ name: "Dashboard" }]})
 				setUserLoggedIn(true)
 			}
 			else {
 				l('User not logged in')
 			}
 		}
-
 		checkUserLogin()
 	}, [])
 	
@@ -52,7 +51,7 @@ const AuthenticationScreen = ({ navigation }) => {
 			</View>
 		)
 	} 
-	// User is not logged in
+	// User is logged in
 	return <View style={styles.mainView} />
   
 }
