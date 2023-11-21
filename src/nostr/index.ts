@@ -6,6 +6,7 @@ import NDK from '@nostr-dev-kit/ndk';
 import { NDKUser } from '@nostr-dev-kit/ndk';
 import { defaultRelays, EventKind } from '@nostr/consts';
 import { getPublicKey, nip19 } from 'nostr-tools';
+import { nip05toNpub } from './util';
 
 class NDKManager {
   private static instance: NDKManager;
@@ -38,29 +39,35 @@ class NDKManager {
   }
 
   public async queryNostrProfile(query: string): Promise<IProfileContent | null> {
-    // Check if query is npub, hexPub, or nip05
-    if (!this.ndk) {
-      throw new Error('NDK not initialized');
-    }
-    // check if query string starts with npub 
-    if (query.startsWith('npub')) {
-      try {
-        const nostrUser = this.ndk.getUser({
-          npub: query,
-        });
-
-        await nostrUser.fetchProfile();
-        const userProfile = nostrUser.profile;
-        // l('Nostr user:', nostrUser);
-        // l('Nostr user profile:', userProfile);
-        return userProfile;
-      } catch (error) {
-        err('Error fetching Nostr profile:', error);
+    try {
+      if (!this.ndk) {
+        throw new Error('NDK not initialized');
+      }
+  
+      let npub: string = '';
+  
+      if (query.startsWith('npub')) {
+        npub = query;
+      } else if (query.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+        l('Query is a NIP05')
+        npub = nip05toNpub(query);
+        if (!npub || !npub.startsWith('npub')) {
+          return null;
+        }
+      } else {
         return null;
       }
+      
+      const nostrUser = this.ndk.getUser({ npub });
+      await nostrUser.fetchProfile();
+      const userProfile = nostrUser.profile;
+      return userProfile;
+    } catch (error) {
+      err('Error fetching Nostr profile:', error);
+      return null;
     }
   }
-
+  
   public async followNpubs(npubs: string[]): Promise<boolean> {
     if (!this.ndk) {
       throw new Error('NDK not initialized');
