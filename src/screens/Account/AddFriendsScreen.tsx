@@ -19,6 +19,7 @@ import ConfirmButton from "@comps/ConfirmButton";
 import QRCodeScreen from "@comps/account/QRcode";
 import SearchCardComponent from "@comps/SearchCardComponent";
 import { useUserProfileStore, useContactManagerStore } from '@store'
+import Swipeable from "react-native-swipeable";
 
 import { err, l } from "@log";
 import { nip05 } from 'nostr-tools'
@@ -54,13 +55,17 @@ const AddFriendScreen = ({ navigation }) => {
     (async () => {
       // Populate users with default npubs  
       defaultNpubs.forEach(npub => {
-        addNpubContact(npub);
+        // add the npub to the users array if it is not already present
+        if (!users.some(contact => contact.npub === npub))
+        {
+          searchNpubContact(npub);
+        }
       });  
     })();
   }, []);
 
 
-  const addNpubContact = async (npub: string) => {
+  const searchNpubContact = async (npub: string) => {
     const queryUserProfile = await ndkManager.queryNostrProfile(npub);
     if (queryUserProfile) {
         const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
@@ -69,7 +74,6 @@ const AddFriendScreen = ({ navigation }) => {
         await setUsers(users => [...users, contact]);
         return true;
     }
-    err("Failed to add contact with npub: ", npub);
     return false;
   };
 
@@ -77,16 +81,21 @@ const AddFriendScreen = ({ navigation }) => {
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
-    console.log(
-      `Bar code with type ${type} and data ${data} has been scanned!`
-    );
-    // Handle your QR Code data here
+    // Check if the scanned data starts with nostr:npub
+    if (data.startsWith("nostr:npub")) {
+      // Extract the npub from the data
+      const npub = data.split("nostr:")[1];
+      // Add the npub to the users array
+      searchNpubContact(npub);
+    } else {
+      err("Invalid QR Code data: ", data);
+    }
   };
 
   const handleInputChange = async (text) => {
     setSearchTerm(text);
-    if (text.startsWith('npub')) { 
-      addNpubContact(text);
+    if (text.length > 0) {
+      searchNpubContact(text);
     }
     setIsTyping(text.length > 0);
   };
@@ -125,6 +134,12 @@ const AddFriendScreen = ({ navigation }) => {
     setIsTyping(false);
     setScanned(false);
   };
+
+  // Function to remove a contact from the users list
+  const handleRemoveContact = (contactToRemove) => {
+    const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
+    setUsers(updatedUsers);
+  };
   
   return isScannerOpen ? (
     <QRCodeScreen 
@@ -148,7 +163,7 @@ const AddFriendScreen = ({ navigation }) => {
         <Image source={SearchIcon} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="npub, username, NIP05"
+          placeholder="npub or NIP05"
           placeholderTextColor={"grey"}
           value={searchTerm}
           onChangeText={handleInputChange}
@@ -174,10 +189,20 @@ const AddFriendScreen = ({ navigation }) => {
       data={users}
       keyExtractor={(contact) => contact.npub}
       renderItem={({ item }) => (
-        <SearchCardComponent
-          contact={item}
-          onSelectionChange={handleSelectionChange}
-        />
+        <Swipeable rightButtons={[
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleRemoveContact(item)}
+          >
+            <Text style={styles.deleteButtonText}>Remove</Text>
+          </TouchableOpacity>
+        ]}>
+          <SearchCardComponent
+            contact={item}
+            onSelectionChange={handleSelectionChange}
+            onRemove={handleRemoveContact} // Pass the removal handler to the card component
+          />
+        </Swipeable>
       )}
     />
     <ConfirmButton
@@ -252,6 +277,16 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
