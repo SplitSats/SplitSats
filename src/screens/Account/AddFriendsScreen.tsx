@@ -19,7 +19,7 @@ import ConfirmButton from "@comps/ConfirmButton";
 import QRCodeScreen from "@comps/account/QRcode";
 import SearchCardComponent from "@comps/SearchCardComponent";
 import { useUserProfileStore, useContactManagerStore } from '@store'
-import Swipeable from "react-native-swipeable";
+// import Swipeable from "react-native-swipeable";
 
 import { err, l } from "@log";
 import { nip05 } from 'nostr-tools'

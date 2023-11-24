@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import { CheckBox } from "react-native-elements";
 import { truncateNpub } from '@nostr/util'
-import Swipeable from "react-native-swipeable";
+// import Swipeable from "react-native-swipeable";
 
 const SearchCardComponent = ({
   contact,
@@ -42,7 +42,7 @@ const SearchCardComponent = ({
   ];
 
   return (
-    <Swipeable rightButtons={swipeableButtons}>
+    // <Swipeable rightButtons={swipeableButtons}>
     <TouchableOpacity
       style={styles.cardContainer}
       onPress={handlePress}
