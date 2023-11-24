@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
 import ImageUploadComponent from '@comps/ImageUploadComponent';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 

@@ -1,41 +1,46 @@
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@src/styles/colors";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, Modal, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, TouchableOpacity, StyleSheet, Modal, Text, Image } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { MaterialIcons } from '@expo/vector-icons'; // Import MaterialIcons from Expo
 
 import GroupsScreen from "@screens/Groups";
 import FriendsScreen from "@screens/Contacts";
 import ActivityScreen from "@screens/History";
 import AccountScreen from "@screens/Account";
+import SvgUri from "expo-svg-uri"; // Import SvgUri from Expo
+// import SvgUri from "react-native-svg-uri"; // Import the necessary component for SVG rendering
+
+import { useUserProfileStore } from '@store';
 
 const Tab = createBottomTabNavigator();
 //--------------------------------------------------------------------------------------
-const CustomTabBarButton = (
-  { children, onPress } //this is for plus sign in the middle
-) => (
+
+const CustomTabBarButton = ({ onPress }) => (
   <TouchableOpacity
     style={{
-      top: -30,
-      justifyContent: "center",
-      alignItems: "center",
+      width: 70,
+      height: 70,
+      borderRadius: 35,
+      backgroundColor: SECONDARY_COLOR,
+      justifyContent: 'center',
+      alignItems: 'center',
+      // marginBottom: 50,
     }}
     onPress={onPress}
   >
-    <View
-      style={{
-        width: 70,
-        height: 70,
-        borderRadius: 35,
-        backgroundColor: SECONDARY_COLOR,
-      }}
-    >
-      {children}
-    </View>
+    <MaterialIcons
+      name="add"
+      size={40}
+      color={PRIMARY_COLOR}
+    />
   </TouchableOpacity>
 );
+
+
 //--------------------------------------------------------------------------------------
-const TabBarButton = ({ accessibilityState, children, onPress }) => {
+const TabBarButton = ({ accessibilityState, children, onPress, icon, image }) => {
   //this is for the rest of Icons
   const focused = accessibilityState.selected;
   const backgroundColor = focused ? "rgba(0,0,0,0.6)" : "transparent"; // Active tab has opacity
@@ -47,20 +52,39 @@ const TabBarButton = ({ accessibilityState, children, onPress }) => {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: focused ? 10 : 0,
+        paddingBottom: 10, // Bottom padding for space
       }}
       accessibilityState={accessibilityState}
     >
       <View
         style={{
-          borderRadius: 20,
+          width: 70, 
+          height: 70,
+          borderRadius: 10,
           backgroundColor,
-          flex: 1,
-          width: "100%",
           justifyContent: "center",
           alignItems: "center",
         }}
-      >
+      >        
+        {typeof icon === "string" && icon.includes(".svg") ? (
+          <SvgUri
+            width="30" // Adjust width and height as needed
+            height="30"
+            source={icon} // Pass the path to your SVG image from assets
+          />
+        ): ( icon && image ? ( // Check if icon is truthy (not empty or undefined)
+        <Image // Render the user's profile picture as an Image component
+          source={{ uri: icon }}
+          style={{ 
+            width: 30, 
+            height: 30, 
+            borderRadius: 15,
+            borderWidth: 1,
+            borderColor: "white",
+          }}
+        />
+      ) : null 
+      )}
         {children}
       </View>
     </TouchableOpacity>
@@ -116,45 +140,59 @@ const ActionMenu = ({ navigation,isVisible, onClose }) => {
 //--------------------------------------------------------------------------------------
 const Navigation = ({navigation}) => {
   const [isActionMenuVisible, setActionMenuVisible] = useState(false);
+  const { userProfile } = useUserProfileStore();
+  const [accountIcon, setAccountIcon] = useState(""); // State to store the user's profile picture URL
+  
+  useEffect(() => {
+    if (userProfile?.picture) {
+      setAccountIcon(userProfile.picture); // Set the user's profile picture as the icon for the Account tab
+    }
+  }, [userProfile]);
 
   const toggleActionMenu = () => {
     setActionMenuVisible(!isActionMenuVisible);
   };
-  //this three line added just for the plus sign action
-  //In fact if you dont have the state of the Plus sign
-  //you will not undrestand when you should show it to user
   return (
     <>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (route.name === "Groups") {
-              iconName = focused ? "people" : "people-outline";
-            } else if (route.name === "Friends") {
-              iconName = focused ? "person-add" : "person-add-outline";
-            } else if (route.name === "Activity") {
-              iconName = focused ? "analytics" : "analytics-outline";
-            } else if (route.name === "Account") {
-              iconName = focused ? "person-circle" : "person-circle-outline";
-            }
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
+         
           tabBarActiveTintColor: "white",
           tabBarInactiveTintColor: SECONDARY_COLOR,
-          tabBarShowLabel: false,
+          tabBarShowLabel: true,
           headerShown: false,
-          tabBarButton: (props) => <TabBarButton {...props} />,
+          tabBarButton: (props) => {
+            let iconPath;
+            let image=false;
+            // Determine the icon path based on the route name
+            if (route.name === "Groups") {
+              iconPath = require("@assets/icon/groups.svg");
+            } else if (route.name === "Friends") {
+              iconPath = require("@assets/icon/contacts.svg");
+            } else if (route.name === "Activity") {
+              iconPath = require("@assets/icon/activity.svg");
+            } else if (route.name === "Account") {
+              iconPath = accountIcon || ""; // Use the user's profile picture for the Account tab
+              image=true;
+            }
+            return (
+              <TabBarButton
+                {...props}
+                icon={iconPath} // Pass the respective SVG image path or user's profile picture
+                image={image}
+              />
+            );
+          },
+          // tabBarButton: (props) => <TabBarButton {...props} />,
           tabBarStyle: {
-            borderColor: "#333A4A",
-            position: "absolute",
-            backgroundColor: "#333A4A",
-            height: 70,
+            borderTopColor: 'transparent',
+            backgroundColor: '#333A4A',
+            height: '10%', // Set the height of the navigation bar
+            justifyContent: 'flex-end', // Align items at the bottom
+            paddingBottom: 5, // Add extra padding at the bottom
           },
         })}
-        screenOptions={{
-          keyboardHidesTabBar: true,
-        }}
+        
       >
         <Tab.Screen name="Groups" component={GroupsScreen} />
         <Tab.Screen name="Friends" component={FriendsScreen} />
@@ -162,14 +200,6 @@ const Navigation = ({navigation}) => {
           name="Plus"
           component={ActivityScreen} // FORGET ABOUT THIS IT"S JUST A PLACE HOLDER
           options={{
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                name="add"
-                size={40}
-                color={"black"}
-                style={{ marginLeft: 3 }}
-              />
-            ),
             tabBarButton: (props) => (
               <CustomTabBarButton {...props} onPress={toggleActionMenu} />
             ),
@@ -178,7 +208,7 @@ const Navigation = ({navigation}) => {
         <Tab.Screen name="Activity" component={ActivityScreen} />
         <Tab.Screen name="Account" component={AccountScreen} />
       </Tab.Navigator>
-      <ActionMenu navigation={navigation} isVisible={isActionMenuVisible} onClose={toggleActionMenu} />
+      {/* <ActionMenu navigation={navigation} isVisible={isActionMenuVisible} onClose={toggleActionMenu} /> */}
     </>
   );
 };
