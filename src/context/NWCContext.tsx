@@ -1,11 +1,40 @@
-import React, { ReactNode, createContext, useContext } from "react";
+import React, {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useContext,
+  useState,
+} from "react";
 
-const NWCContext = createContext<null>(null);
+export interface NWCContextType {
+  nwcUrl: string;
+  setNwcUrl: Dispatch<SetStateAction<string>>;
+}
+
+export const defaultValues = {
+  nwcUrl: "",
+  setNwcUrl: () => null,
+};
+
+const NWCContext = createContext<NWCContextType>(defaultValues);
 
 export function NWCProvider({ children }: { children: ReactNode }) {
-  return <NWCContext.Provider value={null}>{children}</NWCContext.Provider>;
+  const [nwcUrl, setNwcUrl] = useState("");
+
+  return (
+    <NWCContext.Provider value={{ nwcUrl, setNwcUrl }}>
+      {children}
+    </NWCContext.Provider>
+  );
 }
 
 export function useNWCContext() {
   return useContext(NWCContext);
+}
+
+export function useNwcUrl() {
+  const { nwcUrl, setNwcUrl } = useNWCContext();
+
+  return [nwcUrl, setNwcUrl];
 }
