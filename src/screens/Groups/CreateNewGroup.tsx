@@ -10,6 +10,7 @@ import {
   Modal,
   Image, 
   Platform,
+  StatusBar
 } from "react-native";
 import SearchIcon from "@assets/icon/Search.png";
 import SearchCardComponent from "@comps/SearchCardComponent";
@@ -148,10 +149,6 @@ const CreateNewGroup = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   backgroundColor: PRIMARY_COLOR,
-  // },
   container: {
     flex: 1,
     backgroundColor: PRIMARY_COLOR,

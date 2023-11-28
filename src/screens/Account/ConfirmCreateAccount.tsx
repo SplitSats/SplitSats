@@ -78,7 +78,6 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       l('userProfile is null');
       return;
     }
-    //TODO: Publish the user profile to Nostr
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
     navigation.replace('FinalConfirmation');

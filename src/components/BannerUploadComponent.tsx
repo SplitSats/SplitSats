@@ -57,7 +57,7 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
       //   size={60}
       //   onPress={getRandomBannerImage}
       // />)}
-      <Image source={require('@assets/logo/Splitsats_name_W.png')} style={styles.bannerImage} />
+      <Image source={require('@assets/logo/Splitsats_name_W.png')} style={styles.BannerImage} />
     )}
   </View>
   );
@@ -78,9 +78,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  bannerImage: {
-    width: '100%',
-    height: 100,
+  BannerImage: {
+    width: "100%",
+    height: 130,
+
   },
 });
 

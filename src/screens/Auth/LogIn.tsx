@@ -10,25 +10,17 @@ import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
 import ConfirmButton from '@comps/ConfirmButton'
 import { ActivityIndicator } from 'react-native';
 import { l, err } from '@log';
-// import { useUser } from '@hooks'
-// import { useDispatch } from "@store"
-// import { updateUser } from "@redux/slices/settingsSlice"
-// import { useUserProfileStore } from '@store'
-// import { toPrivateKeyHex } from '@nostr/util';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
 
 
 import * as secp from "@noble/secp256k1"
 
 const LogInScreen = ({ navigation }) => {
-	// const { setUserIsLoggedIn } = useAuth()
 	const [Nsec, setNsec] = useState(INIT_KEY)
 	const [loading, setLoading] = useState(false); 
 	const [privateKey, setPrivateKey] = useState("")
-	// const dispatch = useDispatch()
 	const [error, setError] = useState("")
-	// const user = useUser()
-
+	
 	
 	const handlePrivateKeySubmit = async () => {
 		// Perform user authentication logic using the provided private key

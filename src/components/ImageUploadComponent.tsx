@@ -6,7 +6,7 @@ import { l } from "@log";
 
 type ImageUploadComponentProps = {
   imageUri: string | null;
-  setImageUri: React.Dispatch<React.SetStateAction<string | " ">>;
+  setImageUri?: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
@@ -59,8 +59,7 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
         iconColor={MD3Colors.neutral90}
         style={styles.photoIcon}
         size={30}
-        onPress={ () => console.log('Change Profile')}
-        // onPress={generateRandomRobotImage}
+        onPress={generateRandomRobotImage}
       />)}
     </View>
     
