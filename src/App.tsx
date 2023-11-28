@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect, useState } from 'react'
-import { Button, StyleSheet,Text, View, SafeAreaView } from 'react-native'
+import { Button, StyleSheet,Text, View, SafeAreaView, Platform, StatusBar } from 'react-native'
 
 import  CreateAccountScreen from '@screens/Account/CreateAccount'
 import AuthenticationScreen from '@screens/Auth/Authentication'
@@ -16,6 +16,11 @@ import Navigation from '@src/navigation/BottomTabNavigation'
 import CreateNewGroup from '@screens/Groups/CreateNewGroup'
 import AddFriendScreen from '@screens/Account/AddFriendsScreen'
 import { NDKProvider } from './context/NDKContext'
+import ProfileSettingScreen from '@screens/Setting/ProfileSettingScreen'
+import WalletConnectScreen from '@screens/Setting/WalletScreen'
+import KeysScreen from '@screens/Setting/KeysScreen'
+import PreferencesScreen from '@screens/Setting/PreferencesScreen'
+import DonateScreen from '@screens/Setting/DonateScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -42,7 +47,12 @@ export default function App() {
 					<Stack.Screen name="AddFriend" component={AddFriendScreen} />
 					<Stack.Screen name="Dashboard" component={Navigation}/>
 					<Stack.Screen name="CreateNewGroup" component={CreateNewGroup} />
-					
+					<Stack.Screen name="ProfileSetting" component={ProfileSettingScreen}/>
+					<Stack.Screen name="WalletScreen" component={WalletConnectScreen}/>
+					<Stack.Screen name="KeysScreen" component={KeysScreen}/>
+					<Stack.Screen name="PreferencesScreen" component={PreferencesScreen}/>
+					<Stack.Screen name="DonateScreen" component={DonateScreen}/>
+
 				</Stack.Navigator>
 			</NavigationContainer>
 		</NDKProvider>
