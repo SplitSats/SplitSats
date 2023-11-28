@@ -3,12 +3,23 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import ConfirmButton from '@comps/ConfirmButton'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-const WalletConnectScreen = () => {
-    const handleConnectButton = () => {
+import Header from "@comps/Header";
+
+
+const WalletConnectScreen = ({ navigation }) => {
+  
+  const handleConnectButton = () => {
         console.log('Handle the function');
-    }
+  }
+
+  const handleBack = () => {
+    navigation.goBack();
+  }
+  
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="NOSTR WALLET CONNECT" onPressBack={handleBack} />
+
       <View style={styles.contentContainer}>
         <Text style={styles.title}>Connect Your Wallet</Text>
         <Text style={styles.description}>
@@ -18,7 +29,7 @@ const WalletConnectScreen = () => {
         <Text style={styles.description}>
           You can always disconnect it at any time.
         </Text>
-        <ConfirmButton title="CONNECT YOUR WALLET" onPress={handleConnectButton} />
+        <ConfirmButton title="CONNECT YOUR WALLET" onPress={handleConnectButton} disabled={false} />
       </View>
     </SafeAreaView>
   );

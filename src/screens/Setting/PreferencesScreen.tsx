@@ -9,16 +9,27 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import ConfirmButton from "@comps/ConfirmButton";
-const PreferencesScreen = () => {
+import Header from "@comps/Header";
+
+
+const PreferencesScreen = ({ navigation }) => {
   const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [selectedCurrency, setSelectedCurrency] = useState("usd");
   const [selectedBitcoinUnit, setSelectedBitcoinUnit] = useState("sats");
   const [selectedTheme, setSelectedTheme] = useState("default");
   const handleSave = () => {
     console.log('Handle The function');
+    navigation.navigate("Dashboard")
   };
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="Preferences" onPressBack={handleBack} />
+
       <Text style={styles.headerText}>Preferences</Text>
       <View style={styles.textAndPicker}>
         <Text style={styles.pickerLabel}>Language</Text>

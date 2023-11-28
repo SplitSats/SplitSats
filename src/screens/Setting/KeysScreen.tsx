@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -10,28 +10,45 @@ import {
 } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { copyIcon } from "@src/data";
+import Header from "@comps/Header";
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
-const KeysScreen = () => {
+const KeysScreen = ({ navigation }) => {
   const [isKeyVisible, setIsKeyVisible] = useState(false);
-
-  const publicKey =
-    "npub1q6le8ppm0nz0gdnfl4jxy77su3l8t56pqm99t4xpwl5uez6c7q7zqtl6";
-  const nsec = "npub1q6le8ppm0nz0gdnfl4jxy77su3l8t56pqm99t4xpwl5uez6c7q7zqtl6";
+  const [npub, setNpub] = useState("");
+  const [nsec, setNsec] = useState("");
 
   const copyToClipboard = (text) => {
     Clipboard.setString(text);
     alert("Copied to clipboard!");
   };
 
+  useEffect(() => {
+    const fetchKeys = async () => {
+      const nsec = await getWallet(NSEC);
+      setNsec(nsec);
+      const npub = await getWallet(NPUB);
+      setNpub(npub);
+    };
+    fetchKeys();
+  }, []);
+
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerText}>Keys</Text>
+      <Header title="KEYS" onPressBack={handleBack} />
+
+      <Text style={styles.headerText}></Text>
       <View style={styles.section}>
         <Text style={styles.title}>Public key</Text>
-        <Text style={styles.keyText}>{publicKey}</Text>
+        <Text style={styles.keyText}>{npub}</Text>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => copyToClipboard(publicKey)}
+          onPress={() => copyToClipboard(npub)}
         >
           <Image
             source={copyIcon}
@@ -67,10 +84,10 @@ const KeysScreen = () => {
           <Text style={styles.buttonText}>Copy private key</Text>
         </TouchableOpacity>
         <Text style={styles.description}>
-          This key fully controls your account. Don't share it with anyone!
+        ⚠️ This key fully controls your account. Don't share it with anyone!
         </Text>
         <Text style={styles.warning}>
-          REMEMBER TO SECURELY SAVE YOUR PRIVATE KEY!
+        ❗REMEMBER TO SECURELY SAVE YOUR PRIVATE KEY!
         </Text>
       </View>
     </SafeAreaView>
@@ -92,6 +109,8 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
+    padding: 10, // Add padding to the key container
+    borderRadius: 15, // Add border radius to make it slightly rounded
   },
   title: {
     color: "#fff",
@@ -106,6 +125,7 @@ const styles = StyleSheet.create({
     backgroundColor: DARK_GREY, // Assuming a dark gray background for the key container
     padding: 10,
     borderRadius: 10,
+    
   },
   button: {
     backgroundColor: SECONDARY_COLOR, // Adjust the color as needed
@@ -133,11 +153,15 @@ const styles = StyleSheet.create({
   },
   showKey: {
     color: SECONDARY_COLOR,
-    paddingLeft: "50%",
-    top: 5,
+    // put on the right
+    justifyContent: "flex-end",
+    alignSelf: "flex-end",
   },
   privateKeyandShowKey: {
     flexDirection: "row",
+    justifyContent: "space-between", // Align elements horizontally
+    alignItems: "center", // Center vertically
+    marginBottom: 10,
   },
   copyicon: {
     width: 25,

@@ -1,50 +1,74 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { generatePrivateKey, getPublicKey , nip19 } from 'nostr-tools'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { ScrollView, Button, StyleSheet,Text, TextInput, View } from 'react-native'
 import ImageUploadComponent from '@comps/ImageUploadComponent'
 import updateNostrProfile from '@nostr/updateProfile'
 import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { IProfileContent } from '@src/model/nostr';
-import { l } from '@log';
+import { l, err } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
 import ConfirmButton from '@comps/ConfirmButton'
+import { updateNDKProfile }  from '@nostr/profile'
+import { useNDK } from '@src/context/NDKContext';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
+import { useUserProfileStore } from '@store'
+import Header from "@comps/Header";
 
 const ProfileSettingScreen = ({ navigation }) => {
 
 	const [bannerImageUri, setBannerImageUri] = useState('');
-  	const [profileImageUri, setProfileImageUri] = useState('');
-	
+	const [profileImageUri, setProfileImageUri] = useState('');
 
-	const initialProfile: IProfileContent = {
-		about: 'A new SplitSats User',
-		banner: '',
-		displayName: 'SplitSats User',
-		lud06: 'LNURL',
-		lud16: 'splitsats@getalby.com',
-		name: 'splitsats',
-		nip05: 'splitsats@nostr.com',
-		picture: '',
-		username: 'splitsats01',
-		website: '',
-	};
-
-	const [userProfile, setUserProfile] = useState<IProfileContent>(initialProfile);
+	const [loading, setLoading] = useState(false); 
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+	const ndk = useNDK();
 	
-	const handleNextButton = async () => {
+	useEffect(() => {
+		console.log(userProfile);
+		if (userProfile) {
+		  setBannerImageUri(userProfile.banner);
+		  setProfileImageUri(userProfile.picture);
+		}
+	}, 
+	[userProfile]);
+
+	const publishNostrProfile = async (npub, userProfile) => {
+		let result = false;
+		result = await updateNDKProfile(ndk, npub, userProfile);
+		if (!result) {
+			err('Error publishing Nostr profile');
+			return;
+		}
+		l('Nostr profile published!');
+	}
+
+	const handleUpdateProfile = async () => {
+		setLoading(true);
+		if (!userProfile) {
+			l('userProfile is null');
+			return;
+		}
 		// Set the banner and profile images in the user profile
 		userProfile.banner = bannerImageUri;
 		userProfile.picture = profileImageUri;
 		
 		l('User profile create Account:', userProfile)
-		navigation.replace('ConfirmCreateAccount', { userProfile })
-	}
-	
-	l("ProfileSettingScreen")
-	
+		await publishNostrProfile(npub, userProfile);
+		setUserProfile(userProfile);
+		setLoading(false);
+		navigation.replace('Dashboard');
+  	};
+
+	const handleBack = () => {
+		navigation.goBack();
+	};
+
 	return (
 		<ScrollView contentContainerStyle={styles.container}>
+	      <Header title="PROFILE" onPressBack={handleBack} />
+
 			<View style={styles.containerPhotos}>
       			<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
 				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
@@ -64,7 +88,7 @@ const ProfileSettingScreen = ({ navigation }) => {
 				value={userProfile.name} // Display the name from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, name: text })} // Update the UserProfile on input change
 			/>
-			<Text style={styles.label}>LN URL</Text>
+			<Text style={styles.label}>LN ADDRESS</Text>
 			<TextInput
 				style={styles.input}
 				placeholder={userProfile.lud16}
@@ -85,7 +109,7 @@ const ProfileSettingScreen = ({ navigation }) => {
 				value={userProfile.about} // Display the ABOUT ME from the UserProfile
 				onChangeText={(text) => setUserProfile({ ...userProfile, about: text })} // Update the UserProfile on input change
 			/>
-			<ConfirmButton title="NEXT" onPress={handleNextButton} />
+			<ConfirmButton title="UPDATE PROFILE" onPress={handleUpdateProfile} />
 		</ScrollView>
 		
 	)

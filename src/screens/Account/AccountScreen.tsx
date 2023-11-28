@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Image,
@@ -13,12 +13,26 @@ import { settingData ,arrowIcon } from "@src/data";
 import ImageUploadComponent from "@comps/ImageUploadComponent";
 import BannerUploadComponent from "@comps/BannerUploadComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
+
+import { useUserProfileStore } from '@store'
+import { use } from "i18next";
+
 const AccountScreen = ({ navigation }) => {
-  const user = {
-    userBannerImageUrl: "https://source.unsplash.com/random/1080x720",
-    userProfileImageUrl: "https://source.unsplash.com/random/800x200",
-    usedId: "gianlock@getalby.com",
-  };
+  const [bannerImageUri, setBannerImageUri] = useState('');
+	const [profileImageUri, setProfileImageUri] = useState('');
+
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+  
+  useEffect(() => {
+    console.log(userProfile);
+    if (userProfile) {
+      setBannerImageUri(userProfile.banner);
+      setProfileImageUri(userProfile.picture);
+    }
+  }, 
+  [userProfile]);
+
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.profileLinkList}
@@ -44,9 +58,9 @@ const AccountScreen = ({ navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>YOUR ACCOUNT</Text>
       <View style={styles.containerPhotos}>
-        <BannerUploadComponent imageUri={user.userBannerImageUrl} />
-        <ImageUploadComponent imageUri={user.userProfileImageUrl} />
-        <Text style={styles.userId}>{user.usedId}</Text>
+        <BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
+        <ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />  
+        <Text style={styles.userId}>{userProfile.profile?.displayName}</Text>
       </View>
       <Text style={styles.title2}>Settings</Text>
       <View style={styles.flatlistView}>

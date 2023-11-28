@@ -20,11 +20,14 @@ import {
   nostrIcon,
 } from "@src/data";
 import { PRIMARY_COLOR, SECONDARY_COLOR } from "@styles/styles";
-const DonateScreen = () => {
+import Header from "@comps/Header";
+
+
+const DonateScreen = ({ navigation }) => {
   // You can add your action for the donate button here
   const handleDonate = () => {
     // For example, you might want to open a web link
-    Linking.openURL("https://your-donation-link.com");
+    Linking.openURL("lightning://splitsats@getalby.com");
   };
 
   // Social media icon press handler
@@ -32,21 +35,27 @@ const DonateScreen = () => {
     // Open a link depending on the platform
     switch (platform) {
       case "X":
-        Linking.openURL("https://x.com/yourpage");
+        Linking.openURL("https://x.com/splitsats");
         break;
       case "Nostr":
-        Linking.openURL("https://facebook.com/yourpage");
+        Linking.openURL("nostr://npub1jwver7w272as2eaneruv3pg8he3u4fw9v8xukus5qealwv5pdymqp7qgvy");
         break;
       case "Github":
-        Linking.openURL("https://instagram.com/yourpage");
+        Linking.openURL("https://github.com/SplitSats/SplitSats");
         break;
     }
   };
 
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="DONATION" onPressBack={handleBack} />
+
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.header}>Donate</Text>
+        {/* <Text style={styles.header}>Donate</Text> */}
         <Text style={styles.description}>
           SplitSats is an open source project developed by enthusiasts nerds
           during their free time! 😁
