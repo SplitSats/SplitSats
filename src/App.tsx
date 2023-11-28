@@ -12,10 +12,10 @@ import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 import { PRIMARY_COLOR } from '@src/styles/colors'
 import PolyfillCrypto from "react-native-webview-crypto";
-import Navigation from '@src/navigation/MyBottomTabNavigation'
+import Navigation from '@src/navigation/BottomTabNavigation'
 import CreateNewGroup from '@screens/Groups/CreateNewGroup'
 import AddFriendScreen from '@screens/Account/AddFriendsScreen'
-
+import { NDKProvider } from './context/NDKContext'
 
 const Stack = createNativeStackNavigator()
 
@@ -25,25 +25,27 @@ export default function App() {
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
 	    <SafeAreaProvider>
 		<PolyfillCrypto />
+		<NDKProvider>
 			<NavigationContainer>
-				<Stack.Navigator initialRouteName="Loading">
-					<Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }}/>
-					<Stack.Screen name="Authentication" component={AuthenticationScreen} options={{ headerShown: false }}/>
-					<Stack.Screen name="CreateAccount" component={CreateAccountScreen} options={{ headerShown: false }}/> 
-					<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} options={{ headerShown: false }}/> 
-					<Stack.Screen name="FinalConfirmation" component={FinalConfirmation} options={{ headerShown: false }}/>
-					<Stack.Screen name="LogIn" component={LogInScreen} options={{ headerShown: false }}/> 
-					<Stack.Screen name="AddFriend" component={AddFriendScreen} options={{ headerShown: false }}/>
-					<Stack.Screen
-						name="Dashboard"
-						component={Navigation}
-						options={{ headerShown: false }} // Usually, you hide the header for the bottom tab navigator
-						/>
-
-					<Stack.Screen name="CreateGroup" component={CreateNewGroup}/>
+				<Stack.Navigator 
+					initialRouteName="Loading"
+					screenOptions={{
+						headerShown: false, // Default headerShown to false for all screens
+					}}
+				>
+					<Stack.Screen name="Loading" component={LoadingScreen} />
+					<Stack.Screen name="Authentication" component={AuthenticationScreen} />
+					<Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+					<Stack.Screen name="ConfirmCreateAccount" component={ConfirmCreateAccountScreen} />
+					<Stack.Screen name="FinalConfirmation" component={FinalConfirmation} />
+					<Stack.Screen name="LogIn" component={LogInScreen} />
+					<Stack.Screen name="AddFriend" component={AddFriendScreen} />
+					<Stack.Screen name="Dashboard" component={Navigation}/>
+					<Stack.Screen name="CreateNewGroup" component={CreateNewGroup} />
 					
 				</Stack.Navigator>
 			</NavigationContainer>
+		</NDKProvider>
 		</SafeAreaProvider>
 	  </View>
 	)
@@ -51,7 +53,9 @@ export default function App() {
 
 const styles = StyleSheet.create({
 	safeContainer: {
-		flex: 1
+		flex: 1,
+		backgroundColor: PRIMARY_COLOR,
+		paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0, // Adjust for Android status bar
 	},
 	container: {
 		flex: 1,

@@ -5,6 +5,8 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ZustandAsyncStorage } from '@store/persist';
 import { ContactManager } from '@src/managers/contact'
+import { GroupManager } from '@src/managers/group'
+
 
 export const useContactManagerStore = create(
   persist(
@@ -15,6 +17,20 @@ export const useContactManagerStore = create(
     }),
     {
       name: 'contactManager-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+
+export const useGroupManagerStore = create(
+  persist(
+    (set) => ({
+      groupManager: new GroupManager(),
+      setGroupManager: (manager) => set({ groupManager: manager }),
+      clearGroupManager: () => set({ contactManager: new GroupManager() }),
+    }),
+    {
+      name: 'groupManager-storage',
       storage: createJSONStorage(() => AsyncStorage),
     }
   )

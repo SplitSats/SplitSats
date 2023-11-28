@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
 import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
-import updateNostrProfileNDK from '@nostr/updateProfile';
 import { l, err } from '@log';
 import { useNDK } from '@src/context/NDKContext';
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
@@ -15,12 +14,14 @@ import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } 
 import { relay } from '@nostr/class/Relay'
 import { EventKind } from '@nostr/consts'
 import { USE_NDK } from '@nostr/consts'
-import NDKManager  from '@nostr'
+import {updateNDKProfile}  from '@nostr/profile'
+
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const [loading, setLoading] = useState(false); 
+  const ndk = useNDK();
 
   const [npub, setNpub] = useState("");
 
@@ -53,9 +54,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     let result = false;
     if (USE_NDK) {
       
-      const ndkManager = NDKManager.getInstance();
-      await ndkManager.initialize();
-      result = await ndkManager.updateNostrProfile(npub, userProfile);
+      result = await updateNDKProfile(ndk, npub, userProfile);
     }
     else {
       const event = {
@@ -86,7 +85,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
         <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
         <View style={styles.cardContainer}>
           <CreateAccountWrap userProfile={userProfile}/>
@@ -102,7 +101,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       />
       {loading && <ActivityIndicator size="large" color="#0000ff" />} 
     
-    </View>
+    </SafeAreaView>
   );
 };
 

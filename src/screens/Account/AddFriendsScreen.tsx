@@ -9,6 +9,7 @@ import {
   Text,
   ScrollView,
   Button,
+  SafeAreaView
 } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import CancelIcon from "@assets/icon/Cancel.png";
@@ -23,31 +24,57 @@ import { useUserProfileStore, useContactManagerStore } from '@store'
 
 import { err, l } from "@log";
 import { nip05 } from 'nostr-tools'
-import NDKManager  from '@nostr'
+// import NDKManager  from '@nostr'
 import { ContactManager, Contact } from '@src/managers/contact'
 import { defaultNpubs } from '@nostr/consts'
-
+import Header from "@comps/Header";
+import { useNDK } from '@src/context/NDKContext';
+import { queryNostrProfile, followNpubs } from '@nostr'
 
 const AddFriendScreen = ({ navigation }) => {
+  const ndk = useNDK();
   const [searchTerm, setSearchTerm] = useState("");
   const [hasPermission, setHasPermission] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const ndkManager = NDKManager.getInstance();
+  // const ndkManager = NDKManager.getInstance();
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const { contactManager, setContactManager, clearContactManager } = useContactManagerStore();
   // const contactManager =  new ContactManager();
   const [users, setUsers] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
 
+  const initializeContactManager = async () => {
+    try {
+      // Assuming you're using state hooks like useState
+      const existingContactManager = contactManager;
+  
+      if (existingContactManager && existingContactManager.getContacts) {
+        const contacts = await existingContactManager.getContacts();
+        if (contacts.length > 0) {
+          l("Contact manager already initialized");
+          return;
+        }
+      }
+  
+      const newContactManager = new ContactManager();
+      setContactManager(newContactManager);
+    } catch (error) {
+      err('Error initializing contact manager:', error);
+    }
+    l("Contact manager: ", contactManager);
+  };
+  
+
+  useEffect(() => {  
+    initializeContactManager();
+  }, []);
 
   useEffect(() => {
     (async () => {
-      await setContactManager(new ContactManager()); 
-
       const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
+      setHasPermission(status === 'granted');
     })();
   }, []);
   
@@ -66,7 +93,7 @@ const AddFriendScreen = ({ navigation }) => {
 
 
   const searchNpubContact = async (npub: string) => {
-    const queryUserProfile = await ndkManager.queryNostrProfile(npub);
+    const queryUserProfile = await queryNostrProfile(ndk, npub);
     if (queryUserProfile) {
         const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
         l("contact", contact);
@@ -115,10 +142,15 @@ const AddFriendScreen = ({ navigation }) => {
   const handleFinish = () => {
     // Add only the selected contacts to the contact manager
     selectedContacts.forEach(contact => {
+      if(!contactManager){
+        err("Contact manager is null");
+        return;
+      }
+      l("Contacts: ", contactManager.getContacts());
       contactManager.addContact(contact);
     });
     // Lets follow the selected contacts
-    const result = ndkManager.followNpubs(selectedContacts.map(contact => contact.npub));
+    const result = followNpubs(ndk, selectedContacts.map(contact => contact.npub));
     if (!result) {
       err("Failed to follow npubs: ", selectedContacts.map(contact => contact.npub));
     }
@@ -134,7 +166,11 @@ const AddFriendScreen = ({ navigation }) => {
     setIsTyping(false);
     setScanned(false);
   };
-
+  
+  const handleBack = () => {
+    navigation.goBack();
+  }
+  
   // Function to remove a contact from the users list
   const handleRemoveContact = (contactToRemove) => {
     const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
@@ -148,9 +184,10 @@ const AddFriendScreen = ({ navigation }) => {
       setScannerOpen={setScannerOpen}
     />
   ) : (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
     <View>
-      <Text style={styles.headerText}>ADD FRIENDS</Text>
+      <Header title="ADD FRIENDS" onPressBack={handleBack} />
+
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome {userProfile.name}</Text>
         <Image
@@ -189,20 +226,20 @@ const AddFriendScreen = ({ navigation }) => {
       data={users}
       keyExtractor={(contact) => contact.npub}
       renderItem={({ item }) => (
-        <Swipeable rightButtons={[
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={() => handleRemoveContact(item)}
-          >
-            <Text style={styles.deleteButtonText}>Remove</Text>
-          </TouchableOpacity>
-        ]}>
+        // <Swipeable rightButtons={[
+        //   <TouchableOpacity
+        //     style={styles.deleteButton}
+        //     onPress={() => handleRemoveContact(item)}
+        //   >
+        //     <Text style={styles.deleteButtonText}>Remove</Text>
+        //   </TouchableOpacity>
+        // ]}>
           <SearchCardComponent
             contact={item}
             onSelectionChange={handleSelectionChange}
             onRemove={handleRemoveContact} // Pass the removal handler to the card component
           />
-        </Swipeable>
+        // </Swipeable>
       )}
     />
     <ConfirmButton
@@ -210,7 +247,7 @@ const AddFriendScreen = ({ navigation }) => {
         title="FINISH"
         onPress={() => handleFinish()}
       />
-  </View>
+  </SafeAreaView>
   );
 };
 

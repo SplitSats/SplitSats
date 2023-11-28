@@ -7,11 +7,11 @@ class ContactManager {
     this.contacts = {};
   }
 
-  addContact(contact: Contact): void {
+  public addContact(contact: Contact): void {
     this.contacts[contact.npub] = contact;
   }
 
-  getContactByNpub(npub: string): Contact | undefined {
+  public getContactByNpub(npub: string): Contact | undefined {
     return this.contacts[npub];
   }
 
@@ -19,8 +19,14 @@ class ContactManager {
     // Logic to fetch contacts' information
   }
 
-  getContacts(): Contact[] {
-    return Object.values(this.contacts);
+  public async getContacts(): Promise<Contact[]> {
+    try {
+      const contacts = Object.values(this.contacts);
+      return contacts;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
   }
 }
 

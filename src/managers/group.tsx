@@ -1,19 +1,21 @@
 import { IProfileContent } from '@model/nostr';
+import { DebtManager } from './debt';
+import { NDKUser } from '@nostr-dev-kit/ndk';
 
 class GroupManager {
     private groups: Record<string, Group>;
-    private ndkUser: NDKUser;
+    // private ndkUser: NDKUser;
     private debtManager: DebtManager;
-  
-    constructor(ndkUser: NDKUser, debtManager: DebtManager) {
+
+    constructor() {
       this.groups = {};
-      this.ndkUser = ndkUser;
-      this.debtManager = debtManager;
+      // this.ndkUser = {}; // TODO: Initialize the NDKUser object
+      this.debtManager = new DebtManager();
     }
   
     createGroup(group: Group): void {
       // Implement logic to create a group and add it to the groups dictionary
-      this.groups[group.groupId] = group;
+      this.groups[group?.groupId] = group;
     }
   
     addGroup(group: Group): void {
@@ -69,3 +71,5 @@ class GroupManager {
   }
   
   // Define other necessary classes and interfaces as per your application requirements
+
+  export { GroupManager, Group };

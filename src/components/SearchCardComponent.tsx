@@ -63,7 +63,7 @@ const SearchCardComponent = ({
         onPress={handlePress}
       />
     </TouchableOpacity>
-    </Swipeable>
+    // </Swipeable>
   );
 };
 

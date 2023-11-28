@@ -1,5 +1,6 @@
 import { IProfileContent } from '@model/nostr';
-import { Coin } from './coin'; // Assuming Coin class is defined in coin.ts
+import { Coin } from './coin'; 
+import { Bill } from './bill'; 
 
 class DebtTo {
   owner: string;
@@ -27,7 +28,7 @@ class CreditTo {
   // ... other methods as needed
 }
 
-export class DebtManager {
+class DebtManager {
   private credits: Record<string, CreditTo> = {};
   private debts: Record<string, DebtTo> = {};
 
@@ -74,3 +75,5 @@ export class DebtManager {
 
   // ... other methods and logic related to managing debts
 }
+
+export { DebtTo, CreditTo, DebtManager };

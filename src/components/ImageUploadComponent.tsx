@@ -13,6 +13,8 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   imageUri,
   setImageUri,
 }) => {
+
+  const [generatedRandomRobotImage, setGeneratedRandomRobotImage] = useState(false);
   
   const generateRandomRobotImage = async () => {
 	  // Replace 'robohash.org' with 'robohash.io' if you prefer the newer version.
@@ -25,7 +27,10 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 	};
 
   useEffect(() => {
-    generateRandomRobotImage();
+    if (!imageUri && !generatedRandomRobotImage){
+      generateRandomRobotImage();
+      setGeneratedRandomRobotImage(true);
+    }
   }
   , []);
   
@@ -54,7 +59,8 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
         iconColor={MD3Colors.neutral90}
         style={styles.photoIcon}
         size={30}
-        onPress={generateRandomRobotImage}
+        onPress={ () => console.log('Change Profile')}
+        // onPress={generateRandomRobotImage}
       />)}
     </View>
     

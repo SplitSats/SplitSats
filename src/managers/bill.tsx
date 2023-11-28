@@ -8,7 +8,7 @@ export class Bill {
   date: Date;
   splitters: Splitter[];
   billId: string = "0";
-  lastBillID: string;
+  lastBillID: string = "0";
 
   constructor(payer: string, amount: Coin, description: string, date: Date, splitters: Splitter[]) {
     this.payer = payer;
