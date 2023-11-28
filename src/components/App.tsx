@@ -9,16 +9,16 @@ import LoadingScreen from '@screens/Loading'
 import LogInScreen from '@screens/Auth/LogIn'
 import { AuthProvider } from '@src/context/AuthContext'
 import { NDKProvider } from '@src/context/NDKContext'
-import GroupsScreen from '@screens/Groups'
-import ContactsScreen from '@screens/Contacts'
-import AccountScreen from '@screens/Account'
-import HistoryScreen from '@screens/History'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import AddFriendScreen from '@screens/Account/AddFriendsScreen'
 import Navigation from '@src/navigation/MyBottomTabNavigation'
 import CreateNewGroup from '@screens/Groups/CreateNewGroup'
-
+import ProfileSettingScreen from '@screens/Setting/ProfileSettingScreen'
+import WalletConnectScreen from '@screens/Setting/WalletScreen'
+import KeysScreen from '@screens/Setting/KeysScreen'
+import PreferencesScreen from '@screens/Setting/PreferencesScreen'
+import DonateScreen from '@screens/Setting/DonateScreen'
 const Stack = createNativeStackNavigator()
 
 export default function App() {
@@ -36,6 +36,12 @@ export default function App() {
 							<Stack.Screen name="FinalConfirmation" component={FinalConfirmation}/>
 							<Stack.Screen name="LogIn" component={LogInScreen} /> 
 							<Stack.Screen name="AddFriend" component={AddFriendScreen}/>
+							<Stack.Screen name="ProfileSetting" component={ProfileSettingScreen}/>
+							<Stack.Screen name="WalletScreen" component={WalletConnectScreen}/>
+							<Stack.Screen name="KeysScreen" component={KeysScreen}/>
+							<Stack.Screen name="PreferencesScreen" component={PreferencesScreen}/>
+							<Stack.Screen name="DonateScreen" component={DonateScreen}/>
+
 							<Stack.Screen
 								name="Dashboard"
 								component={Navigation}

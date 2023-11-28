@@ -7,11 +7,11 @@ import axios from "axios";
 
 type BannerUploadComponentProps = {
   imageUri: string | null;
-  setImageUri: React.Dispatch<React.SetStateAction<string | " ">>;
+  setImageUri?: React.Dispatch<React.SetStateAction<string | null>>;
 };
 const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
   imageUri,
-  setImageUri,
+  setImageUri = () => {},
 }) => {
   
   

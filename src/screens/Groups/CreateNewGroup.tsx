@@ -15,6 +15,7 @@ import GroupHeaderComponent from "@comps/GroupHeaderComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import MemberCardComponent from "@comps/MemberCardComponent";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have expo/vector-icons installed
+import ConfirmButton from "@comps/ConfirmButton";
 
 // this is user type is same with UserCardComponent
 // For the sake of simplicity for Back-end developing
@@ -26,7 +27,7 @@ type User = {
   profileImage: string;
 };
 
-const CreateNewGroup = () => {
+const CreateNewGroup = ({navigation}) => {
   const [groupMembers, setGroupMembers] = useState<User[]>([]);
   const addMemberToGroup = (user, isSelected) => {
     setGroupMembers((prevMembers) => {
@@ -95,9 +96,6 @@ const CreateNewGroup = () => {
                 <Ionicons name="person-add-outline" size={24} color="grey" />
                 </View>
               </View>
-              
-              
-              
           </View>
         )}
         renderItem={({ item }) => (
@@ -109,6 +107,11 @@ const CreateNewGroup = () => {
           />
         )}
         keyExtractor={(item) => item.id}
+      />
+      <ConfirmButton
+        disabled={false}
+        title="CREATE GROUP"
+        onPress={() => navigation.navigate("Dashboard")}
       />
     </View>
   );

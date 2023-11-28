@@ -6,12 +6,12 @@ import { l } from "@log";
 
 type ImageUploadComponentProps = {
   imageUri: string | null;
-  setImageUri: React.Dispatch<React.SetStateAction<string | " ">>;
+  setImageUri?: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   imageUri,
-  setImageUri,
+  setImageUri = () => {},
 }) => {
   
   const generateRandomRobotImage = async () => {

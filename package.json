@@ -51,6 +51,7 @@
     "@react-native-clipboard/clipboard": "^1.12.1",
     "@react-native-community/checkbox": "^0.5.16",
     "@react-native-community/netinfo": "9.3.10",
+    "@react-native-picker/picker": "^2.5.1",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/core": "^6.4.9",
     "@react-navigation/native": "^6.1.9",

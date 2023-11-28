@@ -7,7 +7,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import GroupsScreen from "@screens/Groups";
 import FriendsScreen from "@screens/Contacts";
 import ActivityScreen from "@screens/History";
-import AccountScreen from "@screens/Account";
+import AccountScreen from "@screens/Account/ProfileScreen";
 
 const Tab = createBottomTabNavigator();
 //--------------------------------------------------------------------------------------
