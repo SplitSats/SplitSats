@@ -49,7 +49,7 @@ const BannerUploadComponent: React.FC<BannerUploadComponentProps> = ({
     
   <View style={styles.BannerContainer}> 
     {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.BannerIcon} />
+          <Image source={{ uri: imageUri }} style={styles.BannerImage} />
           ) : (
       <IconButton
         icon="camera-plus"
@@ -76,6 +76,11 @@ const styles = StyleSheet.create({
     height: 90,
     justifyContent: "center",
     alignItems: "center",
+  },
+  BannerImage: {
+    width: "100%",
+    height: 130,
+
   },
 });
 
