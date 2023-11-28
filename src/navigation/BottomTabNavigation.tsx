@@ -8,7 +8,7 @@ import { MaterialIcons } from '@expo/vector-icons'; // Import MaterialIcons from
 import GroupsScreen from "@screens/Groups";
 import FriendsScreen from "@screens/Contacts";
 import ActivityScreen from "@screens/History";
-import AccountScreen from "@screens/Account";
+import ProfileSettingScreen from "@screens/Setting/ProfileSettingScreen";
 // import SvgUri from "expo-svg-uri"; // Import SvgUri from Expo
 import SvgUri from "react-native-svg"; // Import the necessary component for SVG rendering
 
@@ -161,7 +161,7 @@ const Navigation = ({navigation}) => {
           }}
         />
         <Tab.Screen name="Activity" component={ActivityScreen} />
-        <Tab.Screen name="Account" component={AccountScreen} />
+        <Tab.Screen name="Account" component={ProfileSettingScreen} />
       </Tab.Navigator>
       <ActionMenu navigation={navigation} isVisible={isActionMenuVisible} onClose={toggleActionMenu} />
     </View>

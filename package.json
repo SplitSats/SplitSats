@@ -73,6 +73,7 @@
     "expo-crypto": "~12.4.1",
     "expo-device": "~5.4.0",
     "expo-file-system": "~15.4.4",
+    "expo-font": "^11.6.0",
     "expo-image-picker": "^14.5.0",
     "expo-insights": "^0.2.0",
     "expo-localization": "~14.3.0",
