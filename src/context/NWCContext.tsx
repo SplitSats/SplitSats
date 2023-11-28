@@ -40,7 +40,6 @@ export function NWCProvider({ children }: { children: ReactNode }) {
   const [nostrWebLN, setNostrWebLN] = useState<
     webln.NostrWebLNProvider | undefined
   >(undefined);
-  // const [balance, setBalance] = useState<number | undefined>(undefined);
 
   return (
     <NWCContext.Provider
@@ -97,7 +96,7 @@ export function useNWCEnable(_nwcUrl?: string) {
     };
   }, [nwcUrl]);
 
-  return [isLoading, isError, error];
+  return [isLoading, isError, error, webln];
 }
 
 export function useNwcUrl() {
@@ -107,27 +106,34 @@ export function useNwcUrl() {
 }
 
 export function useConnectWithAlby() {
-  const { pendingNwcUrl, setPendingNwcUrl, nwcAuthUrl, setNwcAuthUrl } =
-    useContext(NWCContext);
+  const {
+    nwcUrl,
+    setNwcUrl,
+    pendingNwcUrl,
+    setPendingNwcUrl,
+    nwcAuthUrl,
+    setNwcAuthUrl,
+  } = useContext(NWCContext);
 
-  useEffect(() => {
-    async function connectWithAlby() {
-      const nwc = webln.NostrWebLNProvider.withNewSecret({});
+  function connectWithAlby() {
+    const nwc = webln.NostrWebLNProvider.withNewSecret();
 
-      const authUrl = nwc.getAuthorizationUrl({
-        name: "SplitSats App",
-      });
+    const authUrl = nwc.getAuthorizationUrl({
+      name: "SplitSats App",
+    });
 
-      setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
-      setNwcAuthUrl(authUrl.toString());
-    }
+    setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
+    setNwcAuthUrl(authUrl.toString());
+  }
 
-    if (pendingNwcUrl !== "" && nwcAuthUrl !== "") {
-      connectWithAlby();
-    }
-  }, []);
-
-  return [pendingNwcUrl, nwcAuthUrl];
+  return [
+    connectWithAlby,
+    nwcUrl,
+    pendingNwcUrl,
+    nwcAuthUrl,
+    setNwcAuthUrl,
+    setNwcUrl,
+  ];
 }
 
 export function usePayInvoice() {}
