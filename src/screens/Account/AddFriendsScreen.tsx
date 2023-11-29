@@ -17,9 +17,15 @@ import SearchIcon from "@assets/icon/Search.png";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import ConfirmButton from "@comps/ConfirmButton";
 import QRCodeScreen from "@comps/account/QRcode";
-import UserCardComponent from "@comps/UserCardComponent";
-import { l } from "@log";
+import SearchCardComponent from "@comps/SearchCardComponent";
+import { useUserProfileStore, useContactManagerStore } from '@store'
+import Swipeable from "react-native-swipeable";
+
+import { err, l } from "@log";
 import { nip05 } from 'nostr-tools'
+import NDKManager  from '@nostr'
+import { ContactManager, Contact } from '@src/managers/contact'
+import { defaultNpubs } from '@nostr/consts'
 
 
 const AddFriendScreen = ({ navigation }) => {
@@ -28,56 +34,111 @@ const AddFriendScreen = ({ navigation }) => {
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const user = {
-    name: "SplitSatS",
-    profileImage:
-      "https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  };
+  const ndkManager = NDKManager.getInstance();
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+  const { contactManager, setContactManager, clearContactManager } = useContactManagerStore();
+  // const contactManager =  new ContactManager();
+  const [users, setUsers] = useState([]);
+  const [selectedContacts, setSelectedContacts] = useState([]);
+
+
   useEffect(() => {
     (async () => {
+      await setContactManager(new ContactManager()); 
+
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     })();
   }, []);
-  const users = [
-    {
-      id: "1",
-      name: "Gian Lock",
-      publicKey: "npub1q6le8ppm0nz0g...",
-      profileImage:
-        "https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-    {
-      id: "2",
-      name: "Gabbo",
-      publicKey: "npub1za03vbthdvstx...",
-      profileImage:
-        "https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-  ];
+  
+  useEffect(() => {
+    (async () => {
+      // Populate users with default npubs  
+      defaultNpubs.forEach(npub => {
+        // add the npub to the users array if it is not already present
+        if (!users.some(contact => contact.npub === npub))
+        {
+          searchNpubContact(npub);
+        }
+      });  
+    })();
+  }, []);
+
+
+  const searchNpubContact = async (npub: string) => {
+    const queryUserProfile = await ndkManager.queryNostrProfile(npub);
+    if (queryUserProfile) {
+        const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
+        l("contact", contact);
+        // Update the users array with the new contact
+        await setUsers(users => [...users, contact]);
+        return true;
+    }
+    return false;
+  };
+
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
-    console.log(
-      `Bar code with type ${type} and data ${data} has been scanned!`
-    );
-    // Handle your QR Code data here
+    // Check if the scanned data starts with nostr:npub
+    if (data.startsWith("nostr:npub")) {
+      // Extract the npub from the data
+      const npub = data.split("nostr:")[1];
+      // Add the npub to the users array
+      searchNpubContact(npub);
+    } else {
+      err("Invalid QR Code data: ", data);
+    }
   };
+
   const handleInputChange = async (text) => {
     setSearchTerm(text);
-    l("text", text);
-
-    let profile = await nip05.queryProfile('jb55.com')
-    console.log(profile?.pubkey)
-
+    if (text.length > 0) {
+      searchNpubContact(text);
+    }
     setIsTyping(text.length > 0);
   };
+
+  // Handler to handle selection change in SearchCardComponent
+  const handleSelectionChange = (contact, selectedState) => {
+    if (selectedState) {
+      setSelectedContacts(prevSelectedContacts => [...prevSelectedContacts, contact]);
+    } else {
+      setSelectedContacts(prevSelectedContacts =>
+        prevSelectedContacts.filter(c => c.npub !== contact.npub)
+      );
+    }
+  };
+
+
+  const handleFinish = () => {
+    // Add only the selected contacts to the contact manager
+    selectedContacts.forEach(contact => {
+      contactManager.addContact(contact);
+    });
+    // Lets follow the selected contacts
+    const result = ndkManager.followNpubs(selectedContacts.map(contact => contact.npub));
+    if (!result) {
+      err("Failed to follow npubs: ", selectedContacts.map(contact => contact.npub));
+    }
+    l()
+
+    // Save the updated contact manager to the store
+    setContactManager(contactManager);
+    navigation.navigate("Dashboard");
+  }
 
   const handleCancel = () => {
     setSearchTerm("");
     setIsTyping(false);
     setScanned(false);
+  };
+
+  // Function to remove a contact from the users list
+  const handleRemoveContact = (contactToRemove) => {
+    const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
+    setUsers(updatedUsers);
   };
   
   return isScannerOpen ? (
@@ -91,9 +152,9 @@ const AddFriendScreen = ({ navigation }) => {
     <View>
       <Text style={styles.headerText}>ADD FRIENDS</Text>
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome {user.name}</Text>
+        <Text style={styles.welcomeText}>Welcome {userProfile.name}</Text>
         <Image
-          source={{ uri: user.profileImage }}
+          source={{ uri: userProfile.picture }}
           style={styles.profileImage}
         />
       </View>
@@ -102,12 +163,14 @@ const AddFriendScreen = ({ navigation }) => {
         <Image source={SearchIcon} style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="npub, username, NIP05"
+          placeholder="npub or NIP05"
           placeholderTextColor={"grey"}
           value={searchTerm}
           onChangeText={handleInputChange}
           onFocus={() => setIsTyping(true)}
           onBlur={() => setIsTyping(searchTerm.length > 0)}
+          selectTextOnFocus={true} // Enable text selection on focus
+          contextMenuHidden={false} // Show context menu (Cut, Copy, Paste, etc.)
         />
         {isTyping ? (
           <TouchableOpacity onPress={handleCancel}>
@@ -124,19 +187,28 @@ const AddFriendScreen = ({ navigation }) => {
     <FlatList
       style={styles.userList}
       data={users}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(contact) => contact.npub}
       renderItem={({ item }) => (
-        <UserCardComponent
-          userName={item.name}
-          userPublicKey={item.publicKey}
-          profileImage={item.profileImage}
-        />
+        <Swipeable rightButtons={[
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleRemoveContact(item)}
+          >
+            <Text style={styles.deleteButtonText}>Remove</Text>
+          </TouchableOpacity>
+        ]}>
+          <SearchCardComponent
+            contact={item}
+            onSelectionChange={handleSelectionChange}
+            onRemove={handleRemoveContact} // Pass the removal handler to the card component
+          />
+        </Swipeable>
       )}
     />
     <ConfirmButton
         disabled={false}
         title="FINISH"
-        onPress={() => navigation.navigate("Dashboard")}
+        onPress={() => handleFinish()}
       />
   </View>
   );
@@ -205,6 +277,16 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

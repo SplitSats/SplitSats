@@ -22,7 +22,7 @@ const CreateAccountScreen = ({ navigation }) => {
 	const initialProfile: NostrProfileContent = {
 	about: 'A new SplitSats User',
 	banner: '',
-	display_name: 'SplitSats User',
+	display_name: randomUserName,
 	lud16: `${randomUserName}@getalby.com`,
 	name: randomUserName,
 	nip05: `${randomUserName}@splitsats.io`,

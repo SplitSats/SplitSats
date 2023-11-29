@@ -10,6 +10,13 @@ export const defaultRelays: string[] = [
 	'wss://purplepag.es',
 	'wss://relay.snort.social',
 ]
+
+export const defaultNpubs: string[] = [
+	'npub1uezd5f0czgdlkru5qfnv0v03a8uwmzxryg2sjvjzd732k3wfphyslwadkc', // waltermaffy
+	'npub1q6le8ppm0nz0gdnfl4jxy77su3l8t56pqm99tl4xpwfl5uez6c7q7ztql6', // gianlock
+	'npub1jwver7w272as2eaneruv3pg8he3u4fw9v8xukus5qealwv5pdymqp7qgvy', // splitsats
+]
+
 export const defaultRelays2: string[] = [
 	'wss://relay.nostrss.re', 
 	'wss://relay.nostrich.de',

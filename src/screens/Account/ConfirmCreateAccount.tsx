@@ -19,11 +19,7 @@ import NDKManager  from '@nostr'
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
-  // const { setUserIsLoggedIn } = useAuth();
-  // const ndk = useNDK();
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
-
-  // const { userProfile } = route.params;
   const [loading, setLoading] = useState(false); 
 
   const [npub, setNpub] = useState("");
