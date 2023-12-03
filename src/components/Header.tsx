@@ -18,21 +18,22 @@ return (
 
 const styles = StyleSheet.create({
     header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: PRIMARY_COLOR,
-    paddingVertical: 15,
-    paddingHorizontal: 10,
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: PRIMARY_COLOR,
+        paddingHorizontal: 20,
+        paddingVertical: 20,
     },
     titleContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: 'white',
     },
 });
     

@@ -15,6 +15,7 @@ import { relay } from '@nostr/class/Relay'
 import { EventKind } from '@nostr/consts'
 import { USE_NDK } from '@nostr/consts'
 import {updateNDKProfile}  from '@nostr/profile'
+import Header from "@comps/Header";
 
 
 const ConfirmCreateAccountScreen = ({ navigation, route }) => {
@@ -82,10 +83,16 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     setLoading(false);
     navigation.replace('FinalConfirmation');
   };
+  
+  const handleBack = () => {
+    navigation.goBack();
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-        <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
+        <Header title="CONFIRM ACCOUNT" onPressBack={handleBack} />
+
+        <Text style={styles.headerText}></Text>
         <View style={styles.cardContainer}>
           <CreateAccountWrap userProfile={userProfile}/>
         </View>
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
-    padding: 20,
+    
     alignItems: 'center',
   },
   cardContainer:{

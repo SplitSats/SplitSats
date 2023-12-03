@@ -51,7 +51,7 @@ const CreateAccountWrap = ({ userProfile }) => {
         </View>
           <Text style={styles.noteText}>{userInputs.username}</Text>     
           <Text style={styles.noteText}>{truncatedNpub}</Text>
-          <Text style={styles.noteText}>{userInputs.lud16}</Text>
+          <Text style={styles.noteText}>⚡{userInputs.lud16}</Text>
           <Text style={styles.noteText}>{userInputs.about}</Text>
       </View>
     );
