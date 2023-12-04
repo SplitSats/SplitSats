@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Image, Button } from 'react-native';
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
+import { DARK_GREY, PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { truncateNpub } from '@nostr/util'
 import { l } from '@log'
 import  QRCodeScreen from '@comps/account/QRCode' 
@@ -35,7 +35,7 @@ const CreateAccountWrap = ({ userProfile }) => {
     }
     fetchUserNpub()
   }
-  , [userNpub])
+  , [userNpub, userProfile])
 
 
   return (
@@ -63,13 +63,14 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARY_COLOR,
     padding: 20,
     alignItems: 'center',
+    
   },
   card: {
     width:'100%',
-    borderWidth:3,
+    borderWidth: 3,
     borderColor:'#83A3EE',
     backgroundColor: PRIMARY_COLOR,
-    borderRadius: 10,
+    borderRadius: 0,
     alignSelf:'flex-start',
   },
   bannerImage: {
@@ -85,7 +86,8 @@ const styles = StyleSheet.create({
     top: 60,
     alignSelf: 'flex-start',
     borderWidth:2,
-    borderColor:'#0F172A'
+    borderColor:'#0F172A',
+    backgroundColor: DARK_GREY,
   },
   noteText: {
     color: 'white',
@@ -93,7 +95,8 @@ const styles = StyleSheet.create({
     fontSize:16,
   },
   photoContainer:{
-    marginBottom:50,
+    marginBottom: '15%',
+    width:'100%'
   }
 });
 

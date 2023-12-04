@@ -3,6 +3,8 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { useState } from "react";
 import { CheckBox } from "react-native-elements";
+
+
 const UserCardComponent = ({ userName, userPublicKey, profileImage,onSelectionChange, ...props  }) => {
   const [selected, setSelected] = useState(false);
   const handlePress = () => {

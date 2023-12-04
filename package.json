@@ -61,6 +61,8 @@
     "@shopify/flash-list": "1.4.3",
     "@types/react-redux": "^7.1.28",
     "axios": "^1.6.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.0",
     "crypto-js": "4.1.1",
     "expo": "^49.0.9",
     "expo-application": "~5.3.0",
@@ -106,6 +108,7 @@
     "react-redux": "^8.1.3",
     "redux-persist": "^6.0.0",
     "sentry-expo": "^7.1.1",
+    "superjson": "^2.2.1",
     "text-encoding-polyfill": "^0.6.7",
     "zustand": "^4.4.6"
   },

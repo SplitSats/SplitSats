@@ -7,7 +7,7 @@ import { STORAGE } from '@src/consts/config'
 
 const GroupsScreen = ({ navigation }) => (
 	<View style={styles.mainView}>
-		<UserProfile dataStore={STORAGE}/>	
+		<UserProfile/>	
 	</View>
 
 )

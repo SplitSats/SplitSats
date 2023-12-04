@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
-    padding: 20,
+    padding: 10,
     alignItems: "center",
   },
   //I put the position absolut so we can achieve the overlaying

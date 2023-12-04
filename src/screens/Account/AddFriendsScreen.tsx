@@ -40,35 +40,31 @@ const AddFriendScreen = ({ navigation }) => {
   const [isTyping, setIsTyping] = useState(false);
   // const ndkManager = NDKManager.getInstance();
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
-  const { contactManager, setContactManager, clearContactManager } = useContactManagerStore();
+  const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
   // const contactManager =  new ContactManager();
+
+  const [currentContactManager, setCurrentContactManager] = useState(null); // ContactManager instance
   const [users, setUsers] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
+  const TAG = '[AddFriendScreen] ';
 
-  const initializeContactManager = async () => {
-    try {
-      // Assuming you're using state hooks like useState
-      const existingContactManager = contactManager;
-  
-      if (existingContactManager && existingContactManager.getContacts) {
-        const contacts = await existingContactManager.getContacts();
-        if (contacts.length > 0) {
-          l("Contact manager already initialized");
-          return;
-        }
-      }
-  
-      const newContactManager = new ContactManager();
-      setContactManager(newContactManager);
-    } catch (error) {
-      err('Error initializing contact manager:', error);
-    }
-    l("Contact manager: ", contactManager);
-  };
-  
+  const isHydrated = useContactManagerStore((state) => state.rehydrated);
+  const contactManager = useContactManagerStore((state) => state.getContactManager());
+
+  // Check if the store is hydrated before using the ContactManager data
+  if (!isHydrated) {
+    return <div>Loading...</div>; // Or any loading indicator while data is being fetched
+  }
 
   useEffect(() => {  
-    initializeContactManager();
+    (async () => {
+      // Set the current contact manager
+      l("[AddFriendScreen] Setting current contact manager");
+      l(contactManager)
+      if(!contactManager){
+        await initializeContactManager()
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -96,7 +92,7 @@ const AddFriendScreen = ({ navigation }) => {
     const queryUserProfile = await queryNostrProfile(ndk, npub);
     if (queryUserProfile) {
         const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
-        l("contact", contact);
+        // l("contact", contact);
         // Update the users array with the new contact
         await setUsers(users => [...users, contact]);
         return true;
@@ -146,9 +142,9 @@ const AddFriendScreen = ({ navigation }) => {
         err("Contact manager is null");
         return;
       }
-      l("Contacts: ", contactManager.getContacts());
       contactManager.addContact(contact);
     });
+    l(TAG, "Contacts: ", contactManager?.getContacts());
     // Lets follow the selected contacts
     const result = followNpubs(ndk, selectedContacts.map(contact => contact.npub));
     if (!result) {
@@ -314,6 +310,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
+    borderWidth:2,
+    borderColor:'#0F172A',
+    backgroundColor: DARK_GREY,
   },
   deleteButton: {
     backgroundColor: 'red',

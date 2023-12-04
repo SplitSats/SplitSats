@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Button, Image, StyleSheet, Platform } from "react-native";
+import { View, TouchableOpacity, Image, StyleSheet, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { IconButton, MD3Colors } from "react-native-paper";
 import { l } from "@log";
@@ -20,12 +20,11 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 	  // Replace 'robohash.org' with 'robohash.io' if you prefer the newer version.
 	  const text = Math.random().toString(36).substring(2);
 	  const baseUrl = 'https://robohash.org/';
-	  const imageUrl = `${baseUrl}${text}.png`;
+	  const imageUrl = `${baseUrl}${text}.png?set=set3`;
 	  l('New profile robot imageUrl:', imageUrl);
 	  setImageUri(imageUrl);
 	  return imageUrl;
 	};
-
   useEffect(() => {
     if (!imageUri && !generatedRandomRobotImage){
       generateRandomRobotImage();
@@ -52,7 +51,10 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   return (
     <View style={styles.PhotoContainer}>
       {imageUri ? (
+        <TouchableOpacity onPress={generateRandomRobotImage}>
           <Image source={{ uri: imageUri }} style={styles.photoIcon} />
+        </TouchableOpacity>
+
           ) : (
       <IconButton
         icon="camera-plus"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, View, SafeAreaView, Platform, FlatList } from 'react-native';
+import { StyleSheet, Text, TextInput, View, SafeAreaView, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
 
 import { PRIMARY_COLOR } from '@styles/styles';
 import ConfirmButton from '@comps/ConfirmButton';
@@ -18,13 +18,19 @@ const CreateAccountScreen = ({ navigation }) => {
 
   const { userProfile, setUserProfile } = useUserProfileStore();
 
+  const initialProfile: NostrProfileContent = {
+    about: 'A new SplitSats User',
+    banner: '',
+    display_name: randomUserName,
+    lud16: `${randomUserName}@getalby.com`,
+    name: randomUserName,
+    nip05: `${randomUserName}@splitsats.io`,
+    picture: '',
+    username: `${randomUserName}`,
+    };
+
   useEffect(() => {
-    setUserProfile({
-      about: 'A new SplitSats User',
-      display_name: randomUserName,
-      username: randomUserName,
-      ...userProfile, // Preserve existing values from the store
-    });
+    setUserProfile(initialProfile);
   }, []);
 
   const handleNextButton = () => {
@@ -35,7 +41,7 @@ const CreateAccountScreen = ({ navigation }) => {
     });
 
     l('User profile create Account:', userProfile);
-    navigation.replace('ConfirmCreateAccount', { userProfile });
+    navigation.navigate('ConfirmCreateAccount', { userProfile });
   };
 
   const handleBack = () => {
@@ -80,6 +86,11 @@ const CreateAccountScreen = ({ navigation }) => {
 
     <SafeAreaView style={styles.container}>
         <Header title="NEW ACCOUNT" onPressBack={handleBack} />
+        <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
+      >
         <View style={styles.containerPhotos}>
           <BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
           <ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
@@ -90,6 +101,7 @@ const CreateAccountScreen = ({ navigation }) => {
           keyExtractor={(item) => item.key}
           contentContainerStyle={styles.formContainer}
         />
+      </KeyboardAvoidingView>
       <ConfirmButton title="NEXT" onPress={handleNextButton} disabled={false} />
     </SafeAreaView>
   );

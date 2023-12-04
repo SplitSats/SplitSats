@@ -35,7 +35,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       // Extract the public key from the private key
       const userPublicKey = getPublicKey(userPrivateKey);
       const npub = nip19.npubEncode(userPublicKey);
-      setNpub(npub);
+      await setNpub(npub);
       l('New nostr keys generated! npub:', npub);
       l('nsec:', nsec);
       l('New nostr keys generated! userPublicKey:', userPublicKey);
@@ -81,7 +81,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     }
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
-    navigation.replace('FinalConfirmation');
+    navigation.navigate('FinalConfirmation');
   };
   
   const handleBack = () => {
@@ -115,8 +115,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
-    
-    alignItems: 'center',
+    padding: 10,
   },
   cardContainer:{
       width:'100%',

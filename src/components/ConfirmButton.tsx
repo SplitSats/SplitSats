@@ -1,12 +1,34 @@
-import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Pressable, Text, StyleSheet, Keyboard, Platform  } from 'react-native';
 import { SECONDARY_COLOR } from '@styles/styles';
 
 
 const ConfirmButton = ({ title, onPress, disabled }) => {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      Platform.OS === 'android' ? 'keyboardDidHide' : 'keyboardWillHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <Pressable
-      style={[styles.button, disabled && styles.disabledButton]}
+      style={[styles.button, disabled && styles.disabledButton, keyboardVisible && styles.keyboardVisible]}
       onPress={onPress}
       disabled={disabled}
     >
@@ -40,7 +62,9 @@ const styles = StyleSheet.create({
   disabledText: {
     color: '#999', // You can change the text color when the button is disabled
   },
-
+  keyboardVisible: {
+    bottom: 0, // Move the button to the bottom when keyboard is visible on Android
+  },
 });
 
 export default ConfirmButton;

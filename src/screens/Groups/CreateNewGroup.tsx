@@ -10,7 +10,9 @@ import {
   Modal,
   Image, 
   Platform,
-  StatusBar
+  StatusBar,
+  Alert,
+
 } from "react-native";
 import SearchIcon from "@assets/icon/Search.png";
 import SearchCardComponent from "@comps/SearchCardComponent";
@@ -23,33 +25,59 @@ import Header from "@comps/Header";
 import { useUserProfileStore, useContactManagerStore, useGroupManagerStore } from '@store'
 // import NDKManager  from '@nostr'
 import ConfirmButton from "@comps/ConfirmButton";
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 import { ContactManager, Contact } from '@src/managers/contact'
 import { l, err } from '@log';
 import SearchUser from '@comps/SearchUser';
 import { Group, GroupManager } from '@src/managers/group';
+import { group } from "console";
 
 const CreateNewGroup = ({ navigation, route }) => {
-  
-  const { contactManager, setContactManager, clearContactManager } = useContactManagerStore();
-  const { grouptManager, setGroupManager, clearGroupManager } = useGroupManagerStore();
+
+	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
+  const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
+  const { groupManager, setGroupManager, clearGroupManager } = useGroupManagerStore();
   const [users, setUsers] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [groupName, setGroupName] = useState("");
+  const [groupImageUri, setGroupImageUri] = useState("");
   const [selectedContacts, setSelectedContacts] = useState([]);
+  const contactManager = useContactManagerStore((state) => state.getContactManager());
 
 
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
   };
 
+  useEffect(() => {  
+
+    const initializeGroupManager = async () => {
+      try {
+        if (!groupManager || !groupManager.hasGroups()) {
+          const newGroupManager = new GroupManager();
+          await setGroupManager(newGroupManager);
+          l("Group manager initialized");
+        } else {
+          l("Group manager already initialized");
+        }
+      } catch (error) {
+        err('Error initializing group manager:', error);
+      }
+      };
+    initializeGroupManager();
+  }, []);
+
 
   useEffect( () => {
     const fetchContacts = async () => {
+      if (!contactManager) {
+        err("Contact manager not initialized");
+        return;
+      }
       const contacts = await contactManager.getContacts();
       l("Contacts: ", contacts)
-      setUsers(contacts);
-      l("Users: ", users)
+      await setUsers(contacts);
     }  
     fetchContacts();
   }, []);
@@ -64,26 +92,63 @@ const CreateNewGroup = ({ navigation, route }) => {
       );
     }
   };
-  
-  const handleFinish = () => {
-    console.log('Selected Contacts: ', selectedContacts);
-    navigation.navigate("Dashboard")
-  }
+
+  const handleFinish = async () => {
+    Alert.alert(
+      "Confirmation",
+      "Are you sure you want to create this group?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Create",
+          onPress: async () => {
+            const userNpub = await getWallet(NPUB);
+            // Create a new Group instance
+            const newGroup = new Group(
+              userNpub,
+              groupName,
+              groupImageUri,
+              selectedContacts.map(contact => contact.npub),
+              "private" //TODO: Add also public groups?
+            );
+            const groupId = await newGroup.createId();
+            l("Group ID: ", groupId);
+            l("Group: ", newGroup);
+            // Assuming you have a group manager instance available
+            if (groupManager) {
+              // Add the new group to the GroupManager
+              const newGroupManager = new GroupManager();
+              newGroupManager.addGroup(newGroup);
+              await setGroupManager(newGroupManager);
+              console.log('New group created:', newGroup);
+            }
+            // navigation.navigate("Dashboard");
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
 
   const handleBack = () => {
     navigation.goBack();
   }
   // Function to sort users based on the search term
-  const sortUsers = () => {
+  const sortUsers = async () => {
     if (searchTerm) {
       const sortedUsers = users.filter((user) =>
         user.profile.displayName.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setUsers(sortedUsers);
     } else {
-      contactManager.getContacts().then((contacts) => {
+      const contacts = await contactManager.getContacts()
+      if(contacts.length > 0) {
         setUsers(contacts);
-      });
+      };
     }
   };
 
@@ -95,13 +160,22 @@ const CreateNewGroup = ({ navigation, route }) => {
     const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
     setUsers(updatedUsers);
   };
+  const handleGroupNameChange = (name) => {
+    setGroupName(name);
+  };
 
+  const handleGroupImageUriChange = (uri) => {
+    setGroupImageUri(uri);
+  };
   return (
     <SafeAreaView style={styles.container}>
       
       <Header title="New Group" onPressBack={handleBack} />
 
-      <GroupHeaderComponent />
+      <GroupHeaderComponent
+        onGroupNameChange={handleGroupNameChange}
+        onGroupImageUriChange={handleGroupImageUriChange}
+      />
       <Text style={styles.sectionTitle}>Members</Text>
       <FlatList
         data={users}

@@ -21,6 +21,7 @@ import WalletConnectScreen from '@screens/Setting/WalletScreen'
 import KeysScreen from '@screens/Setting/KeysScreen'
 import PreferencesScreen from '@screens/Setting/PreferencesScreen'
 import DonateScreen from '@screens/Setting/DonateScreen'
+import UserProfile from '@comps/account/UserProfile'
 
 const Stack = createNativeStackNavigator()
 
@@ -52,6 +53,7 @@ export default function App() {
 					<Stack.Screen name="KeysScreen" component={KeysScreen}/>
 					<Stack.Screen name="PreferencesScreen" component={PreferencesScreen}/>
 					<Stack.Screen name="DonateScreen" component={DonateScreen}/>
+					<Stack.Screen name="UserProfile" component={UserProfile}/>
 
 				</Stack.Navigator>
 			</NavigationContainer>

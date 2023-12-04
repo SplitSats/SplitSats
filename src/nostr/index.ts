@@ -21,8 +21,10 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
       npub = query;
     } else if (query.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
       l('Query is a NIP05')
-      npub = nip05toNpub(query);
-      if (!npub || !npub.startsWith('npub')) {
+      npub = await nip05toNpub(query);
+      l('NIP05 converted to Npub:', npub);
+      // check if npub is a valid string
+      if(!npub || typeof npub !== 'string') {
         return null;
       }
     } else {
@@ -82,7 +84,7 @@ export async function updateNostrProfile(ndk: NDK, userNpub: string, userProfile
     ndkEvent.kind = EventKind.SetMetadata;
     ndkEvent.content = JSON.stringify(userProfile);
     await ndkEvent.publish();
-    l('Nostr user profile updated!', nostrUser.profile);
+    l('[NDK] Nostr user profile updated!', nostrUser.profile);
     return true;
   } catch (error) {
     err('Error updating Nostr profile:', error);

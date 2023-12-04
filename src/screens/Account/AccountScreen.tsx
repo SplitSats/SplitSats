@@ -8,18 +8,23 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 import { settingData ,arrowIcon } from "@src/data";
 import ImageUploadComponent from "@comps/ImageUploadComponent";
 import BannerUploadComponent from "@comps/BannerUploadComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 
-import { useUserProfileStore } from '@store'
+import { useUserProfileStore, useContactManagerStore } from '@store';
+
 import { use } from "i18next";
+import { handleLogout } from "@comps/ButtonLogOut";
+
 
 const AccountScreen = ({ navigation }) => {
   const [bannerImageUri, setBannerImageUri] = useState('');
 	const [profileImageUri, setProfileImageUri] = useState('');
+  const { clearContactManager } = useContactManagerStore();
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   
@@ -32,11 +37,39 @@ const AccountScreen = ({ navigation }) => {
   }, 
   [userProfile]);
 
+  const handleSettings = (item) => {
+    console.log(item);
+    if (item.text === "Log Out") {
+      Alert.alert(
+        "LOG OUT",
+        "Are you sure you want to LogOut?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "LOG OUT",
+            onPress: async () => {
+              await handleLogout();
+              await clearUserProfile();
+              await clearContactManager();
+              navigation.navigate("Authentication");
+            }
+          },
+        ],
+        { cancelable: false }
+      );
+    } else {
+      navigation.navigate(item.pageName);
+    }
+  };
+
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.profileLinkList}
-      onPress={() => navigation.navigate(item.pageName)}
+      onPress={() => handleSettings(item)}
     >
       <Image
         source={item.Image}

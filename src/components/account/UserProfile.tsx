@@ -4,43 +4,37 @@ import { l, err } from '@log';
 import { useUserProfileStore } from '@store'
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 
-const UserProfile = ({ dataStore }) => {
+const UserProfile = ({ }) => {
 	// const ndk = useNDK();
 	const [ndk, setNdk] = useState(null);
-	// const user = useUser()
-	// const profile = useProfile(user?.pubkey)
-	// const profileContent = profile?.content || {}
-
+	const [fetching, setFetching] = useState(false);
+	
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
 
 	useEffect(() => {
 		const fetchUserProfile = async () => {
+			// Use Nostr profile
 			try {
-				if (dataStore === 'nostr') {
-					// Use Nostr profile
-					if (!ndk) {
-						throw new Error('NDK not initialized');
-					}
-					const userNpub = await getWallet(NPUB);
-					if (!userNpub) {
-						l('UserPublicKey not found in local storage');
-					}
-					l('userNpub:', userNpub);
-					const user = ndk.getUser({ npub: userNpub });
-					const userProfile = await user.fetchProfile();
-					if (!userProfile) {
-						err('User profile not found');
-					}
-					setUserProfile(userProfile);
-					console.log(user.profile);
-				} 
+				if (!ndk) {
+					throw new Error('NDK not initialized');
+				}
+				const userNpub = await getWallet(NPUB);
+				if (!userNpub) {
+					l('UserPublicKey not found in local storage');
+				}
+				const user = ndk.getUser({ npub: userNpub });
+				const userProfile = await user.fetchProfile();
+				if (!userProfile) {
+					err('User profile not found');
+				}
+				setUserProfile(userProfile);
+				console.log("Fetched Profile", user.profile);
 			} catch (error) {
-				console.error('Error fetching user profile:', error);
+				// console.warn('Error fetching user profile:', error);
 			}
 		};
-
 		fetchUserProfile();
-	}, []);
+	}, [userProfile]);
 
 	return (
 		<View style={styles.header}>
@@ -58,43 +52,43 @@ const UserProfile = ({ dataStore }) => {
 		</View>
 	);
 };
-
 const styles = StyleSheet.create({
+	// Existing styles for UserProfile component
 	header: {
-		marginTop:50,
-		height: '20%',
-		justifyContent: 'center',
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
+	  marginTop: 50,
+	  height: '20%',
+	  justifyContent: 'center',
+	  position: 'absolute',
+	  top: 0,
+	  left: 0,
+	  right: 0,
 	},
 	headerContent: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginHorizontal: 20,
+	  flexDirection: 'row',
+	  alignItems: 'center',
+	  marginHorizontal: 20,
 	},
 	userPhoto: {
-		width: 100,
-		height: 100,
-		borderRadius: 50,
-		borderWidth: 2,
-		borderColor: '#FFFFFF',
+	  width: 100,
+	  height: 100,
+	  borderRadius: 50,
+	  borderWidth: 2,
+	  borderColor: '#FFFFFF',
 	},
 	userInfo: {
-		flex: 1,
-		marginLeft: 20,
+	  flex: 1,
+	  marginLeft: 20,
 	},
 	welcome: {
-		fontSize: 20,
-		color: 'white',
-		fontWeight: 'bold',
+	  fontSize: 20,
+	  color: 'white',
+	  fontWeight: 'bold',
 	},
 	subtitle: {
-		fontSize: 30,
-		color: 'white',
-		fontWeight: 'bold',
+	  fontSize: 30,
+	  color: 'white',
+	  fontWeight: 'bold',
 	},
-});
-
+  });
+  
 export default UserProfile;
