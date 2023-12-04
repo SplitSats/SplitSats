@@ -3,7 +3,6 @@ import {
   View,
   FlatList,
   StyleSheet,
-  Button,
   Text,
   TextInput,
   TouchableOpacity,
@@ -30,13 +29,12 @@ import { ContactManager, Contact } from '@src/managers/contact'
 import { l, err } from '@log';
 import SearchUser from '@comps/SearchUser';
 import { Group, GroupManager } from '@src/managers/group';
-import { group } from "console";
 
 const CreateNewGroup = ({ navigation, route }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
-  const { groupManager, setGroupManager, clearGroupManager } = useGroupManagerStore();
+  const { setGroupManager, clearGroupManager, initializeGroupManager } = useGroupManagerStore();
   const [users, setUsers] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,30 +42,27 @@ const CreateNewGroup = ({ navigation, route }) => {
   const [groupImageUri, setGroupImageUri] = useState("");
   const [selectedContacts, setSelectedContacts] = useState([]);
   const contactManager = useContactManagerStore((state) => state.getContactManager());
-
+  const groupManager = useGroupManagerStore((state) => state.getGroupManager());
 
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
   };
+  const initGroupManager = async () => {
+    try {
+      if (!groupManager) {
+        await initializeGroupManager();
+        l("Group manager initialized");
+      } else {
+        l("Group manager already initialized");
+      }
+    } catch (error) {
+      err('Error initializing group manager:', error);
+    }
+  };
 
   useEffect(() => {  
-
-    const initializeGroupManager = async () => {
-      try {
-        if (!groupManager || !groupManager.hasGroups()) {
-          const newGroupManager = new GroupManager();
-          await setGroupManager(newGroupManager);
-          l("Group manager initialized");
-        } else {
-          l("Group manager already initialized");
-        }
-      } catch (error) {
-        err('Error initializing group manager:', error);
-      }
-      };
-    initializeGroupManager();
+    initGroupManager();
   }, []);
-
 
   useEffect( () => {
     const fetchContacts = async () => {
@@ -80,7 +75,7 @@ const CreateNewGroup = ({ navigation, route }) => {
       await setUsers(contacts);
     }  
     fetchContacts();
-  }, []);
+  }, [contactManager]);
 
   // Handler to handle selection change in SearchCardComponent
   const handleSelectionChange = (contact, selectedState) => {
@@ -120,12 +115,12 @@ const CreateNewGroup = ({ navigation, route }) => {
             // Assuming you have a group manager instance available
             if (groupManager) {
               // Add the new group to the GroupManager
-              const newGroupManager = new GroupManager();
-              newGroupManager.addGroup(newGroup);
-              await setGroupManager(newGroupManager);
+              // const newGroupManager = new GroupManager();
+              groupManager.addGroup(newGroup);
+              await setGroupManager(groupManager);
               console.log('New group created:', newGroup);
             }
-            // navigation.navigate("Dashboard");
+            navigation.navigate("Dashboard");
           },
         },
       ],
@@ -137,6 +132,7 @@ const CreateNewGroup = ({ navigation, route }) => {
   const handleBack = () => {
     navigation.goBack();
   }
+
   // Function to sort users based on the search term
   const sortUsers = async () => {
     if (searchTerm) {

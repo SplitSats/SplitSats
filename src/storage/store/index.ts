@@ -21,6 +21,15 @@ interface ContactManagerStore {
   setRehydrated: () => void;
 }
 
+// Interface for GroupManagerStore
+interface GroupManagerStore {
+  groupManager: string | null;
+  initializeGroupManager: () => Promise<void>;
+  getGroupManager: () => GroupManager | null;
+  setGroupManager: (manager: GroupManager) => void;
+  clearGroupManager: () => void;
+}
+
 export const useContactManagerStore = create<ContactManagerStore>()(
   persist(
     (set, get) => ({
@@ -32,28 +41,19 @@ export const useContactManagerStore = create<ContactManagerStore>()(
         const newManager = new ContactManager();
         set({ contactManager: newManager });
         const data = JSON.stringify(instanceToPlain(newManager));
-        l('[STORE] initializeContact - ManagerContactManager created');
-        l('[STORE]initializeContactManager - ', newManager);
-        l('[STORE] - ', data);
         await storage?.setItem('contactManager', data);
       },
       getContactManager: () => {
         const manager = get().contactManager;
-        l('[STORE] getContactManager-Manager: ', manager);
-
         if (manager) {
           const data = plainToInstance(ContactManager, manager);
-          l('[STORE] getContactManager-Return: ', data);
           return data
         }
       },
       setContactManager: (manager) => {
-        l('[STORE] setContactManager - Manager: ', manager);
-        l('[STORE] setContactManager - Type Manager: ', typeof manager);
         set({ contactManager: manager });
         const storage = createJSONStorage(() => AsyncStorage);
         const data = JSON.stringify(instanceToPlain(manager));
-        l('[STORE] setContactManager - Data:', data);
         storage?.setItem('contactManager', data);
       },
       clearContactManager: () => {
@@ -79,16 +79,56 @@ export const useContactManagerStore = create<ContactManagerStore>()(
 );
 
 
-export const useGroupManagerStore = create(
+// Create GroupManager store
+export const useGroupManagerStore = create<GroupManagerStore>()(
   persist(
-    (set) => ({
-      groupManager: new GroupManager(),
-      setGroupManager: (manager) => set({ groupManager: manager }),
-      clearGroupManager: () => set({ groupManager: null }),
+    (set, get) => ({
+      groupManager: null,
+      initializeGroupManager: async () => {
+        try {
+          const storage = createJSONStorage(() => AsyncStorage);
+          const storedGroupManager = await storage?.getItem('groupManager');
+          if (storedGroupManager) {
+            const parsedManager = plainToInstance(GroupManager, JSON.parse(storedGroupManager));
+            set({ groupManager: parsedManager });
+          } else {
+            const newManager = new GroupManager();
+            set({ groupManager: newManager });
+            await storage?.setItem('groupManager', JSON.stringify(instanceToPlain(newManager)));
+          }
+        } catch (error) {
+          console.error('Error loading GroupManager:', error);
+          set({ groupManager: null });
+        }
+      },
+      getGroupManager: () => {
+        return get().groupManager;
+      },
+      setGroupManager: (manager) => {
+        set({ groupManager: manager });
+        const storage = createJSONStorage(() => AsyncStorage);
+        storage?.setItem('groupManager', JSON.stringify(instanceToPlain(manager)));
+      },
+      clearGroupManager: () => {
+        set({ groupManager: null });
+        const storage = createJSONStorage(() => AsyncStorage);
+        storage?.removeItem('groupManager');
+      },
     }),
     {
       name: 'groupManager-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: (state) => {
+        return (state, error) => {
+          if (error || !state) {
+            console.log('An error happened during hydration', error);
+          } else {
+            const parsedManager = plainToInstance(GroupManager, JSON.parse(state.groupManager));
+            state.groupManager = parsedManager;
+            // You might want to set some flag here indicating the GroupManager is rehydrated, similar to ContactManager
+          }
+        };
+      },
     }
   )
 );

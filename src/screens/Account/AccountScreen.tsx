@@ -8,6 +8,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  SafeAreaView,
   Alert,
 } from "react-native";
 import { settingData ,arrowIcon } from "@src/data";
@@ -83,12 +84,12 @@ const AccountScreen = ({ navigation }) => {
         resizeMode="contain"
         style={styles.profileArrowImg}
       />
-
     </TouchableOpacity>
   );
+
   return (
     // Add here settings for profile, relays, wallet, logout
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>YOUR ACCOUNT</Text>
       <View style={styles.containerPhotos}>
         <BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
@@ -99,7 +100,7 @@ const AccountScreen = ({ navigation }) => {
       <View style={styles.flatlistView}>
         <FlatList data={settingData} renderItem={renderItem} bounces={false} />
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

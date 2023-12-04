@@ -99,27 +99,25 @@ const ProfileSettingScreen = ({ navigation }) => {
 	  ];
 	return (
 		<SafeAreaView style={styles.container}>
-		<ScrollView contentContainerStyle={styles.container}>
-	      <Header title="PROFILE" onPressBack={handleBack} />
+		  <Header title="PROFILE" onPressBack={handleBack} />
 
 		  <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
-      >
-        <View style={styles.containerPhotos}>
-          <BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
-          <ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
-        </View>
-		<FlatList
-          data={formFields}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.key}
-          contentContainerStyle={styles.formContainer}
-        />
-      </KeyboardAvoidingView>
+			style={{ flex: 1 }}
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
+			>
+			<View style={styles.containerPhotos}>
+				<BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
+				<ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
+			</View>
+			<FlatList
+			data={formFields}
+			renderItem={renderItem}
+			keyExtractor={(item) => item.key}
+			contentContainerStyle={styles.formContainer}
+			/>
+			</KeyboardAvoidingView>
 			<ConfirmButton title="UPDATE PROFILE" onPress={handleUpdateProfile} disabled={false}/>
-		</ScrollView>
 		</SafeAreaView>
 	)
 }

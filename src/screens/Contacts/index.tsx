@@ -22,13 +22,9 @@ const ContactScreen = ({ navigation }) => {
   useEffect(() => {
     const initContactManager = async () => {
       try {
-        l(TAG, 'Initializing contact manager...');
-        l(TAG, 'Contact manager:', contactManager);
-        l(TAG, 'Contact manager contacts:', await contactManager?.getContacts());
-
+        
         if (!contactManager) {
           // If not found in storage, initialize a new one
-          err(TAG, "Contact manager is not initialized. Initializing...");
           await initializeContactManager();
           l(TAG, "Contact manager initialized");
         } 
