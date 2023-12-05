@@ -69,6 +69,8 @@ const AddFriendScreen = ({ navigation }) => {
 
   useEffect(() => {
     (async () => {
+      await setContactManager(new ContactManager()); 
+
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
@@ -161,6 +163,12 @@ const AddFriendScreen = ({ navigation }) => {
     setSearchTerm("");
     setIsTyping(false);
     setScanned(false);
+  };
+
+  // Function to remove a contact from the users list
+  const handleRemoveContact = (contactToRemove) => {
+    const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
+    setUsers(updatedUsers);
   };
   
   const handleBack = () => {
@@ -313,6 +321,16 @@ const styles = StyleSheet.create({
     borderWidth:2,
     borderColor:'#0F172A',
     backgroundColor: DARK_GREY,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   deleteButton: {
     backgroundColor: 'red',
