@@ -34,9 +34,6 @@ const ContactScreen = ({ navigation }) => {
           const fetchedContacts = await contactManager.getContacts() || [];
           setContacts(fetchedContacts);
           l('Fetched contacts:', fetchedContacts);
-          for (const contact of fetchedContacts) {
-            l('Contact:', contact);
-          }
         } else {
           err('Contact manager or getContacts method is undefined.');
         }
@@ -96,7 +93,6 @@ const ContactScreen = ({ navigation }) => {
             data={contacts}
             renderItem={({ item }) => (
             <MemberCardComponent
-                key={item.npub}
                 contact={item}
               />
             )}
