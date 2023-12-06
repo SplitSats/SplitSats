@@ -1,12 +1,12 @@
 // WebViewScreen.js
-
-import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, BackHandler } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
+import { l } from '@src/logger';
 
-const WebViewScreen = ({ route }) => {
-  const { url } = route.params;
+const WebViewScreen = ({ navigation, route }) => {
+  const { url, pendingNwcUrl, setNwcUrl, setNwcAuthUrl } = route.params;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -20,6 +20,9 @@ const WebViewScreen = ({ route }) => {
         onMessage={(event) => {
           if (event.nativeEvent.data === 'nwc:success') {
             // Handle success event if needed
+            l('nwc:success');
+            setNwcAuthUrl("");
+            setNwcUrl(pendingNwcUrl);
           }
         }}
       />

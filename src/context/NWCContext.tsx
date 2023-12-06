@@ -9,7 +9,6 @@ import React, {
   useState,
 } from "react";
 import { l, err } from "@log";
-import { WebView } from "react-native-webview";
 
 export interface NWCContextType {
   nwcUrl: string;

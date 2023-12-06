@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import ConfirmButton from '@comps/ConfirmButton'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
-import { useNWCContext, useConnectWithAlby } from '@src/context/NWCContext';
+import { useNWCContext, useConnectWithAlby, useNwcUrl } from '@src/context/NWCContext';
 import WebView from 'react-native-webview';
 import { err, l } from '@log';
 import WebViewScreen  from '@src/components/WebViewScreen';
@@ -18,7 +18,7 @@ const WalletConnectScreen = ({ navigation }) => {
     pendingNwcUrl,
     nwcAuthUrl,
     setNwcAuthUrl,
-    setNwcUrl
+    setNwcUrl,
   ] = useConnectWithAlby();
 
   const handleBack = () => {
@@ -29,14 +29,27 @@ const WalletConnectScreen = ({ navigation }) => {
     navigation.navigate('WebViewScreen', { url: nwcAuthUrl });
   };
 
+  useEffect(() => {
+    l('nwcUrl:', nwcUrl);
+    l('pendingNwcUrl:', pendingNwcUrl);
+    l('nwcAuthUrl:', nwcAuthUrl);
+  }, [nwcUrl, pendingNwcUrl, nwcAuthUrl]);
+
+
+
   const handleConnectButton = async () => {
     try {
-      await connectWithAlby(); // Triggering the connection logic
-      l('nwcAuthUrl:', nwcAuthUrl);
-      if (nwcAuthUrl)
-        navigateToWebView(nwcAuthUrl);
-      else 
+      await connectWithAlby();
+      if (nwcAuthUrl) {
+        navigation.navigate('WebViewScreen', { 
+          url: nwcAuthUrl,
+          pendingNwcUrl: pendingNwcUrl,
+          setNwcUrl: setNwcUrl, // Pass the function to set nwcUrl
+          setNwcAuthUrl: setNwcAuthUrl, // Pass the function to set nwcAuthUrl
+        });
+      } else {
         err('nwcAuthUrl is empty');
+      }
     } catch (error) {
       console.error('Error connecting with Alby:', error);
     }
@@ -68,23 +81,7 @@ const WalletConnectScreen = ({ navigation }) => {
             <Text>Connected!</Text>
           </>
         )}
-        {nwcAuthUrl && (
-          <WebView
-            source={{ uri: nwcAuthUrl }}
-            injectedJavaScriptBeforeContentLoaded={`
-              // Listen for window messages and post them to the React Native WebView
-              window.addEventListener("message", (event) => {
-                window.ReactNativeWebView.postMessage(event.data?.type);
-              });
-            `}
-            onMessage={(event) => {
-              if (event.nativeEvent.data === 'nwc:success') {
-                setNwcAuthUrl("");
-                setNwcUrl(pendingNwcUrl);
-              }
-            }}
-          />
-        )}
+        
       </View>
     </SafeAreaView>
   );

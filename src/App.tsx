@@ -25,6 +25,7 @@ import DonateScreen from '@screens/Setting/DonateScreen'
 import UserProfile from '@comps/account/UserProfile'
 import WebViewScreen from '@src/components/WebViewScreen';
 import { NWCProvider } from '@src/context/NWCContext'
+// import "../applyGlobalPolyfills";
 
 const Stack = createNativeStackNavigator()
 
