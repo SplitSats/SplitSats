@@ -4,9 +4,18 @@ import { SafeAreaView, StyleSheet, BackHandler } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { l } from '@src/logger';
+import { useNWCContext, useConnectWithAlby, useNwcUrl } from '@src/context/NWCContext';
 
 const WebViewScreen = ({ navigation, route }) => {
-  const { url, pendingNwcUrl, setNwcUrl, setNwcAuthUrl } = route.params;
+  const { url } = route.params;
+  const [
+    connectWithAlby,
+    nwcUrl,
+    pendingNwcUrl,
+    nwcAuthUrl,
+    setNwcAuthUrl,
+    setNwcUrl,
+  ] = useConnectWithAlby();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -23,6 +32,7 @@ const WebViewScreen = ({ navigation, route }) => {
             l('nwc:success');
             setNwcAuthUrl("");
             setNwcUrl(pendingNwcUrl);
+            navigation.goBack();
           }
         }}
       />
