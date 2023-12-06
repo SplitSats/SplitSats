@@ -28,6 +28,7 @@ const CustomTabBarButton = ({ onPress }) => (
       backgroundColor: SECONDARY_COLOR,
       justifyContent: 'center',
       alignItems: 'center',
+      marginTop: -20
       // marginBottom: 50,
     }}
     onPress={onPress}
@@ -110,46 +111,39 @@ const Navigation = ({navigation}) => {
   return (
     <>
     <View style={{flex: 1}}>
-      <Tab.Navigator
+    <Tab.Navigator
         screenOptions={({ route }) => ({
-         
           tabBarActiveTintColor: "white",
           tabBarInactiveTintColor: SECONDARY_COLOR,
           tabBarShowLabel: true,
           headerShown: false,
-          tabBarButton: (props) => {
-            let iconPath;
-            let image=false;
-            // Determine the icon path based on the route name
+          keyboardHidesTabBar: true,
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            let imagePath="";
             if (route.name === "Groups") {
-              iconPath = require("@assets/icon/groups.svg");
+              iconName = focused ? "people-circle" : "people-circle-outline";
             } else if (route.name === "Friends") {
-              iconPath = require("@assets/icon/contacts.svg");
+              iconName = focused ? "people" : "people-outline";
             } else if (route.name === "Activity") {
-              iconPath = require("@assets/icon/activity.svg");
+              iconName = focused ? "analytics" : "analytics-outline";
             } else if (route.name === "Account") {
-              iconPath = accountIcon || ""; // Use the user's profile picture for the Account tab
-              image=true;
+              iconName = focused ? "person-circle" : "person-circle-outline";
+              imagePath = accountIcon || "";
             }
-            return (
-              <TabBarButton
-                {...props}
-                icon={iconPath} // Pass the respective SVG image path or user's profile picture
-                image={image}
-              />
-            );
+            return <Ionicons name={iconName} size={size} color={color}/>;
           },
-          // tabBarButton: (props) => <TabBarButton {...props} />,
+          tabBarButton: (props) => <TabBarButton {...props} />,
           tabBarStyle: {
             borderTopColor: 'transparent',
             backgroundColor: '#333A4A',
             height: '10%', // Set the height of the navigation bar
             justifyContent: 'flex-end', // Align items at the bottom
-            paddingBottom: 5, // Add extra padding at the bottom
+            paddingBottom: 0, // Add extra padding at the bottom
           },
         })}
-        
       >
+      
         <Tab.Screen name="Groups" component={GroupsScreen} />
         <Tab.Screen name="Friends" component={FriendsScreen} />
         <Tab.Screen
