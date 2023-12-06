@@ -16,7 +16,7 @@ import ImageUploadComponent from "@comps/ImageUploadComponent";
 import BannerUploadComponent from "@comps/BannerUploadComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 
-import { useUserProfileStore, useContactManagerStore } from '@store';
+import { useUserProfileStore, useContactManagerStore, useGroupManagerStore } from '@store';
 
 import { use } from "i18next";
 import { handleLogout } from "@comps/ButtonLogOut";
@@ -26,6 +26,7 @@ const AccountScreen = ({ navigation }) => {
   const [bannerImageUri, setBannerImageUri] = useState('');
 	const [profileImageUri, setProfileImageUri] = useState('');
   const { clearContactManager } = useContactManagerStore();
+  const { clearGroupManager } = useGroupManagerStore();
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   
@@ -55,6 +56,7 @@ const AccountScreen = ({ navigation }) => {
               await handleLogout();
               await clearUserProfile();
               await clearContactManager();
+              await clearGroupManager();
               navigation.navigate("Authentication");
             }
           },

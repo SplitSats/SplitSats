@@ -175,11 +175,6 @@ const AddFriendScreen = ({ navigation }) => {
     navigation.goBack();
   }
   
-  // Function to remove a contact from the users list
-  const handleRemoveContact = (contactToRemove) => {
-    const updatedUsers = users.filter(contact => contact.npub !== contactToRemove.npub);
-    setUsers(updatedUsers);
-  };
   
   return isScannerOpen ? (
     <QRCodeScreen 

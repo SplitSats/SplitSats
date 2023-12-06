@@ -81,7 +81,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     }
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
-    navigation.navigate('FinalConfirmation');
+    navigation.navigate('WalletScreen');
   };
   
   const handleBack = () => {

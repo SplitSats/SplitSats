@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { View, FlatList, Text, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
 
 import UserProfile from '@comps/account/UserProfile';
-import ContactCardComponent from '@comps/ContactCardComponent';
 import { useUserProfileStore, useContactManagerStore } from '@store';
 // import { styles } from '@styles/styles';
 import { ContactManager } from '@src/managers/contact';
@@ -48,16 +47,8 @@ const ContactScreen = ({ navigation }) => {
   const handleContactPress = (contact) => {
     // Action when a contact card is pressed
     // For example: navigation.navigate('ContactDetails', { contact });
+    l('Contact pressed:', contact);
   };
-
-  const renderContactCard = ({ item }) => (
-    <ContactCardComponent
-      userName={item.userName}
-      npub={item.npub}
-      profileImage={item.profileImage}
-      onPress={handleContactPress}
-    />
-  );
 
   const handleTabChange = (tabName) => {
     setSelectedTab(tabName);
@@ -94,6 +85,7 @@ const ContactScreen = ({ navigation }) => {
             renderItem={({ item }) => (
             <MemberCardComponent
                 contact={item}
+                onPress={() => handleContactPress(item)}
               />
             )}
             keyExtractor={(item) => item.npub}

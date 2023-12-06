@@ -8,6 +8,8 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { l, err } from "@log";
+import { WebView } from "react-native-webview";
 
 export interface NWCContextType {
   nwcUrl: string;
@@ -85,13 +87,13 @@ export function useNWCEnable(_nwcUrl?: string) {
         });
         setNostrWebLN(_nostrWebLN);
         await _nostrWebLN.enable();
-
+        l("NostrWebLN enabled!");
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
         setIsError(true);
         setError(error);
-        console.log(error);
+        err(error);
       }
     };
   }, [nwcUrl]);
@@ -115,16 +117,21 @@ export function useConnectWithAlby() {
     setNwcAuthUrl,
   } = useContext(NWCContext);
 
-  function connectWithAlby() {
-    const nwc = webln.NostrWebLNProvider.withNewSecret();
+  const connectWithAlby = async () => {
+    try {
+      const nwc = webln.NostrWebLNProvider.withNewSecret();
 
-    const authUrl = nwc.getAuthorizationUrl({
-      name: "SplitSats App",
-    });
+      const authUrl = await nwc.getAuthorizationUrl({
+        name: "SplitSats App",
+      });
 
-    setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
-    setNwcAuthUrl(authUrl.toString());
-  }
+      await setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
+      await setNwcAuthUrl(authUrl.toString());
+
+    } catch (error) {
+      console.error('Error connecting with Alby:', error);
+    }
+  };
 
   return [
     connectWithAlby,

@@ -22,6 +22,8 @@ import KeysScreen from '@screens/Setting/KeysScreen'
 import PreferencesScreen from '@screens/Setting/PreferencesScreen'
 import DonateScreen from '@screens/Setting/DonateScreen'
 import UserProfile from '@comps/account/UserProfile'
+import WebViewScreen from '@src/components/WebViewScreen';
+import { NWCProvider } from '@src/context/NWCContext'
 
 const Stack = createNativeStackNavigator()
 
@@ -32,6 +34,7 @@ export default function App() {
 	    <SafeAreaProvider>
 		<PolyfillCrypto />
 		<NDKProvider>
+		<NWCProvider>
 			<NavigationContainer>
 				<Stack.Navigator 
 					initialRouteName="Loading"
@@ -54,9 +57,11 @@ export default function App() {
 					<Stack.Screen name="PreferencesScreen" component={PreferencesScreen}/>
 					<Stack.Screen name="DonateScreen" component={DonateScreen}/>
 					<Stack.Screen name="UserProfile" component={UserProfile}/>
+					<Stack.Screen name="WebViewScreen" component={WebViewScreen}/>
 
 				</Stack.Navigator>
 			</NavigationContainer>
+		</NWCProvider>
 		</NDKProvider>
 		</SafeAreaProvider>
 	  </View>
