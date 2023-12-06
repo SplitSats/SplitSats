@@ -8,6 +8,7 @@ import AuthenticationScreen from '@screens/Auth/Authentication'
 import LoadingScreen from '@screens/Loading'
 import LogInScreen from '@screens/Auth/LogIn'
 import ConfirmCreateAccountScreen from '@screens/Account/ConfirmCreateAccount'
+import LightningAddressScreen from '@screens/Account/LightningAddress'
 import FinalConfirmation from '@screens/Account/FinalConfirmation'
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context"
 import { PRIMARY_COLOR } from '@src/styles/colors'
@@ -53,6 +54,7 @@ export default function App() {
 					<Stack.Screen name="CreateNewGroup" component={CreateNewGroup} />
 					<Stack.Screen name="ProfileSetting" component={ProfileSettingScreen}/>
 					<Stack.Screen name="WalletScreen" component={WalletConnectScreen}/>
+					<Stack.Screen name="LightningAddressScreen" component={LightningAddressScreen}/>
 					<Stack.Screen name="KeysScreen" component={KeysScreen}/>
 					<Stack.Screen name="PreferencesScreen" component={PreferencesScreen}/>
 					<Stack.Screen name="DonateScreen" component={DonateScreen}/>

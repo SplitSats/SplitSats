@@ -55,6 +55,7 @@ const ProfileSettingScreen = ({ navigation }) => {
 		userProfile.picture = profileImageUri;
 		
 		l('User profile create Account:', userProfile)
+		const npub = await getWallet(NPUB);
 		await publishNostrProfile(npub, userProfile);
 		setUserProfile(userProfile);
 		setLoading(false);

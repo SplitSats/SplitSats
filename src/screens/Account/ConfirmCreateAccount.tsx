@@ -18,7 +18,7 @@ import {updateNDKProfile}  from '@nostr/profile'
 import Header from "@comps/Header";
 
 
-const ConfirmCreateAccountScreen = ({ navigation, route }) => {
+const ConfirmCreateAccountScreen = ({ navigation }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const [loading, setLoading] = useState(false); 
@@ -26,7 +26,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
 
   const [npub, setNpub] = useState("");
 
-  useEffect(() => {
+  useEffect(()  => {
     const createNostrKeys = async () => {
       setLoading(true);
       // Generate a private key for the user
@@ -81,13 +81,13 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     }
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
-    navigation.navigate('WalletScreen');
   };
   
   const handleBack = () => {
     navigation.goBack();
   }
 
+  
   return (
     <SafeAreaView style={styles.container}>
         <Header title="CONFIRM ACCOUNT" onPressBack={handleBack} />
@@ -106,7 +106,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
           disabled={loading} // Disable the button when loading
       />
       {loading && <ActivityIndicator size="large" color="#0000ff" />} 
-    
+      
     </SafeAreaView>
   );
 };

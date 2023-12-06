@@ -18,6 +18,8 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   
   const generateRandomRobotImage = async () => {
 	  // Replace 'robohash.org' with 'robohash.io' if you prefer the newer version.
+    if(!setImageUri) return;
+    
 	  const text = Math.random().toString(36).substring(2);
 	  const baseUrl = 'https://robohash.org/';
 	  const imageUrl = `${baseUrl}${text}.png?set=set3`;

@@ -6,7 +6,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Modal,
   Image, 
   Platform,
   StatusBar,
@@ -75,7 +74,7 @@ const CreateNewGroup = ({ navigation, route }) => {
       await setUsers(contacts);
     }  
     fetchContacts();
-  }, [contactManager]);
+  }, []);
 
   // Handler to handle selection change in SearchCardComponent
   const handleSelectionChange = (contact, selectedState) => {

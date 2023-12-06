@@ -6,6 +6,7 @@ import ConfirmButton from '@comps/ConfirmButton';
 import Header from "@comps/Header";
 import BannerUploadComponent from '@comps/BannerUploadComponent';
 import ImageUploadComponent from '@comps/ImageUploadComponent';
+import ConfirmModal  from "@comps/ConfirmModal"; 
 import { generateRandomHumanReadableUserName } from './utils';
 import { useUserProfileStore } from '@store';
 import { l } from '@log';
@@ -13,6 +14,7 @@ import { l } from '@log';
 const CreateAccountScreen = ({ navigation }) => {
   const [bannerImageUri, setBannerImageUri] = useState('');
   const [profileImageUri, setProfileImageUri] = useState('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const randomUserName = generateRandomHumanReadableUserName(2);
 
@@ -33,19 +35,33 @@ const CreateAccountScreen = ({ navigation }) => {
     setUserProfile(initialProfile);
   }, []);
 
-  const handleNextButton = () => {
-    setUserProfile({
+  const handleNextButton = async () => {
+    await setUserProfile({
       ...userProfile,
       banner: bannerImageUri,
       picture: profileImageUri,
     });
 
     l('User profile create Account:', userProfile);
-    navigation.navigate('ConfirmCreateAccount', { userProfile });
+    setIsModalVisible(true);
   };
 
   const handleBack = () => {
     navigation.goBack();
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleYes = () => {
+    navigation.navigate('WalletScreen');
+    closeModal();
+  };
+
+  const handleNo = () => {
+    navigation.navigate('LightningAddressScreen');
+    closeModal();
   };
 
   const renderItem = ({ item }) => (
@@ -102,6 +118,17 @@ const CreateAccountScreen = ({ navigation }) => {
           contentContainerStyle={styles.formContainer}
         />
       </KeyboardAvoidingView>
+      <ConfirmModal
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        title="Nostr Wallet Connect"
+        description="Do you want to connect or create your wallet with Nostr Wallet Connect to pay in-app?"
+        leftButtonTitle="No"
+        rightButtonTitle="Yes"
+        onLeftButtonPress={handleNo}
+        onRightButtonPress={handleYes}
+      />
+
       <ConfirmButton title="NEXT" onPress={handleNextButton} disabled={false} />
     </SafeAreaView>
   );

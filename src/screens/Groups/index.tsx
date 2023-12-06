@@ -8,7 +8,6 @@ import {
 	Text,
 	TextInput,
 	TouchableOpacity,
-	Modal,
 	Image, 
 	Platform,
 	StatusBar,
