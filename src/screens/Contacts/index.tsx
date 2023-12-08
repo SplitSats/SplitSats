@@ -10,6 +10,8 @@ import { l, err } from '@log';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 // import { UserCardComponent } from '@comps/UserCardComponent';
 import MemberCardComponent from "@comps/MemberCardComponent";
+import PaymentModal from '@comps/PaymentModal'; 
+
 
 const ContactScreen = ({ navigation }) => {
   const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
@@ -17,6 +19,19 @@ const ContactScreen = ({ navigation }) => {
   const [selectedTab, setSelectedTab] = useState('Friends');
   const TAG = '[ContactScreen] ';
   const contactManager = useContactManagerStore((state) => state.getContactManager());
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null); // State to hold the selected contact
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const handlePay = (amount) => {
+    // Handle payment logic here
+    console.log('Payment initiated with amount:', amount);
+    setIsModalVisible(false);
+  };
+
 
   useEffect(() => {
     const initContactManager = async () => {
@@ -44,11 +59,11 @@ const ContactScreen = ({ navigation }) => {
   }, []);
   
   // Handle when a contact card is pressed
-  const handleContactPress = (contact) => {
-    // Action when a contact card is pressed
-    // For example: navigation.navigate('ContactDetails', { contact });
-    l('Contact pressed:', contact);
+  const handleZap = (contact) => {
+    setSelectedContact(contact); // Set the selected contact when a contact card is pressed
+    toggleModal(); // Show the payment modal
   };
+
 
   const handleTabChange = (tabName) => {
     setSelectedTab(tabName);
@@ -85,13 +100,18 @@ const ContactScreen = ({ navigation }) => {
             renderItem={({ item }) => (
             <MemberCardComponent
                 contact={item}
-                onPress={() => handleContactPress(item)}
+                onPress={() => handleZap(item)} // Pass the contact data to handleZap
               />
             )}
             keyExtractor={(item) => item.npub}
           />
         )}
-
+        <PaymentModal
+          isVisible={isModalVisible}
+          onClose={toggleModal}
+          // onPay={handlePay}
+          contact={selectedContact} 
+        />
         {/* Add another conditional section for 'Debts' tab */}
         {selectedTab === 'Debts' && (
           <View>

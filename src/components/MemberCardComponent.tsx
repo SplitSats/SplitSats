@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FILL_CARD_COLOR } from "@styles/styles";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
@@ -6,9 +7,14 @@ import { truncateNpub } from '@nostr/util'
 
 const MemberCardComponent = ({ contact, onPress }) => {
   
+  const [contactPressed, setContactPressed] = useState('');
+  useEffect(() => {
+    setContactPressed(contact);
+  }, [contact]);
+
   const handlePress = () => {
     if (onPress) {
-      onPress({ contact });
+      onPress({ contactPressed });
     }
   };
 
@@ -20,7 +26,7 @@ const MemberCardComponent = ({ contact, onPress }) => {
         <Text style={styles.npub}>{truncateNpub(contact.npub)}</Text>
       </View>
       {/* A little button with a thunder icon for paying  */}
-      <TouchableOpacity style={styles.payContainer}>
+      <TouchableOpacity style={styles.payContainer} onPress={handlePress}>
         <Text style={styles.payText}>Zap ⚡</Text>
       </TouchableOpacity>
       

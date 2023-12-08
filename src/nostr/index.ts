@@ -20,7 +20,7 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
     if (query.startsWith('npub')) {
       npub = query;
     } else if (query.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
-      l('Query is a NIP05')
+      l('Query is a email-like')
       npub = await nip05toNpub(query);
       l('NIP05 converted to Npub:', npub);
       // check if npub is a valid string

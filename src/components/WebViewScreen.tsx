@@ -1,40 +1,45 @@
-// WebViewScreen.js
-import React, { useEffect } from 'react';
-import { SafeAreaView, StyleSheet, BackHandler } from 'react-native';
+import React, { useEffect,  useRef } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { l } from '@src/logger';
-import { useNWCContext, useConnectWithAlby, useNwcUrl } from '@src/context/NWCContext';
+import { useFocusEffect } from '@react-navigation/native';
+import { useNWCContext } from '@src/context/NWCContext';
+import Header from "@comps/Header";
 
-const WebViewScreen = ({ navigation, route }) => {
-  const { url } = route.params;
-  const [
-    connectWithAlby,
-    nwcUrl,
+const WebViewScreen = ({ navigation }) => {
+  const { nwcUrl,
+    setNwcUrl,
     pendingNwcUrl,
+    setPendingNwcUrl,
     nwcAuthUrl,
     setNwcAuthUrl,
-    setNwcUrl,
-  ] = useConnectWithAlby();
+    nostrWebLN,
+    setNostrWebLN, } = useNWCContext();
+
+  const handleWebViewMessage = (event) => {
+    if (event.nativeEvent.data === 'nwc:success') {
+      l('nwc:success');
+      setNwcAuthUrl('');
+      setNwcUrl(pendingNwcUrl);
+      navigation.goBack();
+    }
+  };
+  
+  const handleBack = () => {
+    navigation.goBack();
+  }
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header title="NWC Alby" onPressBack={handleBack} />
+
       <WebView
-        source={{ uri: url }}
+        source={{ uri: nwcAuthUrl }}
         injectedJavaScriptBeforeContentLoaded={`
           window.addEventListener("message", (event) => {
             window.ReactNativeWebView.postMessage(event.data?.type);
           });
         `}
-        onMessage={(event) => {
-          if (event.nativeEvent.data === 'nwc:success') {
-            // Handle success event if needed
-            l('nwc:success');
-            setNwcAuthUrl("");
-            setNwcUrl(pendingNwcUrl);
-            navigation.goBack();
-          }
-        }}
       />
     </SafeAreaView>
   );

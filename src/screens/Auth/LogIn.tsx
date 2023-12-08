@@ -1,16 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getPublicKey , nip19 } from 'nostr-tools'
 import React, { useState } from 'react'
-import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
+import { Button, StyleSheet,Text, TextInput, View, SafeAreaView } from 'react-native'
 
-import { useAuth } from '@src/context/AuthContext' // Import the AuthContext
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
-import { secureStore, store } from '@store'
-import { SECRET, STORE_KEYS, INIT_KEY } from '@store/consts';
+import {  INIT_KEY } from '@store/consts';
 import ConfirmButton from '@comps/ConfirmButton'
 import { ActivityIndicator } from 'react-native';
 import { l, err } from '@log';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
+import Header from "@comps/Header";
 
 
 import * as secp from "@noble/secp256k1"
@@ -59,10 +58,13 @@ const LogInScreen = ({ navigation }) => {
 		// Navigate to the HomeScreen
 		navigation.navigate('Dashboard');
 	}
-
+	const handleBack = () => {
+		navigation.goBack();
+	}  
+	  
 	return (
-		<View style={styles.container}>
-			<Text style={styles.title}>LOG IN</Text>
+		<SafeAreaView style={styles.container}>
+			<Header title="SIGN IN" onPressBack={handleBack} />
 
 			<View style={styles.inputContainer}>
 				<Text style={styles.inputLabel}>PASTE HERE YOUR NOSTR PRIV KEY</Text>
@@ -80,7 +82,7 @@ const LogInScreen = ({ navigation }) => {
 				disabled={loading} // Disable the button when loading
     		/>
       		{loading && <ActivityIndicator size="large" color="#0000ff" />} 
-		</View>
+		</SafeAreaView>
 	)
 }
 
@@ -88,8 +90,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: PRIMARY_COLOR, // Replace with your primary color
-		alignItems: 'center',
-		justifyContent: 'center',
 	},
 	title: {
 		fontSize: 24,
@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
 		width: '100%',
 		padding: 20,
 		alignItems: 'center',
+		marginTop: "50%",
+
 	},
 	inputLabel: {
 		color: SECONDARY_COLOR, // Replace with your secondary color

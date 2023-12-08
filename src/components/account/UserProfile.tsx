@@ -40,7 +40,7 @@ const UserProfile = ({ }) => {
 		<View style={styles.header}>
 			<View style={styles.headerContent}>
 				<View style={styles.userInfo}>
-					<Text style={styles.welcome}>Hello, {userProfile?.name}</Text>
+					<Text style={styles.welcome}>Hello, {userProfile?.display_name}</Text>
 					<Text style={styles.subtitle}>Split your Sats.</Text>
 				</View>
 				{userProfile?.picture ? (

@@ -1,13 +1,15 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import ConfirmButton from '@comps/ConfirmButton'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
-import { useNWCContext, useConnectWithAlby, useNwcUrl } from '@src/context/NWCContext';
+import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
 import WebView from 'react-native-webview';
 import { err, l } from '@log';
 import WebViewScreen  from '@src/components/WebViewScreen';
+import { webln } from "@getalby/sdk";
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const WalletConnectScreen = ({ navigation }) => {
@@ -20,40 +22,72 @@ const WalletConnectScreen = ({ navigation }) => {
     setNwcAuthUrl,
     setNwcUrl,
   ] = useConnectWithAlby();
+  const {isLoading, isError, error, webln } = useNWCEnable();
+
+  const [balance, setBalance] = useState<number | undefined>();
+  const [webLNEnable, setWebLNEnable] = useState<boolean>(false);
+
+  const { nostrWebLN } = useNWCContext();
 
   const handleBack = () => {
     navigation.goBack();
   }
 
+
   const navigateToWebView = () => {
-    navigation.navigate('WebViewScreen', { url: nwcAuthUrl });
+    navigation.navigate('WebViewScreen');
   };
 
   useEffect(() => {
+  const handleWebLN = async () => {
     l('nwcUrl:', nwcUrl);
     l('pendingNwcUrl:', pendingNwcUrl);
     l('nwcAuthUrl:', nwcAuthUrl);
+    l('nostrWebLN:', nostrWebLN);
+
+    // if(pendingNwcUrl) {
+    //   const wln = new webln.NostrWebLNProvider({
+    //     nostrWalletConnectUrl: pendingNwcUrl,
+    //   });
+    //   await wln.enable();
+    //   const response = await wln.getBalance();
+    //   setBalance(response.balance);
+    //   l('Balance of user wallet: ', response.balance)
+    // }
+  };
+  handleWebLN();
   }, [nwcUrl, pendingNwcUrl, nwcAuthUrl]);
 
+  // useEffect(() => {
+  //   const updateBalace = async () => {
+  //     if (!nostrWebLN) {
+  //       return;
+  //     }
+  //     try {
+  //       const response = await nostrWebLN.getBalance();
+  //       setBalance(response.balance);
+  //       l('Balance of user wallet: ', response.balance)
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+  //   updateBalace();
+  // }, [nostrWebLN]);
 
 
   const handleConnectButton = async () => {
     try {
       await connectWithAlby();
       if (nwcAuthUrl) {
-        navigation.navigate('WebViewScreen', { 
-          url: nwcAuthUrl,
-          pendingNwcUrl: pendingNwcUrl,
-          setNwcUrl: setNwcUrl, // Pass the function to set nwcUrl
-          setNwcAuthUrl: setNwcAuthUrl, // Pass the function to set nwcAuthUrl
-        });
+        navigateToWebView();
       } else {
-        err('nwcAuthUrl is empty');
+        err('nwcAuthUrl is empty or pendingNwcUrl is set');
       }
     } catch (error) {
       console.error('Error connecting with Alby:', error);
     }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
