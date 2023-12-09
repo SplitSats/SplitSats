@@ -81,7 +81,7 @@ const ConfirmCreateAccountScreen = ({ navigation }) => {
     }
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
-    navigation.navigate('AddFriend');
+    navigation.navigate('FinalConfirmation');
   };
   
   const handleBack = () => {

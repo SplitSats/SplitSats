@@ -33,9 +33,11 @@ const WalletConnectScreen = ({ navigation }) => {
     navigation.goBack();
   }
 
-
-  const navigateToWebView = () => {
-    navigation.navigate('WebViewScreen');
+  const navigateToWebView = async () => {
+    await connectWithAlby();
+    if (nwcAuthUrl) {
+      navigation.navigate('WebViewScreen');
+    } 
   };
 
   useEffect(() => {
@@ -44,48 +46,12 @@ const WalletConnectScreen = ({ navigation }) => {
     l('pendingNwcUrl:', pendingNwcUrl);
     l('nwcAuthUrl:', nwcAuthUrl);
     l('nostrWebLN:', nostrWebLN);
-
-    // if(pendingNwcUrl) {
-    //   const wln = new webln.NostrWebLNProvider({
-    //     nostrWalletConnectUrl: pendingNwcUrl,
-    //   });
-    //   await wln.enable();
-    //   const response = await wln.getBalance();
-    //   setBalance(response.balance);
-    //   l('Balance of user wallet: ', response.balance)
-    // }
   };
   handleWebLN();
   }, [nwcUrl, pendingNwcUrl, nwcAuthUrl]);
 
-  // useEffect(() => {
-  //   const updateBalace = async () => {
-  //     if (!nostrWebLN) {
-  //       return;
-  //     }
-  //     try {
-  //       const response = await nostrWebLN.getBalance();
-  //       setBalance(response.balance);
-  //       l('Balance of user wallet: ', response.balance)
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-  //   updateBalace();
-  // }, [nostrWebLN]);
-
-
   const handleConnectButton = async () => {
-    try {
-      await connectWithAlby();
-      if (nwcAuthUrl) {
-        navigateToWebView();
-      } else {
-        err('nwcAuthUrl is empty or pendingNwcUrl is set');
-      }
-    } catch (error) {
-      console.error('Error connecting with Alby:', error);
-    }
+    navigation.navigate('NostrWalletConnect');
   };
 
 
@@ -101,11 +67,14 @@ const WalletConnectScreen = ({ navigation }) => {
               to SplitSats to pay your friends without leaving the app! ⚡
             </Text>
             <Text style={styles.description}>
-              You can always disconnect it at any time.
-            </Text>
+              If you don't have a Lightning Wallet (NWC) yet, use Alby to create one</Text>
+            <Text style={styles.description}>You can always disconnect it at any time.</Text>
+           <TouchableOpacity onPress={handleConnectButton} style={styles.connectButton}>
+              <Text style={styles.buttonText}>CONNECT NWC</Text>
+            </TouchableOpacity>
             <ConfirmButton
-              title="CONNECT YOUR WALLET"
-              onPress={handleConnectButton}
+              title="CONNECT WITH ALBY 🐝"
+              onPress={navigateToWebView}
               disabled={false}
             />
           </>
@@ -144,6 +113,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 16, // Adjust the margin as needed
     textAlign: 'center',
+  },
+  connectButton: {
+    position: 'absolute',
+    borderRadius: 25,
+    backgroundColor: '#83A2AE', // Background color of the button
+    width: '80%',
+    height: 50,
+    alignSelf: 'center',
+    overflow: 'hidden',
+    bottom: 100,
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
+    color: 'black', // Text color
+  },
+  buttonText: {
+    color: 'black', // Text color
+    fontSize: 18, // Adjust the font size as needed
+    fontWeight: 'bold', // Adjust the font weight as needed
   },
 });
 

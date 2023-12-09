@@ -22,15 +22,16 @@ import { l, err } from '@log';
 
 const GroupsScreen = ({ navigation }) => {
 
+	const { setGroupManager, getGroupManager, initializeGroupManager } = useGroupManagerStore();
 	const groupManager = useGroupManagerStore((state) => state.getGroupManager());
 	const [groups, setGroups] = useState([]);
-
+	const TAG = '[GroupsScreen] ';
 
 	useEffect(() => {
 		const fetchGroups = async () => {
 			try {
 				if (!groupManager) {
-					l('Group manager not found');
+					await initializeGroupManager();
 					return;
 				}
 				const fetchedGroups = await groupManager.getGroups() || [];

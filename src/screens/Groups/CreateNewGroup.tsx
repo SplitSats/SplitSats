@@ -28,6 +28,7 @@ import { ContactManager, Contact } from '@src/managers/contact'
 import { l, err } from '@log';
 import SearchUser from '@comps/SearchUser';
 import { Group, GroupManager } from '@src/managers/group';
+import ConfirmModal  from "@comps/ConfirmModal"; 
 
 const CreateNewGroup = ({ navigation, route }) => {
 
@@ -42,10 +43,12 @@ const CreateNewGroup = ({ navigation, route }) => {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const contactManager = useContactManagerStore((state) => state.getContactManager());
   const groupManager = useGroupManagerStore((state) => state.getGroupManager());
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
   };
+
   const initGroupManager = async () => {
     try {
       if (!groupManager) {
@@ -87,44 +90,32 @@ const CreateNewGroup = ({ navigation, route }) => {
     }
   };
 
-  const handleFinish = async () => {
-    Alert.alert(
-      "Confirmation",
-      "Are you sure you want to create this group?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Create",
-          onPress: async () => {
-            const userNpub = await getWallet(NPUB);
-            // Create a new Group instance
-            const newGroup = new Group(
-              userNpub,
-              groupName,
-              groupImageUri,
-              selectedContacts.map(contact => contact.npub),
-              "private" //TODO: Add also public groups?
-            );
-            const groupId = await newGroup.createId();
-            l("Group ID: ", groupId);
-            l("Group: ", newGroup);
-            // Assuming you have a group manager instance available
-            if (groupManager) {
-              // Add the new group to the GroupManager
-              // const newGroupManager = new GroupManager();
-              groupManager.addGroup(newGroup);
-              await setGroupManager(groupManager);
-              console.log('New group created:', newGroup);
-            }
-            navigation.navigate("Dashboard");
-          },
-        },
-      ],
-      { cancelable: false }
+  const handleCreateGroup = async () => {
+    const userNpub = await getWallet(NPUB);
+    // Create a new Group instance
+    const newGroup = new Group(
+      userNpub,
+      groupName,
+      groupImageUri,
+      selectedContacts.map(contact => contact.npub),
+      "private" //TODO: Add also public groups?
     );
+    const groupId = await newGroup.createId();
+    l("Group ID: ", groupId);
+    l("Group: ", newGroup);
+    // Assuming you have a group manager instance available
+    if (groupManager) {
+      // Add the new group to the GroupManager
+      // const newGroupManager = new GroupManager();
+      groupManager.addGroup(newGroup);
+      await setGroupManager(groupManager);
+      console.log('New group created:', newGroup);
+    }
+    navigation.navigate("Dashboard");
+  }
+
+  const handleFinish = async () => {
+    setIsModalVisible(true);
   };
 
 
@@ -162,6 +153,22 @@ const CreateNewGroup = ({ navigation, route }) => {
   const handleGroupImageUriChange = (uri) => {
     setGroupImageUri(uri);
   };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleYes = () => {
+    navigation.navigate('WalletScreen');
+    closeModal();
+  };
+
+  const handleNo = () => {
+    navigation.navigate('LightningAddressScreen');
+    closeModal();
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       
@@ -206,7 +213,17 @@ const CreateNewGroup = ({ navigation, route }) => {
         )}
         keyExtractor={(item) => item.npub}
       />
-      
+      <ConfirmModal
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        title="Confirmation"
+        description="Are you sure you want to create this group?"
+        leftButtonTitle="No"
+        rightButtonTitle="Yes"
+        onLeftButtonPress={handleNo}
+        onRightButtonPress={handleYes}
+      />
+
       <ConfirmButton
         disabled={false}
         title="CREATE GROUP"

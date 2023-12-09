@@ -15,7 +15,7 @@ import { PRIMARY_COLOR } from '@src/styles/colors'
 import PolyfillCrypto from "react-native-webview-crypto";
 import Navigation from '@src/navigation/BottomTabNavigation'
 import CreateNewGroup from '@screens/Groups/CreateNewGroup'
-import AddFriendScreen from '@screens/Account/AddFriendsScreen'
+import AddFriendScreen from '@screens/Contacts/AddFriendsScreen'
 import { NDKProvider } from './context/NDKContext'
 import ProfileSettingScreen from '@screens/Setting/ProfileSettingScreen'
 import WalletConnectScreen from '@screens/Setting/WalletScreen'
@@ -24,13 +24,19 @@ import PreferencesScreen from '@screens/Setting/PreferencesScreen'
 import DonateScreen from '@screens/Setting/DonateScreen'
 import UserProfile from '@comps/account/UserProfile'
 import WebViewScreen from '@src/components/WebViewScreen';
+import NostrWalletConnectScreen from '@screens/Setting/NostrWalletConnect';
 import { NWCProvider } from '@src/context/NWCContext'
 // import "../applyGlobalPolyfills";
+import { setupURLHandler } from '@src/util/DeepLinkService'; // Replace with the correct path
 
 const Stack = createNativeStackNavigator()
 
 export default function App() {
-	
+	// useEffect(() => {
+	// 	const cleanupURLHandler = setupURLHandler();
+	// 	return cleanupURLHandler;
+	// }, []);
+
 	return (
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
 	    <SafeAreaProvider>
@@ -61,6 +67,7 @@ export default function App() {
 					<Stack.Screen name="DonateScreen" component={DonateScreen}/>
 					<Stack.Screen name="UserProfile" component={UserProfile}/>
 					<Stack.Screen name="WebViewScreen" component={WebViewScreen}/>
+					<Stack.Screen name="NostrWalletConnect" component={NostrWalletConnectScreen}/>
 
 				</Stack.Navigator>
 			</NavigationContainer>

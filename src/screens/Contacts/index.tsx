@@ -9,7 +9,7 @@ import { ContactManager } from '@src/managers/contact';
 import { l, err } from '@log';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 // import { UserCardComponent } from '@comps/UserCardComponent';
-import MemberCardComponent from "@comps/MemberCardComponent";
+import ContactCardComponent from "@comps/ContactCardComponent";
 import PaymentModal from '@comps/PaymentModal'; 
 
 
@@ -98,7 +98,7 @@ const ContactScreen = ({ navigation }) => {
           <FlatList
             data={contacts}
             renderItem={({ item }) => (
-            <MemberCardComponent
+            <ContactCardComponent
                 contact={item}
                 onPress={() => handleZap(item)} // Pass the contact data to handleZap
               />

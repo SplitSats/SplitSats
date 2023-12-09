@@ -38,9 +38,7 @@ export function NWCProvider({ children }: { children: ReactNode }) {
   const [nwcUrl, setNwcUrl] = useState("");
   const [pendingNwcUrl, setPendingNwcUrl] = useState("");
   const [nwcAuthUrl, setNwcAuthUrl] = useState("");
-  const [nostrWebLN, setNostrWebLN] = useState<
-    webln.NostrWebLNProvider | undefined
-  >(undefined);
+  const [nostrWebLN, setNostrWebLN] = useState<webln.NostrWebLNProvider | undefined>(undefined);
 
   return (
     <NWCContext.Provider
@@ -102,7 +100,6 @@ export function useNWCEnable(_nwcUrl?: string) {
 
 export function useNwcUrl() {
   const { nwcUrl, setNwcUrl } = useNWCContext();
-
   return [nwcUrl, setNwcUrl];
 }
 
@@ -142,4 +139,4 @@ export function useConnectWithAlby() {
   ];
 }
 
-export function usePayInvoice() {}
+export async function usePayInvoice() {}

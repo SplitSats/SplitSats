@@ -1,92 +1,40 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { FILL_CARD_COLOR } from "@styles/styles";
-import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
-import { truncateNpub } from '@nostr/util'
 
-const MemberCardComponent = ({ contact, onPress }) => {
-  
-  const [contactPressed, setContactPressed] = useState('');
-  useEffect(() => {
-    setContactPressed(contact);
-  }, [contact]);
-
-  const handlePress = () => {
-    if (onPress) {
-      onPress({ contactPressed });
-    }
-  };
-
+const MemberCardComponent = ({ contact }) => {
   return (
-    <View style={styles.cardContainer}>
-      <Image source={{ uri: contact.profile?.image }} style={styles.profileImage} />
-      <View style={styles.userInfo}>
-        <Text style={styles.userName}>{contact.profile?.displayName}</Text>
-        <Text style={styles.npub}>{truncateNpub(contact.npub)}</Text>
-      </View>
-      {/* A little button with a thunder icon for paying  */}
-      <TouchableOpacity style={styles.payContainer} onPress={handlePress}>
-        <Text style={styles.payText}>Zap ⚡</Text>
-      </TouchableOpacity>
-      
+    <View style={styles.container}>
+    <Image source={{ uri: contact.profile?.image }} style={styles.image} />
+      <Text style={styles.name}>{contact.profile?.displayName}</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    width: "100%",
-    alignSelf: "center",
-    alignItems: "center",
-    flexDirection: "row",
-    padding: 10,
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: FILL_CARD_COLOR,
-    marginBottom: 10,
     borderRadius: 20,
-    shadowColor: "black",
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 2,
+    padding: 8,
+    margin: 5,
+    elevation: 3, // for Android shadow
+    shadowColor: '#000', // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.25, // for iOS shadow
+    shadowRadius: 3.84, // for iOS shadow
   },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  image: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     marginRight: 10,
   },
-  userInfo: {
-    flex: 1,
-  },
-  userName: {
+  name: {
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "bold",
-    color: "white",
   },
-  npub: {
-    fontSize: 14,
-    color: "grey",
-  },
-  payContainer: {
-    backgroundColor: SECONDARY_COLOR,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  payButton: {
-    backgroundColor: DARK_GREY,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  payText: {
-    color: 'white',
-    fontSize: 14,
-  }
 });
 
 export default MemberCardComponent;
