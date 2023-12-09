@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { DARK_GREY } from "@styles/styles";
+import { FILL_CARD_COLOR } from "@styles/styles";
 
-const MemberCardComponent: React.FC<User> = ({ name, profileImage }) => {
+const MemberCardComponent = ({ contact }) => {
   return (
     <View style={styles.container}>
-      <Image source={{ uri: profileImage }} style={styles.image} />
-      <Text style={styles.name}>{name}</Text>
+    <Image source={{ uri: contact.profile?.image }} style={styles.image} />
+      <Text style={styles.name}>{contact.profile?.displayName}</Text>
     </View>
   );
 };
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: DARK_GREY,
+    backgroundColor: FILL_CARD_COLOR,
     borderRadius: 20,
     padding: 8,
     margin: 5,

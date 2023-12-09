@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, Button, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, Button, ScrollView, SafeAreaView} from "react-native";
 import { PRIMARY_COLOR } from "@styles/styles";
 import { IconButton } from "react-native-paper";
 import * as Clipboard from "expo-clipboard";
@@ -10,7 +10,7 @@ import { l } from "@log";
 import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
-
+import Header from "@comps/Header";
 
 const FinalConfirmation = ({ navigation }) => {
 	const { reset } = navigation
@@ -46,10 +46,16 @@ const FinalConfirmation = ({ navigation }) => {
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
   };
-
+  const handleBack = () => {
+    navigation.goBack();
+  }
+  
   return (
+    <SafeAreaView style={styles.container}>
+
     <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.headerText}>ACCOUNT CREATED</Text>
+      <Header title="ACCOUNT CREATED" onPressBack={handleBack}/>
+        
         <View style={styles.cardContainer}>
           <CreateAccountWrap userProfile={userProfile} />
 
@@ -103,6 +109,8 @@ const FinalConfirmation = ({ navigation }) => {
           disabled={!isCheckboxChecked} // Disable the button when loading
         />
     </ScrollView>
+    </SafeAreaView>
+
   );
 };
 
@@ -111,7 +119,7 @@ const styles = StyleSheet.create({
     position: "relative",
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
-    padding: 20,
+    padding: 10,
     alignItems: "center",
   },
   //I put the position absolut so we can achieve the overlaying

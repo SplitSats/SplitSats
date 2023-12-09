@@ -5,6 +5,7 @@ export const PRIMARY_COLOR = '#0F172A'
 export const SECONDARY_COLOR = '#83A3EE'
 export const DARK_GREY = '#2B2B2B'
 export const FILL_CARD_COLOR = '#303444'
+export const FILL_CARD_COLOR_SOFT = '#404454'
 export const SOFT_GREY = '#D9D9D9'
 
 

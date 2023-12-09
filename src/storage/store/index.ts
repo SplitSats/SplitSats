@@ -1,21 +1,134 @@
 import { SecureStore } from '@store/SecureStore'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { StateStorage } from 'zustand/middleware';
-import { create } from 'zustand';
+import { create, GetState, SetState } from 'zustand'
+
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { ZustandAsyncStorage } from '@store/persist';
 import { ContactManager } from '@src/managers/contact'
+import { GroupManager } from '@src/managers/group'
+import { plainToInstance, instanceToPlain } from 'class-transformer';
+import { l } from '@log';
 
-export const useContactManagerStore = create(
+
+interface ContactManagerStore {
+  contactManager: string | null;
+  initializeContactManager: () => Promise<void>;
+  getContactManager: () => ContactManager | null;
+  setContactManager: (manager: ContactManager) => void;
+  clearContactManager: () => void;
+  rehydrated: boolean;
+  setRehydrated: () => void;
+}
+
+// Interface for GroupManagerStore
+interface GroupManagerStore {
+  groupManager: string | null;
+  initializeGroupManager: () => Promise<void>;
+  getGroupManager: () => GroupManager | null;
+  setGroupManager: (manager: GroupManager) => void;
+  clearGroupManager: () => void;
+}
+
+export const useContactManagerStore = create<ContactManagerStore>()(
   persist(
-    (set) => ({
-      contactManager: new ContactManager(),
-      setContactManager: (manager) => set({ contactManager: manager }),
-      clearContactManager: () => set({ contactManager: new ContactManager() }),
+    (set, get) => ({
+      rehydrated: false,
+      setRehydrated: () => set({ rehydrated: true }),
+      contactManager: null,
+      initializeContactManager: async () => {
+        const storage = createJSONStorage(() => AsyncStorage);
+        const newManager = new ContactManager();
+        set({ contactManager: newManager });
+        const data = JSON.stringify(instanceToPlain(newManager));
+        await storage?.setItem('contactManager', data);
+      },
+      getContactManager: () => {
+        const manager = get().contactManager;
+        if (manager) {
+          const data = plainToInstance(ContactManager, manager);
+          return data
+        }
+      },
+      setContactManager: (manager) => {
+        set({ contactManager: manager });
+        const storage = createJSONStorage(() => AsyncStorage);
+        const data = JSON.stringify(instanceToPlain(manager));
+        storage?.setItem('contactManager', data);
+      },
+      clearContactManager: () => {
+        set({ contactManager: null });
+      },
     }),
     {
       name: 'contactManager-storage',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: (state) => {
+        return (state, error) => {
+          if (error || !state) {
+            console.log('An error happened during hydration', error);
+          } else {
+            const parsedManager = plainToInstance(ContactManager, JSON.parse(state.contactManager));
+            state.contactManager = parsedManager;
+            state.setRehydrated();
+          }
+        };
+      },
+    }
+  )
+);
+
+
+// Create GroupManager store
+export const useGroupManagerStore = create<GroupManagerStore>()(
+  persist(
+    (set, get) => ({
+      groupManager: null,
+      initializeGroupManager: async () => {
+        try {
+          const storage = createJSONStorage(() => AsyncStorage);
+          const storedGroupManager = await storage?.getItem('groupManager');
+          if (storedGroupManager) {
+            const parsedManager = plainToInstance(GroupManager, JSON.parse(storedGroupManager));
+            set({ groupManager: parsedManager });
+          } else {
+            const newManager = new GroupManager();
+            set({ groupManager: newManager });
+            await storage?.setItem('groupManager', JSON.stringify(instanceToPlain(newManager)));
+          }
+        } catch (error) {
+          console.error('Error loading GroupManager:', error);
+          set({ groupManager: null });
+        }
+      },
+      getGroupManager: () => {
+        return get().groupManager;
+      },
+      setGroupManager: (manager) => {
+        set({ groupManager: manager });
+        const storage = createJSONStorage(() => AsyncStorage);
+        storage?.setItem('groupManager', JSON.stringify(instanceToPlain(manager)));
+      },
+      clearGroupManager: () => {
+        set({ groupManager: null });
+        const storage = createJSONStorage(() => AsyncStorage);
+        storage?.removeItem('groupManager');
+      },
+    }),
+    {
+      name: 'groupManager-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: (state) => {
+        return (state, error) => {
+          if (error || !state) {
+            console.log('An error happened during hydration', error);
+          } else {
+            const parsedManager = plainToInstance(GroupManager, JSON.parse(state.groupManager));
+            state.groupManager = parsedManager;
+            // You might want to set some flag here indicating the GroupManager is rehydrated, similar to ContactManager
+          }
+        };
+      },
     }
   )
 );

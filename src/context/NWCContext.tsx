@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { l, err } from "@log";
 
 export interface NWCContextType {
   nwcUrl: string;
@@ -37,9 +38,7 @@ export function NWCProvider({ children }: { children: ReactNode }) {
   const [nwcUrl, setNwcUrl] = useState("");
   const [pendingNwcUrl, setPendingNwcUrl] = useState("");
   const [nwcAuthUrl, setNwcAuthUrl] = useState("");
-  const [nostrWebLN, setNostrWebLN] = useState<
-    webln.NostrWebLNProvider | undefined
-  >(undefined);
+  const [nostrWebLN, setNostrWebLN] = useState<webln.NostrWebLNProvider | undefined>(undefined);
 
   return (
     <NWCContext.Provider
@@ -85,13 +84,13 @@ export function useNWCEnable(_nwcUrl?: string) {
         });
         setNostrWebLN(_nostrWebLN);
         await _nostrWebLN.enable();
-
+        l("NostrWebLN enabled!");
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
         setIsError(true);
         setError(error);
-        console.log(error);
+        err(error);
       }
     };
   }, [nwcUrl]);
@@ -101,7 +100,6 @@ export function useNWCEnable(_nwcUrl?: string) {
 
 export function useNwcUrl() {
   const { nwcUrl, setNwcUrl } = useNWCContext();
-
   return [nwcUrl, setNwcUrl];
 }
 
@@ -115,16 +113,21 @@ export function useConnectWithAlby() {
     setNwcAuthUrl,
   } = useContext(NWCContext);
 
-  function connectWithAlby() {
-    const nwc = webln.NostrWebLNProvider.withNewSecret();
+  const connectWithAlby = async () => {
+    try {
+      const nwc = webln.NostrWebLNProvider.withNewSecret();
 
-    const authUrl = nwc.getAuthorizationUrl({
-      name: "SplitSats App",
-    });
+      const authUrl = await nwc.getAuthorizationUrl({
+        name: "SplitSats App",
+      });
 
-    setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
-    setNwcAuthUrl(authUrl.toString());
-  }
+      await setPendingNwcUrl(nwc.getNostrWalletConnectUrl(true));
+      await setNwcAuthUrl(authUrl.toString());
+
+    } catch (error) {
+      console.error('Error connecting with Alby:', error);
+    }
+  };
 
   return [
     connectWithAlby,
@@ -136,4 +139,4 @@ export function useConnectWithAlby() {
   ];
 }
 
-export function usePayInvoice() {}
+export async function usePayInvoice() {}

@@ -1,9 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
-import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Button, TouchableOpacity, Image, StyleSheet, Text, TextInput, View, SafeAreaView} from 'react-native';
 import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
-import updateNostrProfileNDK from '@nostr/updateProfile';
 import { l, err } from '@log';
 import { useNDK } from '@src/context/NDKContext';
 import CreateAccountWrap from "@comps/account/CreateAccountWrap";
@@ -15,16 +14,19 @@ import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } 
 import { relay } from '@nostr/class/Relay'
 import { EventKind } from '@nostr/consts'
 import { USE_NDK } from '@nostr/consts'
-import NDKManager  from '@nostr'
+import {updateNDKProfile}  from '@nostr/profile'
+import Header from "@comps/Header";
 
-const ConfirmCreateAccountScreen = ({ navigation, route }) => {
+
+const ConfirmCreateAccountScreen = ({ navigation }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const [loading, setLoading] = useState(false); 
+  const ndk = useNDK();
 
   const [npub, setNpub] = useState("");
 
-  useEffect(() => {
+  useEffect(()  => {
     const createNostrKeys = async () => {
       setLoading(true);
       // Generate a private key for the user
@@ -33,7 +35,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       // Extract the public key from the private key
       const userPublicKey = getPublicKey(userPrivateKey);
       const npub = nip19.npubEncode(userPublicKey);
-      setNpub(npub);
+      await setNpub(npub);
       l('New nostr keys generated! npub:', npub);
       l('nsec:', nsec);
       l('New nostr keys generated! userPublicKey:', userPublicKey);
@@ -53,9 +55,7 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
     let result = false;
     if (USE_NDK) {
       
-      const ndkManager = NDKManager.getInstance();
-      await ndkManager.initialize();
-      result = await ndkManager.updateNostrProfile(npub, userProfile);
+      result = await updateNDKProfile(ndk, npub, userProfile);
     }
     else {
       const event = {
@@ -79,15 +79,21 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
       l('userProfile is null');
       return;
     }
-    //TODO: Publish the user profile to Nostr
     await publishNostrProfile(npub, userProfile);
     setLoading(false);
-    navigation.replace('FinalConfirmation');
+    navigation.navigate('FinalConfirmation');
   };
+  
+  const handleBack = () => {
+    navigation.goBack();
+  }
 
+  
   return (
-    <View style={styles.container}>
-        <Text style={styles.headerText}>CONFIRM ACCOUNT</Text>
+    <SafeAreaView style={styles.container}>
+        <Header title="CONFIRM ACCOUNT" onPressBack={handleBack} />
+
+        <Text style={styles.headerText}></Text>
         <View style={styles.cardContainer}>
           <CreateAccountWrap userProfile={userProfile}/>
         </View>
@@ -101,8 +107,8 @@ const ConfirmCreateAccountScreen = ({ navigation, route }) => {
           disabled={loading} // Disable the button when loading
       />
       {loading && <ActivityIndicator size="large" color="#0000ff" />} 
-    
-    </View>
+      
+    </SafeAreaView>
   );
 };
 
@@ -110,8 +116,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: PRIMARY_COLOR,
-    padding: 20,
-    alignItems: 'center',
+    padding: 10,
   },
   cardContainer:{
       width:'100%',

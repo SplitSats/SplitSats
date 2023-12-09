@@ -1,18 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { View, Image, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
 import ImageUploadComponent from '@comps/ImageUploadComponent';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 
-const GroupHeaderComponent = ({ }) => {
+const GroupHeaderComponent = ({ onGroupNameChange, onGroupImageUriChange }) => {
   const [groupName, setGroupName] = useState('');
-  const [profileImageUri, setProfileImageUri] = useState('');
+  const [groupImageUri, setGroupImageUri] = useState('');
   
+  const getRandomImage = async () => {
+    const url = 'https://source.unsplash.com/random/70x70';
+    setGroupImageUri(url);
+    return url;
+  };
+
+  const getRandomName = async () => {
+    const url = 'SatsSplitter' + Math.floor(Math.random() * 1000) + 1; 
+    setGroupName(url);
+    return url;
+  }
+
+  useEffect(() => {
+    onGroupNameChange(groupName);
+    getRandomImage();
+    getRandomName();
+  }, []);
 
   return (
     <View style={styles.headerContainer}>
-      <ImageUploadComponent imageUri={"https://images.unsplash.com/photo-1682685796467-89a6f149f07a?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"}
-      setImageUri={setProfileImageUri}/>
+      <ImageUploadComponent imageUri={groupImageUri} setImageUri={setGroupImageUri}/>
       <TextInput
         value={groupName}
         onChangeText={setGroupName}

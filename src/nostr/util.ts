@@ -67,7 +67,6 @@ export async function nip05toNpub(identifier: string): Promise<string | null>{
   }
   catch (e) {
     // print error in console
-    err(e)
     return null
   }
 }

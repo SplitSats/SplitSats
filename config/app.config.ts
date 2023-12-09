@@ -49,7 +49,7 @@ const cameraPermission = 'Allow splitsats to access camera.'
 const config: ExpoConfig = {
 	name: `splitsats${!IS_PROD ? ` (${_appVariant})` : ''}`,
 	slug: 'splitsats',
-	owner: 'bizantinw',
+	owner: 'splitsats',
 	privacy: 'public',
 	platforms: [
 		'ios',
