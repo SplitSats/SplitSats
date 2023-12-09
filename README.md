@@ -38,8 +38,6 @@ Provide instructions on how to use your application:
 
 ## Features
 
-List the key features of your application:
-
  - [X] Account creation on Nostr
  - [X] Add friends from Nostr 
  - [X] Lightning Wallet Connection with NWC
@@ -47,6 +45,16 @@ List the key features of your application:
  - [ ] Add expenses and bills to groups
  - [ ] Settle debts with Zaps using NWC
  - [ ] Off-line sync with Nostr 
+
+
+## Dependencies
+
+SplitSats uses different libraries in order to provide its functionalities. Some of them: 
+
+- **Nostr** : We use a combination of [NDK](https://github.com/nostr-dev-kit/ndk/tree/master/ndk) and [nostr-tools](https://github.com/nbd-wtf/nostr-tools) libraries to handle communications between users in a sort of P2P interaction 
+- **Lighting Network** : [Alby SDK](https://github.com/getAlby/js-sdk) and [lightning-tools](https://github.com/getAlby/js-lightning-tools) enable sats flow features
+- **Zustand**: [link](https://github.com/pmndrs/zustand) Bear necessities in React simplyfing state management 
+
 
 ## Contributing
 
