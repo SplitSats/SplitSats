@@ -38,6 +38,8 @@ Provide instructions on how to use your application:
 
 ## Features
 
+Please take a look to the [technical documentation](doc/03_Technical_Specification.md) in order to understand how groups and bill flow works. 
+
  - [X] Account creation on Nostr
  - [X] Add friends from Nostr 
  - [X] Lightning Wallet Connection with NWC
