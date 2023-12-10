@@ -1,5 +1,5 @@
 # SplitSats - Sync Groups, Split Bills and Settle in Bitcoin
-SplitSats is a complete re-imagination of financial collaboration powered by BTC on Lightning and centred around chat with Nostr as the base layer.
+SplitSats is a complete re-imagination of financial collaboration powered by bitcoin on Lightning and centred around chat with Nostr as the base layer.
 
 SplitSats is a proof of concept application that aims to provide users with an easy way to share expenses and settle debts instantly using bitcoin. The React Native app will utilize Nostr for user profiles and payment contacts. Users will be able to add expenses manually or automatically, by scanning fiscal receipts, enabling them to itemize expenses and assign them to appropriate contacts (friends), to tabulate amounts owing by each group member. Artificial intelligence API will be implemented for receipt scanning to extract itemized lists within the app.
 
@@ -12,6 +12,7 @@ SplitSats is a proof of concept application that aims to provide users with an e
   - [Installation](#installation)
   - [Usage](#usage)
   - [Features](#features)
+  - [Dependencies](#dependencies)
   - [Contributing](#contributing)
   - [License](#license)
 
