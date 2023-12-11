@@ -37,6 +37,9 @@ Provide instructions on how to use your application:
 2. Scan the QR code with the Expo Go app on your mobile device or run in a simulator.
 
 ## Features
+Please take a look to the [technical documentation](doc/03_Technical_Specification.md)
+  in order to understand how groups and bill flow works. 
+
 
 List the key features of your application:
 
