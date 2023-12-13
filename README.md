@@ -61,8 +61,6 @@ SplitSats uses different libraries in order to provide its functionalities. Some
 
 ## Contributing
 
-Explain how others can contribute to your project:
-
 0. Select the issue you want to work on or create a new one and assign yourself to it.
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/my-feature`).
