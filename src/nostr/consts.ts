@@ -64,6 +64,10 @@ export enum EventKind {
 	ZapRequest = 9734, 			// NIP 57
 	ZapReceipt = 9735, 			// NIP 57
 	HttpAuthentication = 27235, // NIP XX - HTTP Authentication
+	SplitGroupRequest = 5001, 	// SplitSats Create Group
+	SplitGroupReceipt = 5002, 	// SplitSats Confirm Group
+
+
 }
 
 export const npubLength = 64

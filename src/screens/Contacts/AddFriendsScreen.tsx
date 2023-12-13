@@ -16,9 +16,9 @@ import CancelIcon from "@assets/icon/Cancel.png";
 import QRIcon from "@assets/icon/QR-code.png";
 import SearchIcon from "@assets/icon/Search.png";
 import { BarCodeScanner } from "expo-barcode-scanner";
-import ConfirmButton from "@comps/ConfirmButton";
-import QRCodeScreen from "@comps/account/QRcode";
-import SearchCardComponent from "@comps/SearchCardComponent";
+import ButtonConfirm from "@comps/ButtonConfirm";
+import QRCodeScreen from "@comps/QRcode";
+import SearchCardComponent from "@comps/CardComponentSearch";
 import { useUserProfileStore, useContactManagerStore } from '@store'
 // import Swipeable from "react-native-swipeable";
 
@@ -241,7 +241,7 @@ const AddFriendScreen = ({ navigation }) => {
         // </Swipeable>
       )}
     />
-    <ConfirmButton
+    <ButtonConfirm
         disabled={false}
         title="FINISH"
         onPress={() => handleFinish()}

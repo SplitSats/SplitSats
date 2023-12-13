@@ -49,7 +49,6 @@ async function createEncryptedEvent(sender: User, receiver: User, message: strin
 // Define a function to handle incoming events on the receiver side
 function handleIncomingEvent(event: any) {
   const senderPublicKey = event.pubkey;
-
   const sharedKey = nip44.utils.v2.getConversationKey(receiver.privateKey, senderPublicKey);
   const plaintext = nip44.decrypt(sharedKey, event.content);
   console.log(plaintext);

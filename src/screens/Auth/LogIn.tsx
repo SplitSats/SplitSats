@@ -5,7 +5,7 @@ import { Button, StyleSheet,Text, TextInput, View, SafeAreaView } from 'react-na
 
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import {  INIT_KEY } from '@store/consts';
-import ConfirmButton from '@comps/ConfirmButton'
+import ButtonConfirm from '@comps/ButtonConfirm'
 import { ActivityIndicator } from 'react-native';
 import { l, err } from '@log';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
@@ -76,7 +76,7 @@ const LogInScreen = ({ navigation }) => {
 				/>
 
 			</View>
-			<ConfirmButton
+			<ButtonConfirm
 				title="PASTE YOUR KEY"
 				onPress={handlePrivateKeySubmit}
 				disabled={loading} // Disable the button when loading

@@ -2,15 +2,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, Text, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
 
-import UserProfile from '@comps/account/UserProfile';
+import UserProfile from '@comps/UserProfile';
 import { useUserProfileStore, useContactManagerStore } from '@store';
 // import { styles } from '@styles/styles';
 import { ContactManager } from '@src/managers/contact';
 import { l, err } from '@log';
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 // import { UserCardComponent } from '@comps/UserCardComponent';
-import ContactCardComponent from "@comps/ContactCardComponent";
-import PaymentModal from '@comps/PaymentModal'; 
+import ContactCardComponent from "@comps/CardComponentContact";
+import PaymentModal from '@comps/ModalPayment'; 
 
 
 const ContactScreen = ({ navigation }) => {

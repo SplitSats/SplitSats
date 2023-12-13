@@ -1,11 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import ConfirmButton from '@comps/ConfirmButton'
+import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
 import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
-import QRCodeScreen from "@comps/account/QRcode";
+import QRCodeScreen from "@comps/QRcode";
 import { err, l } from '@log';
 
 
@@ -82,7 +82,7 @@ const NostrWalletConnectScreen = ({ navigation }) => {
               <Text style={styles.buttonText}>SCAN QR CODE</Text>
             </TouchableOpacity>
             
-			<ConfirmButton
+			<ButtonConfirm
 				title="CONNECT"
 				onPress={handleConnect}
 				disabled={loading} 

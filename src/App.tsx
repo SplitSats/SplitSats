@@ -22,8 +22,9 @@ import WalletConnectScreen from '@screens/Setting/WalletScreen'
 import KeysScreen from '@screens/Setting/KeysScreen'
 import PreferencesScreen from '@screens/Setting/PreferencesScreen'
 import DonateScreen from '@screens/Setting/DonateScreen'
-import UserProfile from '@comps/account/UserProfile'
-import WebViewScreen from '@src/components/WebViewScreen';
+import GroupDetailsScreen from '@screens/Groups/GroupDetails'
+import UserProfile from '@comps/UserProfile'
+import WebViewScreen from '@screens/WebViewScreen';
 import NostrWalletConnectScreen from '@screens/Setting/NostrWalletConnect';
 import { NWCProvider } from '@src/context/NWCContext'
 // import "../applyGlobalPolyfills";
@@ -68,6 +69,7 @@ export default function App() {
 					<Stack.Screen name="UserProfile" component={UserProfile}/>
 					<Stack.Screen name="WebViewScreen" component={WebViewScreen}/>
 					<Stack.Screen name="NostrWalletConnect" component={NostrWalletConnectScreen}/>
+					<Stack.Screen name="GroupDetails" component={GroupDetailsScreen}/>
 
 				</Stack.Navigator>
 			</NavigationContainer>

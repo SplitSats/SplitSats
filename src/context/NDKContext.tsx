@@ -1,6 +1,6 @@
 import NDK from '@nostr-dev-kit/ndk'
 import React, { createContext, useContext, useEffect,useState } from 'react'
-import { createWallet, getWallet, PRIVATE_KEY_HEX, NPUB, NSEC } from '@store/secure';
+import { getWallet, PRIVATE_KEY_HEX, NPUB, NSEC } from '@store/secure';
 import { IProfileContent } from '@model/nostr';
 import { defaultRelays, EventKind } from '@nostr/consts';
 import { getPublicKey, nip19 } from 'nostr-tools';

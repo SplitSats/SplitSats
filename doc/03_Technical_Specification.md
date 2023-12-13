@@ -6,7 +6,7 @@
 # User Stories
 
 ## Creating a group
-KIND: 50001
+KIND: 5001
 Alice want to create a group with Bob and Carol
 
 - 0. Alice press the "+" button for create a new group. Alice fill the form with the group information.

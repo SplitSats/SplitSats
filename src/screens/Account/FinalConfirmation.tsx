@@ -4,8 +4,8 @@ import { PRIMARY_COLOR } from "@styles/styles";
 import { IconButton } from "react-native-paper";
 import * as Clipboard from "expo-clipboard";
 import Checkbox from "expo-checkbox";
-import CreateAccountWrap from "@comps/account/CreateAccountWrap";
-import ConfirmButton from '@comps/ConfirmButton';
+import CreateAccountWrap from "@comps/CreateAccountWrap";
+import ButtonConfirm from '@comps/ButtonConfirm';
 import { l } from "@log";
 import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
@@ -103,7 +103,7 @@ const FinalConfirmation = ({ navigation }) => {
           />
           <Text style={styles.textCheckBox}>I've backed up my Private key</Text>
         </View>
-        <ConfirmButton
+        <ButtonConfirm
           title="ADD FRIENDS"
           onPress={handleAddFriends}
           disabled={!isCheckboxChecked} // Disable the button when loading

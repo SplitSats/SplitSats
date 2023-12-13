@@ -12,7 +12,7 @@ import { l } from '@log';
 
 
 interface ContactManagerStore {
-  contactManager: string | null;
+  contactManager: ContactManager | null;
   initializeContactManager: () => Promise<void>;
   getContactManager: () => ContactManager | null;
   setContactManager: (manager: ContactManager) => void;
@@ -23,11 +23,13 @@ interface ContactManagerStore {
 
 // Interface for GroupManagerStore
 interface GroupManagerStore {
-  groupManager: string | null;
+  groupManager: GroupManager | null;
   initializeGroupManager: () => Promise<void>;
   getGroupManager: () => GroupManager | null;
   setGroupManager: (manager: GroupManager) => void;
   clearGroupManager: () => void;
+  rehydrated: boolean;
+  setRehydrated: () => void;
 }
 
 export const useContactManagerStore = create<ContactManagerStore>()(
@@ -58,6 +60,8 @@ export const useContactManagerStore = create<ContactManagerStore>()(
       },
       clearContactManager: () => {
         set({ contactManager: null });
+        const storage = createJSONStorage(() => AsyncStorage);
+        storage?.removeItem('contactManager');
       },
     }),
     {
@@ -83,31 +87,33 @@ export const useContactManagerStore = create<ContactManagerStore>()(
 export const useGroupManagerStore = create<GroupManagerStore>()(
   persist(
     (set, get) => ({
+      rehydrated: false,
+      setRehydrated: () => set({ rehydrated: true }),
       groupManager: null,
       initializeGroupManager: async () => {
         try {
           const storage = createJSONStorage(() => AsyncStorage);
-          const storedGroupManager = await storage?.getItem('groupManager');
-          if (storedGroupManager) {
-            const parsedManager = plainToInstance(GroupManager, JSON.parse(storedGroupManager));
-            set({ groupManager: parsedManager });
-          } else {
-            const newManager = new GroupManager();
-            set({ groupManager: newManager });
-            await storage?.setItem('groupManager', JSON.stringify(instanceToPlain(newManager)));
-          }
+          const newManager = new GroupManager();
+          set({ groupManager: newManager });
+          const data = JSON.stringify(instanceToPlain(newManager));
+          await storage?.setItem('groupManager', data);
         } catch (error) {
           console.error('Error loading GroupManager:', error);
           set({ groupManager: null });
         }
       },
       getGroupManager: () => {
-        return get().groupManager;
+        const manager = get().groupManager;
+        if (manager) {
+          const data = plainToInstance(GroupManager, manager);
+          return data
+        }
       },
       setGroupManager: (manager) => {
         set({ groupManager: manager });
         const storage = createJSONStorage(() => AsyncStorage);
-        storage?.setItem('groupManager', JSON.stringify(instanceToPlain(manager)));
+        const data = JSON.stringify(instanceToPlain(manager));
+        storage?.setItem('contactManager', data);
       },
       clearGroupManager: () => {
         set({ groupManager: null });

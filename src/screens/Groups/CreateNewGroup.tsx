@@ -13,22 +13,24 @@ import {
 
 } from "react-native";
 import SearchIcon from "@assets/icon/Search.png";
-import SearchCardComponent from "@comps/SearchCardComponent";
+import SearchCardComponent from "@comps/CardComponentSearch";
 import GroupHeaderComponent from "@comps/GroupHeaderComponent";
 import { PRIMARY_COLOR, SECONDARY_COLOR, FILL_CARD_COLOR } from "@styles/styles";
-import MemberCardComponent from "@comps/MemberCardComponent";
+import MemberCardComponent from "@comps/CardComponentMember";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you have expo/vector-icons installed
 import { SafeAreaView } from "react-native-safe-area-context"; // Import SafeAreaView
 import Header from "@comps/Header";
 import { useUserProfileStore, useContactManagerStore, useGroupManagerStore } from '@store'
 // import NDKManager  from '@nostr'
-import ConfirmButton from "@comps/ConfirmButton";
+import ButtonConfirm from "@comps/ButtonConfirm";
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 import { ContactManager, Contact } from '@src/managers/contact'
 import { l, err } from '@log';
 import SearchUser from '@comps/SearchUser';
 import { Group, GroupManager } from '@src/managers/group';
-import ConfirmModal  from "@comps/ConfirmModal"; 
+import ConfirmModal  from "@comps/ModalConfirm"; 
+import { useNDK } from '@src/context/NDKContext';
+import { publishGroup } from '@nostr';
 
 const CreateNewGroup = ({ navigation, route }) => {
 
@@ -44,6 +46,9 @@ const CreateNewGroup = ({ navigation, route }) => {
   const contactManager = useContactManagerStore((state) => state.getContactManager());
   const groupManager = useGroupManagerStore((state) => state.getGroupManager());
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const ndk = useNDK();
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
@@ -91,6 +96,10 @@ const CreateNewGroup = ({ navigation, route }) => {
   };
 
   const handleCreateGroup = async () => {
+    if (!groupName || !groupImageUri) {
+      Alert.alert('Please provide a group name and image.');
+      return;
+    }
     const userNpub = await getWallet(NPUB);
     // Create a new Group instance
     const newGroup = new Group(
@@ -105,14 +114,29 @@ const CreateNewGroup = ({ navigation, route }) => {
     l("Group: ", newGroup);
     // Assuming you have a group manager instance available
     if (groupManager) {
-      // Add the new group to the GroupManager
-      // const newGroupManager = new GroupManager();
-      groupManager.addGroup(newGroup);
-      await setGroupManager(groupManager);
-      console.log('New group created:', newGroup);
+      try {
+        // Add the new group to the GroupManager
+        groupManager.addGroup(newGroup);
+        await publishGroup(ndk, newGroup);
+        await setGroupManager(groupManager);
+        console.log('New group created:', newGroup);
+        showToast('Group created successfully!');
+        navigation.navigate('Dashboard');
+        closeModal();
+      } 
+      catch (error) {
+        showToast('Error creating group. Please try again.');
+      }
     }
-    navigation.navigate("Dashboard");
   }
+
+  const showToast = (message) => {
+    setToastMessage(message);
+    setToastVisible(true);
+    setTimeout(() => {
+      setToastVisible(false);
+    }, 3000); // Hide the toast after 3 seconds
+  };
 
   const handleFinish = async () => {
     setIsModalVisible(true);
@@ -158,13 +182,8 @@ const CreateNewGroup = ({ navigation, route }) => {
     setIsModalVisible(false);
   };
 
-  const handleYes = () => {
-    navigation.navigate('WalletScreen');
-    closeModal();
-  };
 
   const handleNo = () => {
-    navigation.navigate('LightningAddressScreen');
     closeModal();
   };
 
@@ -221,10 +240,16 @@ const CreateNewGroup = ({ navigation, route }) => {
         leftButtonTitle="No"
         rightButtonTitle="Yes"
         onLeftButtonPress={handleNo}
-        onRightButtonPress={handleYes}
+        onRightButtonPress={handleCreateGroup}
       />
+      
+      {toastVisible && (
+        <View style={styles.toastContainer}>
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </View>
+      )}
 
-      <ConfirmButton
+      <ButtonConfirm
         disabled={false}
         title="CREATE GROUP"
         onPress={() => handleFinish()}
@@ -232,6 +257,17 @@ const CreateNewGroup = ({ navigation, route }) => {
 
     </SafeAreaView>
   );
+};
+
+const Toast = ({ visible, message }) => {
+  if (visible) {
+    return (
+      <View style={styles.toastContainer}>
+        <Text style={styles.toastText}>{message}</Text>
+      </View>
+    );
+  }
+  return null;
 };
 
 const styles = StyleSheet.create({
@@ -267,6 +303,9 @@ const styles = StyleSheet.create({
   },
   membersList: {
     flexDirection: "row",
+    marginTop: 10,
+    marginBottom: 10,
+    paddingVertical: 10,
   },
   sectionTitle: {
     color: "white",
@@ -299,6 +338,20 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 10,
     height: 10,
+  },
+  toastContainer: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });
 

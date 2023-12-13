@@ -1,13 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import ConfirmButton from '@comps/ConfirmButton'
+import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
 import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
 import WebView from 'react-native-webview';
 import { err, l } from '@log';
-import WebViewScreen  from '@src/components/WebViewScreen';
+import WebViewScreen  from '@screens/WebViewScreen';
 import { webln } from "@getalby/sdk";
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -72,7 +72,7 @@ const WalletConnectScreen = ({ navigation }) => {
            <TouchableOpacity onPress={handleConnectButton} style={styles.connectButton}>
               <Text style={styles.buttonText}>CONNECT NWC</Text>
             </TouchableOpacity>
-            <ConfirmButton
+            <ButtonConfirm
               title="CONNECT WITH ALBY 🐝"
               onPress={navigateToWebView}
               disabled={false}

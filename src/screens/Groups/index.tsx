@@ -13,11 +13,12 @@ import {
 	StatusBar,
 	Alert,
 } from "react-native";
-import UserProfile from '@comps/account/UserProfile'
+import UserProfile from '@comps/UserProfile'
 import { Group, GroupManager } from '@src/managers/group';
 import { useUserProfileStore, useContactManagerStore, useGroupManagerStore } from '@store'
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import { l, err } from '@log';
+import GroupCardComponent from '@comps/CardComponentGroup';
 
 
 const GroupsScreen = ({ navigation }) => {
@@ -27,23 +28,32 @@ const GroupsScreen = ({ navigation }) => {
 	const [groups, setGroups] = useState([]);
 	const TAG = '[GroupsScreen] ';
 
+
 	useEffect(() => {
-		const fetchGroups = async () => {
-			try {
-				if (!groupManager) {
-					await initializeGroupManager();
-					return;
-				}
-				const fetchedGroups = await groupManager.getGroups() || [];
-				setGroups(fetchedGroups);
-				l('Fetched groups:', fetchedGroups);
-			} catch (error) {
-				console.error('Error fetching groups:', error);
-			}
-		}
-		fetchGroups();
-	}, [groupManager]);
+		const initGroupManager = async () => {
+		  try {
+			
+			if (!groupManager) {
+			  // If not found in storage, initialize a new one
+			  await initializeGroupManager();
+			  l(TAG, "Group manager initialized");
+			} 
 	
+			// Fetch groups from groupManager
+			if (groupManager) {
+				const fetchedGroups = await groupManager?.getGroups() || [];
+				await setGroups(fetchedGroups);
+				l('Fetched groups:', fetchedGroups);
+			} else {
+			  err('Group manager or getGroups method is undefined.');
+			}
+		  } catch (error) {
+			console.error('Error initializing group manager:', error);
+		  }
+		};
+		initGroupManager();
+	  }, []);
+	 
 	const handleGroupPress = (group) => {
 		navigation.navigate('GroupDetails', { group });
 	};
@@ -64,12 +74,15 @@ const GroupsScreen = ({ navigation }) => {
 			<View style={styles.groupListContainer}>
 				<FlatList
 					data={groups}
-					ListHeaderComponent={<View style={styles.divider} />} // Add a divider before the list
-					renderItem={renderGroupCard}
-					keyExtractor={(item) => item.npub}
-				/>
+					renderItem={({ item }) => (
+						<GroupCardComponent
+							group={item}
+							onPress={() => handleGroupPress(item)}
+						/>
+						)}
+						keyExtractor={(item) => item.groupId}
+					  />
 			</View>
-
 		</SafeAreaView>
 	);
 };
@@ -80,6 +93,15 @@ const styles = StyleSheet.create({
 	  backgroundColor: PRIMARY_COLOR,
 	  paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
 	},
+	groupListContainer: {
+		flex: 1,
+		backgroundColor: PRIMARY_COLOR, // Change the background color as needed
+		marginTop: '35%', // Adjust the marginTop to position the contact list below the UserProfile
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		paddingTop: 20,
+		paddingHorizontal: 20,
+	  },
 	header: {
 	  color: SECONDARY_COLOR,
 	  fontSize: 24,

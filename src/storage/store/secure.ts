@@ -28,7 +28,6 @@ export async function getWallet(type: WalletType): Promise<string | null> {
   }
 }
 
-
 export async function deleteWallet(type: WalletType): Promise<void> {
   await SecureStore.deleteItemAsync(type);
 }
