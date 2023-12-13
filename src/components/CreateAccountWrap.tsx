@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, Button } from 'react-native';
 import { DARK_GREY, PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { truncateNpub } from '@nostr/util'
 import { l } from '@log'
-import  QRCodeScreen from '@comps/account/QRCode' 
+import  QRCodeScreen from '@comps/QRcode' 
 import { getWallet, NPUB } from '@store/secure';
 
 const CreateAccountWrap = ({ userProfile }) => {

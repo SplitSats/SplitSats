@@ -5,8 +5,8 @@ import { generatePrivateKey, getPublicKey, nip19 } from 'nostr-tools';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles';
 import { l, err } from '@log';
 import { useNDK } from '@src/context/NDKContext';
-import CreateAccountWrap from "@comps/account/CreateAccountWrap";
-import ConfirmButton from '@comps/ConfirmButton';
+import CreateAccountWrap from "@comps/CreateAccountWrap";
+import ButtonConfirm from '@comps/ButtonConfirm';
 import { ActivityIndicator } from 'react-native';
 import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
@@ -101,7 +101,7 @@ const ConfirmCreateAccountScreen = ({ navigation }) => {
           This is a preview of your Nostr account.
           You can always change your info from the profile settings.
         </Text>
-        <ConfirmButton
+        <ButtonConfirm
           title="CREATE ACCOUNT"
           onPress={handleCreateAccount}
           disabled={loading} // Disable the button when loading

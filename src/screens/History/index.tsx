@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Button, Image, StyleSheet,Text, View } from 'react-native'
 
 import { styles } from '@styles/styles'
-import UserProfile from '@comps/account/UserProfile'
+import UserProfile from '@comps/UserProfile'
 
 const HistoryScreen = ({ navigation }) => (
 	<View style={styles.mainView}>

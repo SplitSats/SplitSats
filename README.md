@@ -16,6 +16,7 @@ SplitSats is a proof of concept application that aims to provide users with an e
   - [Contributing](#contributing)
   - [License](#license)
 
+
 ## About
 
 This is a React Native application that uses the Expo framework. It is a proof of concept application that aims to provide users with an easy way to share expenses and settle debts instantly using bitcoin. 

@@ -9,7 +9,7 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import { IProfileContent } from '@src/model/nostr';
 import { l, err } from '@log';
 import BannerUploadComponent from '@comps/BannerUploadComponent'
-import ConfirmButton from '@comps/ConfirmButton'
+import ButtonConfirm from '@comps/ButtonConfirm'
 import { updateNDKProfile }  from '@nostr/profile'
 import { useNDK } from '@src/context/NDKContext';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
@@ -118,7 +118,7 @@ const ProfileSettingScreen = ({ navigation }) => {
 			contentContainerStyle={styles.formContainer}
 			/>
 			</KeyboardAvoidingView>
-			<ConfirmButton title="UPDATE PROFILE" onPress={handleUpdateProfile} disabled={false}/>
+			<ButtonConfirm title="UPDATE PROFILE" onPress={handleUpdateProfile} disabled={false}/>
 		</SafeAreaView>
 	)
 }

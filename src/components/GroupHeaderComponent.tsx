@@ -9,18 +9,19 @@ const GroupHeaderComponent = ({ onGroupNameChange, onGroupImageUriChange }) => {
   
   const getRandomImage = async () => {
     const url = 'https://source.unsplash.com/random/70x70';
-    setGroupImageUri(url);
+    await setGroupImageUri(url);
+    await onGroupImageUriChange(url)
     return url;
   };
 
   const getRandomName = async () => {
-    const url = 'SatsSplitter' + Math.floor(Math.random() * 1000) + 1; 
-    setGroupName(url);
-    return url;
+    const name = 'SatsSplitter' + Math.floor(Math.random() * 1000) + 1; 
+    await setGroupName(name);
+    await onGroupNameChange(name);
+    return name;
   }
 
   useEffect(() => {
-    onGroupNameChange(groupName);
     getRandomImage();
     getRandomName();
   }, []);

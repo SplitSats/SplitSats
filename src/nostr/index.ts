@@ -7,6 +7,11 @@ import NDK from '@nostr-dev-kit/ndk'
 import { defaultRelays, EventKind } from '@nostr/consts';
 import { getPublicKey, nip19 } from 'nostr-tools';
 import { nip05toNpub } from './util';
+import { Group, GroupManager } from '@src/managers/group';
+import { nip05, nip44 } from 'nostr-tools'
+import { nostr } from '@getalby/lightning-tools';
+import { G } from 'react-native-svg';
+import { plainToInstance, instanceToPlain } from 'class-transformer';
 
 
 export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfileContent | null> {
@@ -21,6 +26,9 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
       npub = query;
     } else if (query.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
       l('Query is a email-like')
+      // let profile = await nip05.queryProfile('jb55.com')
+      // console.log(profile.pubkey)
+
       npub = await nip05toNpub(query);
       l('NIP05 converted to Npub:', npub);
       // check if npub is a valid string
@@ -39,6 +47,42 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
     err('Error fetching Nostr profile:', error);
     return null;
   }
+}
+
+export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
+  if (!ndk) {
+    throw new Error('NDK not initialized');
+  }
+  const groupMembers = group?.members;
+  const groupData = JSON.stringify(group.toJSON());
+  l('[NDK] Group data:', groupData);
+  if (!groupMembers || !groupData) {
+    throw new Error('Group members or data not found');
+  }
+  const privateKey = await getWallet(PRIVATE_KEY_HEX);
+  const npub = await getWallet(NPUB);
+
+  for (const member of groupMembers) {
+    const nostrUser = ndk.getUser({ npub: member });
+    if (!nostrUser) {
+      err('Nostr user not found: ', member);
+      throw new Error('Nostr user not found');
+    }
+    const receiverPublicKey = nostrUser.pubkey;
+    const sharedKey = nip44.utils.v2.getConversationKey(privateKey, receiverPublicKey);
+    console.log(sharedKey);
+    const ciphertext = nip44.encrypt(sharedKey, groupData);
+  
+    const ndkEvent = new NDKEvent(ndk);
+    ndkEvent.kind = EventKind.DirectMessage;
+    // ndkEvent.kind = EventKind.SplitGroupRequest;
+    
+    ndkEvent.content = ciphertext;
+    await ndkEvent.publish();
+    l('[NDK] Group request sent to:', member);
+  l('[NDK] Group published!', groupData);
+  }
+
 }
 
 export async function followNpubs(ndk: NDK, npubs: string[]): Promise<boolean> {

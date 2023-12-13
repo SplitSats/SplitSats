@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { PRIMARY_COLOR } from "@styles/styles";
-import ConfirmButton from "@comps/ConfirmButton";
+import ButtonConfirm from "@comps/ButtonConfirm";
 import Header from "@comps/Header";
 
 const PreferencesScreen = ({ navigation }) => {
@@ -81,9 +81,10 @@ const PreferencesScreen = ({ navigation }) => {
         style={styles.flatList}
       />
 
-      <ConfirmButton
+      <ButtonConfirm
         title="SAVE"
         onPress={handleSave}
+        disabled={false}
         // Disable the button when loading
       />
     </SafeAreaView>

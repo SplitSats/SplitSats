@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, SafeAreaView, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
 
 import { PRIMARY_COLOR } from '@styles/styles';
-import ConfirmButton from '@comps/ConfirmButton';
+import ButtonConfirm from '@comps/ButtonConfirm';
 import Header from "@comps/Header";
 import BannerUploadComponent from '@comps/BannerUploadComponent';
 import ImageUploadComponent from '@comps/ImageUploadComponent';
-import ConfirmModal  from "@comps/ConfirmModal"; 
+import ConfirmModal  from "@comps/ModalConfirm"; 
 import { generateRandomHumanReadableUserName } from './utils';
 import { useUserProfileStore } from '@store';
 import { l } from '@log';
@@ -129,7 +129,7 @@ const CreateAccountScreen = ({ navigation }) => {
         onRightButtonPress={handleYes}
       />
 
-      <ConfirmButton title="NEXT" onPress={handleNextButton} disabled={false} />
+      <ButtonConfirm title="NEXT" onPress={handleNextButton} disabled={false} />
     </SafeAreaView>
   );
 };

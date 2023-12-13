@@ -14,7 +14,7 @@ import SvgUri from "react-native-svg"; // Import the necessary component for SVG
 import AccountScreen from "@screens/Account/AccountScreen";
 
 import { useUserProfileStore } from '@store';
-import ActionMenu from "@comps/ActionMenu";
+import ActionMenu from "@comps/ModalAction";
 
 const Tab = createBottomTabNavigator();
 //--------------------------------------------------------------------------------------

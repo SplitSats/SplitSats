@@ -47,8 +47,8 @@ class GroupManager {
     private author: string;
     private createdAt: Date;
     private updatedAt: Date;
-    private groupName: string;
-    private groupImage: string;
+    private name: string;
+    private image: string;
     private members: string[];
     private groupId: string = "0";
     private groupType: string = "private";
@@ -57,8 +57,8 @@ class GroupManager {
   
     constructor(author, groupName, groupImage, members, groupType) {
       this.author = author || '';
-      this.groupName = groupName || '';
-      this.groupImage = groupImage || '';
+      this.name = groupName || '';
+      this.image = groupImage || '';
       this.members = members || [];
       this.groupType = groupType || 'private';
       this.bills = [];
@@ -84,8 +84,8 @@ class GroupManager {
     public toJSON(): Record<string, unknown> {
       return {
         author: this.author,
-        groupName: this.groupName,
-        groupImage: this.groupImage,
+        name: this.name,
+        image: this.image,
         members: this.members,
         groupType: this.groupType,
         createdAt: this.createdAt.toJSON(), // Serialize createdAt date in ISO format

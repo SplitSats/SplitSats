@@ -3,7 +3,7 @@ import { Pressable, Text, StyleSheet, Keyboard, Platform  } from 'react-native';
 import { SECONDARY_COLOR } from '@styles/styles';
 
 
-const ConfirmButton = ({ title, onPress, disabled }) => {
+const ButtonConfirm = ({ title, onPress, disabled }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -67,4 +67,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConfirmButton;
+export default ButtonConfirm;
