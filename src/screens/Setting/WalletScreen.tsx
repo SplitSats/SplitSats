@@ -11,7 +11,7 @@ import WebViewScreen  from '@screens/WebViewScreen';
 import { webln } from "@getalby/sdk";
 import { useFocusEffect } from '@react-navigation/native';
 import { Coin } from '@src/managers/coin';
-import { deleteWallet, NWC_URL } from '@store/secure';
+import { createWallet, deleteWallet, NWC_URL } from '@store/secure';
 
 const WalletConnectScreen = ({ navigation }) => {
   
@@ -25,21 +25,11 @@ const WalletConnectScreen = ({ navigation }) => {
     setNwcAuthUrl,
     setNwcUrlState,
   ] = useConnectWithAlby();
-  // const {isLoading, isError, error, webln } = useNWCEnable();
   const [balance, setBalance] = useState(new Coin(0, 'sats'));
-
-  // const [webLNEnable, setWebLNEnable] = useState<boolean>(false);
   const { nostrWebLN, setNostrWebLN } = useNWCContext();
   const handleBack = () => {
     navigation.goBack();
   }
-
-  const navigateToWebView = async () => {
-    // await connectWithAlby();
-    if (nwcUrl) {
-      navigation.navigate('WebViewScreen');
-    } 
-  };
 
   const connectWithAlbyHandle = async () => {
     await connectWithAlby();
@@ -50,12 +40,8 @@ const WalletConnectScreen = ({ navigation }) => {
     navigation.navigate('WebViewScreen');
   }
 
-  useEffect(() => {
-    
+  useEffect(() => {    
     const handleWebLN = async () => {
-      // l('pendingNwcUrl:', pendingNwcUrl);  
-      // l('Setting nwcUrl...');
-      // setNwcUrl(pendingNwcUrl);
       if (!nwcUrl) {
         l('HandleWebLN: nwcUrl is null');
         return;
@@ -68,6 +54,7 @@ const WalletConnectScreen = ({ navigation }) => {
       });
       setNostrWebLN(nostrWebLN);
       await nostrWebLN.enable();
+      createWallet(NWC_URL, nwcUrl);
       l("NostrWebLN enabled!");
       const response = await nostrWebLN.getBalance();
       l("Balance>", response);
