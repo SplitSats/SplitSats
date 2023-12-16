@@ -9,6 +9,7 @@ import React, {
   useState,
 } from "react";
 import { l, err } from "@log";
+import { getWallet, createWallet, NWC_URL } from '@store/secure';
 
 export interface NWCContextType {
   nwcUrl: string;
@@ -40,6 +41,28 @@ export function NWCProvider({ children }: { children: ReactNode }) {
   const [nwcAuthUrl, setNwcAuthUrl] = useState("");
   const [nostrWebLN, setNostrWebLN] = useState<webln.NostrWebLNProvider | undefined>(undefined);
 
+  useEffect(() => {
+    const initializeNWC = async () => {
+      const nwcUrl = await getWallet(NWC_URL);
+		
+      if (!nwcUrl) {
+        l('No NWC url found in storage')
+        return
+      }
+      setNwcUrl(nwcUrl);
+      const _nostrWebLN = new webln.NostrWebLNProvider({
+        nostrWalletConnectUrl: nwcUrl,
+      });
+      setNostrWebLN(_nostrWebLN);
+      await _nostrWebLN.enable();
+      l("NostrWebLN enabled!");
+      const balace = await _nostrWebLN.getBalance();
+      l("Balance:", balace);
+      
+    };
+    initializeNWC();
+  }, []);
+
   return (
     <NWCContext.Provider
       value={{
@@ -62,41 +85,7 @@ export function useNWCContext() {
   return useContext(NWCContext);
 }
 
-export function useNWCEnable(_nwcUrl?: string) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [error, setError] = useState<any>(undefined);
-  const { nwcUrl, setNwcUrl, setNostrWebLN } = useNWCContext();
 
-  if (_nwcUrl) setNwcUrl(_nwcUrl);
-
-  useEffect(() => {
-    if (!nwcUrl) {
-      return;
-    }
-
-    async () => {
-      try {
-        setIsLoading(true);
-
-        const _nostrWebLN = new webln.NostrWebLNProvider({
-          nostrWalletConnectUrl: nwcUrl,
-        });
-        setNostrWebLN(_nostrWebLN);
-        await _nostrWebLN.enable();
-        l("NostrWebLN enabled!");
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        setIsError(true);
-        setError(error);
-        err(error);
-      }
-    };
-  }, [nwcUrl]);
-
-  return [isLoading, isError, error, webln];
-}
 
 export function useNwcUrl() {
   const { nwcUrl, setNwcUrl } = useNWCContext();
@@ -116,7 +105,6 @@ export function useConnectWithAlby() {
   const connectWithAlby = async () => {
     try {
       const nwc = webln.NostrWebLNProvider.withNewSecret();
-
       const authUrl = await nwc.getAuthorizationUrl({
         name: "SplitSats App",
       });

@@ -1,5 +1,11 @@
 import { defaultRelays, EventKind } from '@nostr/consts';
 import { NDKEvent } from '@nostr-dev-kit/ndk';
+import { nip19 } from 'nostr-tools';
+
+export async function getnprofile(pubkey: string) {
+  const nprofile = nip19.nprofileEncode({ pubkey: pubkey, relays: defaultRelays })
+  return nprofile
+}
 
 export async function updateNDKProfile(ndk, userNpub, userProfile) {
     if (!ndk) {

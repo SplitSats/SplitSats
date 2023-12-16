@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, SafeAreaView, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, FlatList, Text, SafeAreaView, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 
 import UserProfile from '@comps/UserProfile';
 import { useUserProfileStore, useContactManagerStore } from '@store';
@@ -11,9 +11,13 @@ import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 // import { UserCardComponent } from '@comps/UserCardComponent';
 import ContactCardComponent from "@comps/CardComponentContact";
 import PaymentModal from '@comps/ModalPayment'; 
+import { useNDK } from '@src/context/NDKContext';
+import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import RefreshIndicator from '@comps/RefreshIndicator';
 
 
 const ContactScreen = ({ navigation }) => {
+  const ndk = useNDK();
   const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
   const [contacts, setContacts] = useState([]);
   const [selectedTab, setSelectedTab] = useState('Friends');
@@ -21,17 +25,18 @@ const ContactScreen = ({ navigation }) => {
   const contactManager = useContactManagerStore((state) => state.getContactManager());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null); // State to hold the selected contact
+  const [follows, setFollows] = useState([]); // State to hold the set of follows
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
+
 
   const handlePay = (amount) => {
     // Handle payment logic here
     console.log('Payment initiated with amount:', amount);
     setIsModalVisible(false);
   };
-
 
   useEffect(() => {
     const initContactManager = async () => {
@@ -43,6 +48,10 @@ const ContactScreen = ({ navigation }) => {
           l(TAG, "Contact manager initialized");
         } 
 
+        const fetchedFollows = await getUserFollows(ndk);
+        const followsSet = new Set(fetchedFollows);
+        setFollows([...followsSet]);
+        // l(TAG, "Follows: ", follows);
         // Fetch contacts from contactManager
         if (contactManager ) {
           const fetchedContacts = await contactManager.getContacts() || [];
@@ -51,6 +60,8 @@ const ContactScreen = ({ navigation }) => {
         } else {
           err('Contact manager or getContacts method is undefined.');
         }
+        // setLoading(false);
+
       } catch (error) {
         console.error('Error initializing contact manager:', error);
       }
@@ -96,7 +107,7 @@ const ContactScreen = ({ navigation }) => {
         {/* Conditionally render based on selectedTab */}
         {selectedTab === 'Friends' && (
           <FlatList
-            data={contacts}
+            data={follows}
             renderItem={({ item }) => (
             <ContactCardComponent
                 contact={item}

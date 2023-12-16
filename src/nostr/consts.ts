@@ -9,12 +9,22 @@ export const defaultRelays: string[] = [
 	'wss://relay.nostr.band', 
 	'wss://purplepag.es',
 	'wss://relay.snort.social',
+	'wss://nos.lol/',
+	'wss://nostr.zebedee.social',
+	'wss://relay.plebstr.com',
+	'wss://relay.nostrich.de',
+	'wss://nostr.massmux.com',
+	'wss://eden.nostr.land',
+	'wss://nostr.wine',
 ]
 
 export const defaultNpubs: string[] = [
+	'npub1jwver7w272as2eaneruv3pg8he3u4fw9v8xukus5qealwv5pdymqp7qgvy', // splitsats
 	'npub1uezd5f0czgdlkru5qfnv0v03a8uwmzxryg2sjvjzd732k3wfphyslwadkc', // waltermaffy
 	'npub1q6le8ppm0nz0gdnfl4jxy77su3l8t56pqm99tl4xpwfl5uez6c7q7ztql6', // gianlock
-	'npub1jwver7w272as2eaneruv3pg8he3u4fw9v8xukus5qealwv5pdymqp7qgvy', // splitsats
+	'npub16k0sld6ctkqd70kwalhvdgtlmtqzevg9w4dvnwa3sgtpqtmrqeeqak3n8e', // nadia
+	'npub1suynw72ac26e835g0z7zzrteqzka9ls7pm3t8px70aktmwa5syrsjsjme3', // bitpolito
+	'npub1za04drthlvxtwsq0phwc4mgh8rxhjafjkv2w7pf6ze5afka8gvaquadur3', // pavlenex
 ]
 
 export const defaultRelays2: string[] = [

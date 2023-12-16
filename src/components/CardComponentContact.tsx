@@ -8,6 +8,7 @@ import { truncateNpub } from '@nostr/util'
 const ContactCardComponent = ({ contact, onPress }) => {
   
   const [contactPressed, setContactPressed] = useState('');
+  
   useEffect(() => {
     setContactPressed(contact);
   }, [contact]);

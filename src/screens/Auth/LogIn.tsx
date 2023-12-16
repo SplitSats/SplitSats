@@ -8,16 +8,15 @@ import {  INIT_KEY } from '@store/consts';
 import ButtonConfirm from '@comps/ButtonConfirm'
 import { ActivityIndicator } from 'react-native';
 import { l, err } from '@log';
-import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX } from '@store/secure';
+import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 import Header from "@comps/Header";
 
 
 import * as secp from "@noble/secp256k1"
 
 const LogInScreen = ({ navigation }) => {
-	const [Nsec, setNsec] = useState(INIT_KEY)
+	const [userInputSecret, setUserInputSecret] = useState(INIT_KEY)
 	const [loading, setLoading] = useState(false); 
-	const [privateKey, setPrivateKey] = useState("")
 	const [error, setError] = useState("")
 	
 	
@@ -31,15 +30,16 @@ const LogInScreen = ({ navigation }) => {
 			let validPrivateKey: string
 			let validPubkey: string
 			// TODO: Use to privateKeyHex function 
-			if (privateKey.startsWith("nsec")) {
-			  const { data } = nip19.decode(privateKey)
+			l('userInputSecret:', userInputSecret)
+			if (userInputSecret.startsWith("nsec")) {
+			  const { data } = nip19.decode(userInputSecret)
 			  const hexPrivateKey = data as string
 			  const hexPubkey = getPublicKey(hexPrivateKey)
 			  validPrivateKey = hexPrivateKey
 			  validPubkey = hexPubkey
 			} else {
-			  if (secp.utils.isValidPrivateKey(privateKey)) {
-				const hexPrivateKey = privateKey
+			  if (secp.utils.isValidPrivateKey(userInputSecret)) {
+				const hexPrivateKey = userInputSecret
 				const hexPubkey = getPublicKey(hexPrivateKey)
 				validPrivateKey = hexPrivateKey
 				validPubkey = hexPubkey
@@ -47,6 +47,11 @@ const LogInScreen = ({ navigation }) => {
 				throw new Error("Invalid private key")
 			  }
 			}
+			const nsec = nip19.nsecEncode(validPrivateKey);
+			const npub = nip19.npubEncode(validPubkey);
+			l("Welcome back - ", npub)
+			await createWallet(NSEC, nsec);
+			await createWallet(NPUB, npub);
 			await createWallet(PRIVATE_KEY_HEX, validPrivateKey);
 			await createWallet(PUBLIC_KEY_HEX, validPubkey);
 		} catch (e) {
@@ -71,8 +76,8 @@ const LogInScreen = ({ navigation }) => {
 				<TextInput
 					style={styles.input}
 					placeholder="nsec"
-					value={Nsec} // Bind the value to the state
-					onChangeText={(text) => setNsec(text)} // Update the state with user input
+					value={userInputSecret} // Bind the value to the state
+					onChangeText={(text) => setUserInputSecret(text)} // Update the state with user input
 				/>
 
 			</View>

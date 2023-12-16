@@ -1,12 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, Clipboard } from 'react-native';
 import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
 import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
 import QRCodeScreen from "@comps/QRcode";
 import { err, l } from '@log';
+import { webln } from "@getalby/sdk";
+import LoadingModal from '@comps/ModalLoading';
 
 
 const NostrWalletConnectScreen = ({ navigation }) => {
@@ -14,31 +16,46 @@ const NostrWalletConnectScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true); 
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
-  const { 
-		nwcUrl,
-        setNwcUrl,
-        pendingNwcUrl,
-        setPendingNwcUrl,
-        nwcAuthUrl,
-        setNwcAuthUrl,
-        nostrWebLN,
-        setNostrWebLN
-  } = useNWCContext();
+  const [nwcUrl, setNwcUrl]= useNwcUrl();
+  const [userUrl, setUserUrl] = useState('');
 
   const handleBack = () => {
 		navigation.goBack();
 	}  
-
+  const handlePasteFromClipboard = async () => {
+		const clipboardContent = await Clipboard.getString(); // Get content from clipboard
+		setUserUrl(clipboardContent); // Set the content to the TextInput value
+		setLoading(false);
+	};
   const handleConnect = async () => {
     setLoading(true);
-    await setNwcUrl(nwcUrl);
+	if (!userUrl) {
+		err('userUrl is null');
+		return;
+	}
+	await setNwcUrl(userUrl);
+	l('Handle connect with NWCUrl: ', nwcUrl);
+	// const [isLoading, isError, error, webln] = useNWCEnable(nwcUrl);
+	const nostrWebLN = new webln.NostrWebLNProvider({
+		nostrWalletConnectUrl: nwcUrl,
+	  });
+	await nostrWebLN.enable();
+	const response = await nostrWebLN.getBalance();
+	l('Respose: ', response);
+	const response2 = await webln.getInfo();
+	l('Respose: ', response2);
+
+
+	// l('webln:', webln);
+	// l('isLoading:', isLoading);
+	// l('isError:', isError);
+	// l('error:', error);
     setLoading(false);
-	await useNWCEnable(nwcUrl);
     navigation.navigate('ConfirmCreateAccount');
   }
 
-  const handleTextChange = (text) => {
-	setNwcUrl(text);
+  const handleTextChange = async (text) => {
+	await setNwcUrl(text);
 	setLoading(false);
   }
 
@@ -75,6 +92,9 @@ const NostrWalletConnectScreen = ({ navigation }) => {
 					value={nwcUrl} // Bind the value to the state
 					onChangeText={(text) => handleTextChange(text)} // Update the state with user input
 				/>
+				 <TouchableOpacity onPress={handlePasteFromClipboard} style={styles.pasteButton}>
+        			<Text style={styles.inputLabel}>Paste</Text>
+      			</TouchableOpacity>
 			</View>
 
 
@@ -121,6 +141,18 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 10,
 	},
+	pasteButton: {
+		borderRadius: 25,
+		backgroundColor: PRIMARY_COLOR, // Background color of the button
+		width: '80%',
+		height: 50,
+		alignSelf: 'center',
+		overflow: 'hidden',
+		marginBottom: 10, // Margin bottom for spacing
+		justifyContent: 'center', // Center vertically
+		alignItems: 'center', // Center horizontally
+		color: 'black', // Text color
+	  },
 	connectButton: {
 		position: 'absolute',
 		borderRadius: 25,

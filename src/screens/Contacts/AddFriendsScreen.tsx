@@ -11,6 +11,8 @@ import {
   Button,
   SafeAreaView
 } from "react-native";
+import { ActivityIndicator } from 'react-native';
+
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import CancelIcon from "@assets/icon/Cancel.png";
 import QRIcon from "@assets/icon/QR-code.png";
@@ -29,14 +31,17 @@ import { ContactManager, Contact } from '@src/managers/contact'
 import { defaultNpubs } from '@nostr/consts'
 import Header from "@comps/Header";
 import { useNDK } from '@src/context/NDKContext';
-import { queryNostrProfile, followNpubs } from '@nostr'
-
+import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import LoadingModal from '@comps/ModalLoading';
+ 
 const AddFriendScreen = ({ navigation }) => {
   const ndk = useNDK();
   const [searchTerm, setSearchTerm] = useState("");
   const [hasPermission, setHasPermission] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [isTyping, setIsTyping] = useState(false);
   // const ndkManager = NDKManager.getInstance();
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
@@ -63,14 +68,13 @@ const AddFriendScreen = ({ navigation }) => {
       l(contactManager)
       if(!contactManager){
         await initializeContactManager()
+        l("[AddFriendScreen] Initializing contact manager");
       }
     })();
   }, []);
 
   useEffect(() => {
     (async () => {
-      await setContactManager(new ContactManager()); 
-
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
@@ -78,14 +82,21 @@ const AddFriendScreen = ({ navigation }) => {
   
   useEffect(() => {
     (async () => {
-      // Populate users with default npubs  
-      defaultNpubs.forEach(npub => {
-        // add the npub to the users array if it is not already present
-        if (!users.some(contact => contact.npub === npub))
-        {
-          searchNpubContact(npub);
-        }
-      });  
+      try {
+        const follows = await getUserFollows(ndk)
+        // Get npubs that i am following
+        const contactNpubsSet: Set<string> = new Set(
+          follows ? [...follows].map(user => user.npub).filter(npub => npub !== undefined) : []
+        );        
+        
+        const filteredNpubs = defaultNpubs.filter(npub => !contactNpubsSet.has(npub));
+        // Fetch details for the filtered npubs concurrently using Promise.all()
+        await Promise.all(filteredNpubs.map(async npub => {
+          await searchNpubContact(npub);
+        }));
+      } catch (error) {
+        console.error('Error fetching npubs:', error);
+      }
     })();
   }, []);
 
@@ -96,7 +107,7 @@ const AddFriendScreen = ({ navigation }) => {
         const contact = new Contact(queryUserProfile.name, npub, queryUserProfile);
         // l("contact", contact);
         // Update the users array with the new contact
-        await setUsers(users => [...users, contact]);
+        setUsers(users => [contact, ...users]);
         return true;
     }
     return false;
@@ -139,6 +150,8 @@ const AddFriendScreen = ({ navigation }) => {
 
   const handleFinish = () => {
     // Add only the selected contacts to the contact manager
+    setIsLoading(true); // Set loading to true before processing
+
     selectedContacts.forEach(contact => {
       if(!contactManager){
         err("Contact manager is null");
@@ -152,10 +165,9 @@ const AddFriendScreen = ({ navigation }) => {
     if (!result) {
       err("Failed to follow npubs: ", selectedContacts.map(contact => contact.npub));
     }
-    l()
-
     // Save the updated contact manager to the store
     setContactManager(contactManager);
+    setIsLoading(false); 
     navigation.navigate("Dashboard");
   }
 
@@ -194,7 +206,8 @@ const AddFriendScreen = ({ navigation }) => {
           style={styles.profileImage}
         />
       </View>
-
+			<LoadingModal visible={isLoading} message="Loading..." />
+      
       <View style={styles.searchSection}>
         <Image source={SearchIcon} style={styles.searchIcon} />
         <TextInput

@@ -4,56 +4,91 @@ import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-na
 import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
-import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
+import { useNWCContext, useConnectWithAlby, useNwcUrl, enableNWC } from '@src/context/NWCContext';
 import WebView from 'react-native-webview';
 import { err, l } from '@log';
 import WebViewScreen  from '@screens/WebViewScreen';
 import { webln } from "@getalby/sdk";
 import { useFocusEffect } from '@react-navigation/native';
-
+import { Coin } from '@src/managers/coin';
+import { deleteWallet, NWC_URL } from '@store/secure';
 
 const WalletConnectScreen = ({ navigation }) => {
   
+  const [nwcUrl, setNwcUrl] = useNwcUrl();
+  const [useAlby, setUseAlby] = useState<boolean>(false);
   const [
     connectWithAlby,
-    nwcUrl,
+    nwcUrlState,
     pendingNwcUrl,
     nwcAuthUrl,
     setNwcAuthUrl,
-    setNwcUrl,
+    setNwcUrlState,
   ] = useConnectWithAlby();
-  const {isLoading, isError, error, webln } = useNWCEnable();
+  // const {isLoading, isError, error, webln } = useNWCEnable();
+  const [balance, setBalance] = useState(new Coin(0, 'sats'));
 
-  const [balance, setBalance] = useState<number | undefined>();
-  const [webLNEnable, setWebLNEnable] = useState<boolean>(false);
-
-  const { nostrWebLN } = useNWCContext();
-
+  // const [webLNEnable, setWebLNEnable] = useState<boolean>(false);
+  const { nostrWebLN, setNostrWebLN } = useNWCContext();
   const handleBack = () => {
     navigation.goBack();
   }
 
   const navigateToWebView = async () => {
-    await connectWithAlby();
-    if (nwcAuthUrl) {
+    // await connectWithAlby();
+    if (nwcUrl) {
       navigation.navigate('WebViewScreen');
     } 
   };
 
+  const connectWithAlbyHandle = async () => {
+    await connectWithAlby();
+    l('pendingUrl:', pendingNwcUrl);
+    if (pendingNwcUrl) {
+      setNwcUrl(pendingNwcUrl);
+    }
+    navigation.navigate('WebViewScreen');
+  }
+
   useEffect(() => {
-  const handleWebLN = async () => {
-    l('nwcUrl:', nwcUrl);
-    l('pendingNwcUrl:', pendingNwcUrl);
-    l('nwcAuthUrl:', nwcAuthUrl);
-    l('nostrWebLN:', nostrWebLN);
-  };
+    
+    const handleWebLN = async () => {
+      // l('pendingNwcUrl:', pendingNwcUrl);  
+      // l('Setting nwcUrl...');
+      // setNwcUrl(pendingNwcUrl);
+      if (!nwcUrl) {
+        l('HandleWebLN: nwcUrl is null');
+        return;
+      }
+      
+      l('nwcUrl:', nwcUrl);
+      l("Enabling NostrWebLN...");
+      const nostrWebLN = new webln.NostrWebLNProvider({
+        nostrWalletConnectUrl: nwcUrl,
+      });
+      setNostrWebLN(nostrWebLN);
+      await nostrWebLN.enable();
+      l("NostrWebLN enabled!");
+      const response = await nostrWebLN.getBalance();
+      l("Balance>", response);
+      setBalance(new Coin(response.balance, response.currency));
+    };
   handleWebLN();
-  }, [nwcUrl, pendingNwcUrl, nwcAuthUrl]);
+  }, [nwcUrl]);
 
   const handleConnectButton = async () => {
     navigation.navigate('NostrWalletConnect');
   };
 
+  const disconnectWallet = async () => {
+    l('Disconnecting wallet...');
+
+    setNwcUrl(null);
+    deleleWallet(NWC_URL);
+    setNostrWebLN(null);
+    
+    l('Wallet disconnected!');
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -74,17 +109,36 @@ const WalletConnectScreen = ({ navigation }) => {
             </TouchableOpacity>
             <ButtonConfirm
               title="CONNECT WITH ALBY 🐝"
-              onPress={navigateToWebView}
+              onPress={connectWithAlbyHandle}
               disabled={false}
             />
           </>
         )}
         {nwcUrl && (
           <>
-            <Text>Connected!</Text>
+            <Text style={styles.title}>Wallet Connected ✅</Text>
+            <Text style={styles.balance}>
+              Balance: {balance.amount} {balance.currency}.
+            </Text>
+
+            <Text style={styles.description}>
+              Your wallet is connected to SplitSats!
+            </Text>
+            <Text style={styles.description}>
+              You can now pay your friends directly from your wallet.
+            </Text>
+            <Text style={styles.description}>
+              You can always disconnect it at any time.
+            </Text>
+
+            <ButtonConfirm
+              title="DISCONNECT"
+              onPress={disconnectWallet}
+              disabled={false}
+            />
           </>
         )}
-        
+
       </View>
     </SafeAreaView>
   );
@@ -111,7 +165,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     color: '#fff',
-    marginBottom: 16, // Adjust the margin as needed
+    marginBottom: 12, // Adjust the margin as needed
     textAlign: 'center',
   },
   connectButton: {
@@ -126,6 +180,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // Center vertically
     alignItems: 'center', // Center horizontally
     color: 'black', // Text color
+  },
+  balance: {
+    fontSize: 30,
+    color: '#fff',
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 10,
+    textAlign: 'center',
   },
   buttonText: {
     color: 'black', // Text color

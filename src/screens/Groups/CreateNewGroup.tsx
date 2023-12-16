@@ -31,6 +31,8 @@ import { Group, GroupManager } from '@src/managers/group';
 import ConfirmModal  from "@comps/ModalConfirm"; 
 import { useNDK } from '@src/context/NDKContext';
 import { publishGroup } from '@nostr';
+import LoadingModal from '@comps/ModalLoading';
+import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
 
 const CreateNewGroup = ({ navigation, route }) => {
 
@@ -49,6 +51,7 @@ const CreateNewGroup = ({ navigation, route }) => {
   const ndk = useNDK();
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddFriends = () => {
     navigation.navigate("AddFriend");
@@ -78,7 +81,9 @@ const CreateNewGroup = ({ navigation, route }) => {
         return;
       }
       const contacts = await contactManager.getContacts();
-      l("Contacts: ", contacts)
+      l("Contacts: ", contacts);
+      // const follows =  getUserFollows(ndk);
+
       await setUsers(contacts);
     }  
     fetchContacts();
@@ -96,6 +101,8 @@ const CreateNewGroup = ({ navigation, route }) => {
   };
 
   const handleCreateGroup = async () => {
+    setIsLoading(true); // Set loading to true before processing
+
     if (!groupName || !groupImageUri) {
       Alert.alert('Please provide a group name and image.');
       return;
@@ -121,11 +128,15 @@ const CreateNewGroup = ({ navigation, route }) => {
         await setGroupManager(groupManager);
         console.log('New group created:', newGroup);
         showToast('Group created successfully!');
-        navigation.navigate('Dashboard');
+        setIsLoading(false); 
         closeModal();
+        navigation.navigate('Dashboard');
+        
       } 
       catch (error) {
         showToast('Error creating group. Please try again.');
+        setIsLoading(false); 
+
       }
     }
   }
@@ -150,10 +161,15 @@ const CreateNewGroup = ({ navigation, route }) => {
   // Function to sort users based on the search term
   const sortUsers = async () => {
     if (searchTerm) {
-      const sortedUsers = users.filter((user) =>
-        user.profile.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+      const contacts = await contactManager.getContacts();
+      const filteredUsers = contacts.filter(
+        (user) =>
+          user.profile?.displayName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          user.npub.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setUsers(sortedUsers);
+      setUsers(filteredUsers);
     } else {
       const contacts = await contactManager.getContacts()
       if(contacts.length > 0) {
@@ -248,6 +264,8 @@ const CreateNewGroup = ({ navigation, route }) => {
           <Text style={styles.toastText}>{toastMessage}</Text>
         </View>
       )}
+			<LoadingModal visible={isLoading} message="Loading..." />
+
 
       <ButtonConfirm
         disabled={false}

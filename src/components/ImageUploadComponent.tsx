@@ -34,6 +34,37 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
     }
   }
   , []);
+
+  const uploadImage = async (imageData) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', {
+        name: "image", 
+        uri: imageData.uri,
+        type: 'image/jpeg', 
+      });
+  
+      const response = await fetch('https://nostrimg.com/api/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // Add any other headers if required
+        },
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        return data.url; // Return the URL from the response
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  };
+  
   
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
