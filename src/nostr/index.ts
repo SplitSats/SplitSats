@@ -12,6 +12,7 @@ import { nip05, nip44 } from 'nostr-tools'
 import { nostr } from '@getalby/lightning-tools';
 import { G } from 'react-native-svg';
 import { plainToInstance, instanceToPlain } from 'class-transformer';
+import { Contact } from '@src/managers/contact';
 
 export async function getUserFollows(ndk: NDK): Promise<Set<NDKUser> | undefined> {
   // Return Set<NDKUser> that the user is following
@@ -22,7 +23,7 @@ export async function getUserFollows(ndk: NDK): Promise<Set<NDKUser> | undefined
       // Fetch the profile for each user
       const userProfile = await user.fetchProfile();
       if (userProfile) {
-        console.log(`User: ${userProfile.name}, Npub: ${user.npub}`);
+        console.log(`User: ${userProfile.name}: ${user.npub}`);
         // Print other details from the userProfile object as needed
       } else {
         console.log(`Failed to fetch profile for user with Npub: ${user.npub}`);
@@ -107,6 +108,23 @@ export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
   }
 
 }
+export async function zapUser(ndk: NDK, npub: string, amount: integer, comment: string): Promise<string> {
+  if (!ndk) {
+    throw new Error('NDK not initialized');
+  }
+  const nostrUser = await ndk.getUser({ npub: npub });
+  if (!nostrUser) {
+    err('Nostr user not found: ', contact.npub);
+    throw new Error('Nostr user not found');
+  }
+  l('[NDK] Zapping user:', nostrUser)
+  const paymentRequest = await nostrUser.zap(amount, comment);
+  // sleep for 2 seconds
+  await new Promise(r => setTimeout(r, 2000));
+  l('[NDK] Payment request:', paymentRequest);
+  return paymentRequest;
+}
+
 
 export async function followNpubs(ndk: NDK, npubs: string[]): Promise<boolean> {
   if (!ndk) {

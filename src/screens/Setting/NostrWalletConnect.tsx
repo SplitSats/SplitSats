@@ -13,7 +13,7 @@ import LoadingModal from '@comps/ModalLoading';
 
 const NostrWalletConnectScreen = ({ navigation }) => {
   
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(false); 
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
   const [nwcUrl, setNwcUrl]= useNwcUrl();
@@ -37,37 +37,28 @@ const NostrWalletConnectScreen = ({ navigation }) => {
 	l('Handle connect with NWCUrl: ', nwcUrl);
 	// const [isLoading, isError, error, webln] = useNWCEnable(nwcUrl);
 	const nostrWebLN = new webln.NostrWebLNProvider({
-		nostrWalletConnectUrl: nwcUrl,
+		nostrWalletConnectUrl: userUrl,
 	  });
 	await nostrWebLN.enable();
-	const response = await nostrWebLN.getBalance();
-	l('Respose: ', response);
-	const response2 = await webln.getInfo();
-	l('Respose: ', response2);
-
-
-	// l('webln:', webln);
-	// l('isLoading:', isLoading);
-	// l('isError:', isError);
-	// l('error:', error);
+	const response = await nostrWebLN.getInfo();
+	l('NWC Respose: ', response);
     setLoading(false);
     navigation.navigate('ConfirmCreateAccount');
   }
 
   const handleTextChange = async (text) => {
-	await setNwcUrl(text);
+	await setUserUrl(text);
 	setLoading(false);
   }
 
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
     // Check if the scanned data starts with nostr:npub
     if (data.startsWith("nostr+walletconnect://")) {
       // TODO: Handle connection with NWC wallet 
-	  setNwcUrl(data);
-	  l('nwcUrl:', nwcUrl);
+	  await setUserUrl(data);
 	  setLoading(false);
     } else {
       err("Invalid QR Code data: ", data);
@@ -89,14 +80,14 @@ const NostrWalletConnectScreen = ({ navigation }) => {
 				<TextInput
 					style={styles.input}
 					placeholder="nostr+walletconnect://"
-					value={nwcUrl} // Bind the value to the state
+					value={userUrl} // Bind the value to the state
 					onChangeText={(text) => handleTextChange(text)} // Update the state with user input
 				/>
 				 <TouchableOpacity onPress={handlePasteFromClipboard} style={styles.pasteButton}>
         			<Text style={styles.inputLabel}>Paste</Text>
       			</TouchableOpacity>
 			</View>
-
+			<LoadingModal visible={loading} message="Loading..." />
 
 			<TouchableOpacity onPress={() => setScannerOpen(true)} style={styles.connectButton}>
               <Text style={styles.buttonText}>SCAN QR CODE</Text>

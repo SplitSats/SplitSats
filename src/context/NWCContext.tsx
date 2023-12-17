@@ -85,8 +85,6 @@ export function useNWCContext() {
   return useContext(NWCContext);
 }
 
-
-
 export function useNwcUrl() {
   const { nwcUrl, setNwcUrl } = useNWCContext();
   return [nwcUrl, setNwcUrl];

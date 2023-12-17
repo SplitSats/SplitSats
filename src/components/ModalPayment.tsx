@@ -3,36 +3,84 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles"; // Import your color constants here
 import { LightningAddress } from "@getalby/lightning-tools";
 import { l } from "@log";
+import { useNWCContext} from '@src/context/NWCContext';
+import { zapUser } from '@nostr';
+import { useNDK } from '@src/context/NDKContext';
+import  SuccessModal from '@comps/ModalSuccess';
+import LoadingModal from '@comps/ModalLoading';
 
-
-const PaymentModal = ({ isVisible, onClose, contact }) => {
+const PaymentModal = ({ isVisible, onClose, contact, onSuccess, onFailure }) => {
   const [amount, setAmount] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [paymentRequest, setPaymentRequest] = React.useState("");
   const TAG = '[PaymentModal] ';  
-
+  const [lightningAddress, setLightningAddress] = useState(null);
+  const { nostrWebLN } = useNWCContext();
+  const [isLoading, setIsLoading] = useState(false); 
+  const [isSuccess, setIsSuccess] = useState(false); 
+  const ndk = useNDK();
 
   const handleConfirmPayment = async () => {
     // Handle payment logic here
-    console.log('Payment initiated with amount:', amount);
+    setIsLoading(true);
     setShowConfirmation(false);
+    console.log('Payment initiated with amount:', amount);
     try {
-      const lightningAddress = new LightningAddress(contact?.lud16);
-      await lightningAddress.fetch();
-      const invoice = await lightningAddress.requestInvoice({
-        satoshi: amount,
-      });
-      setPaymentRequest(invoice.paymentRequest);
-      l(TAG, "Payment request:", invoice.paymentRequest);
+      l(TAG, "Contact:", contact);
+      if(!contact.profile?.lud16) {
+        l(TAG, "Lightning address not found");
+        return;
+      }
+      const comment = `A new  Zap from a SplitSats user!`;
+      // let paymentRequest = await zapUser(ndk, contact.npub, amount, comment);
+      let paymentRequest = ""
+      if (!paymentRequest) {
+        l(TAG, "Unable to zap user trying with lightning address");
+        const lightningAddress = new LightningAddress(contact.profile?.lud16);
+        await lightningAddress.fetch();
+        const invoice = await lightningAddress.requestInvoice({
+          satoshi: amount,
+        });
+        paymentRequest = invoice.paymentRequest
+      }
+      
+      setPaymentRequest(paymentRequest);
+      l(TAG, "Payment request:", paymentRequest);
+      if (nostrWebLN && paymentRequest) {
+        const response = await nostrWebLN.sendPayment(paymentRequest);
+        l(TAG, "Payment response:", response);
+        if (response) {
+          setIsSuccess(true);
+          onSuccess();
+        } else {
+          setIsSuccess(false);
+          onFailure();
+        }
+      } else {
+        l(TAG, "NostrWebLN is null or payment request is null");
+        l(TAG, "NostrWebLN:", nostrWebLN);
+        l(TAG, "Payment request:", paymentRequest);
+        setIsSuccess(false);
+        onFailure();
+      }
+      setIsLoading(false);
+
     } catch (error) {
+      setIsSuccess(false);
+      onFailure();
       console.error(error);
     }
 
     onClose();
   };
+  
+  const toggleModal = () => {
+    setIsSuccess(!isSuccess);
+  };
 
   const handlePay = () => {
     if (amount) {
+      // setIsLoading(true);
       setShowConfirmation(true);
     } else {
       alert('Please enter a valid amount.');
@@ -77,6 +125,9 @@ const PaymentModal = ({ isVisible, onClose, contact }) => {
             </View>
           </View>
         )}
+        <LoadingModal visible={isLoading} message="Loading..." />
+        
+
       </View>
     </View>
   );

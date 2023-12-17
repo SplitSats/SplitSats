@@ -26,7 +26,7 @@ const WebViewScreen = ({ navigation }) => {
   };
   
   const handleBack = () => {
-    navigation.goBack();
+    navigation.navigate('WalletScreen');
   }
 
   return (

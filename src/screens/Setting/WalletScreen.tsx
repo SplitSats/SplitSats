@@ -4,7 +4,7 @@ import { SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-na
 import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
-import { useNWCContext, useConnectWithAlby, useNwcUrl, enableNWC } from '@src/context/NWCContext';
+import { useNWCContext, useConnectWithAlby, useNwcUrl } from '@src/context/NWCContext';
 import WebView from 'react-native-webview';
 import { err, l } from '@log';
 import WebViewScreen  from '@screens/WebViewScreen';
@@ -12,6 +12,9 @@ import { webln } from "@getalby/sdk";
 import { useFocusEffect } from '@react-navigation/native';
 import { Coin } from '@src/managers/coin';
 import { createWallet, deleteWallet, NWC_URL } from '@store/secure';
+import  SuccessModal from '@comps/ModalSuccess';
+import LoadingModal from '@comps/ModalLoading';
+
 
 const WalletConnectScreen = ({ navigation }) => {
   
@@ -25,6 +28,8 @@ const WalletConnectScreen = ({ navigation }) => {
     setNwcAuthUrl,
     setNwcUrlState,
   ] = useConnectWithAlby();
+  const [isLoading, setIsLoading] = useState(false); 
+  const [isSuccess, setIsSuccess] = useState(false); 
   const [balance, setBalance] = useState(new Coin(0, 'sats'));
   const { nostrWebLN, setNostrWebLN } = useNWCContext();
   const handleBack = () => {
@@ -32,11 +37,13 @@ const WalletConnectScreen = ({ navigation }) => {
   }
 
   const connectWithAlbyHandle = async () => {
+    setIsLoading(true);
     await connectWithAlby();
     l('pendingUrl:', pendingNwcUrl);
     if (pendingNwcUrl) {
       setNwcUrl(pendingNwcUrl);
     }
+    setIsLoading(false);
     navigation.navigate('WebViewScreen');
   }
 
@@ -49,6 +56,7 @@ const WalletConnectScreen = ({ navigation }) => {
       
       l('nwcUrl:', nwcUrl);
       l("Enabling NostrWebLN...");
+      // setIsLoading(true);
       const nostrWebLN = new webln.NostrWebLNProvider({
         nostrWalletConnectUrl: nwcUrl,
       });
@@ -59,6 +67,8 @@ const WalletConnectScreen = ({ navigation }) => {
       const response = await nostrWebLN.getBalance();
       l("Balance>", response);
       setBalance(new Coin(response.balance, response.currency));
+      setIsLoading(false);
+      setIsSuccess(false);
     };
   handleWebLN();
   }, [nwcUrl]);
@@ -68,14 +78,19 @@ const WalletConnectScreen = ({ navigation }) => {
   };
 
   const disconnectWallet = async () => {
+    setIsLoading(true);
     l('Disconnecting wallet...');
-
-    setNwcUrl(null);
-    deleleWallet(NWC_URL);
+    setNwcUrl('');
+    deleteWallet(NWC_URL);
     setNostrWebLN(null);
-    
     l('Wallet disconnected!');
+    setIsLoading(false);
+    setIsSuccess(false);
   }
+
+  const toggleModal = () => {
+    setIsSuccess(!isSuccess);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -117,15 +132,20 @@ const WalletConnectScreen = ({ navigation }) => {
             <Text style={styles.description}>
               You can always disconnect it at any time.
             </Text>
-
             <ButtonConfirm
               title="DISCONNECT"
               onPress={disconnectWallet}
               disabled={false}
             />
           </>
-        )}
-
+        )}      
+        <LoadingModal visible={isLoading} message="Loading..." />
+        <SuccessModal
+          isVisible={isSuccess}
+          onClose={toggleModal}
+          message="Success!"
+          description="Wallet connected!"
+        />
       </View>
     </SafeAreaView>
   );

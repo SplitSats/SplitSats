@@ -14,6 +14,8 @@ import PaymentModal from '@comps/ModalPayment';
 import { useNDK } from '@src/context/NDKContext';
 import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
 import RefreshIndicator from '@comps/RefreshIndicator';
+import LoadingModal from '@comps/ModalLoading';
+import  SuccessModal from '@comps/ModalSuccess';
 
 
 const ContactScreen = ({ navigation }) => {
@@ -26,9 +28,26 @@ const ContactScreen = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null); // State to hold the selected contact
   const [follows, setFollows] = useState([]); // State to hold the set of follows
+  const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
+  const [message, setMessage] = useState('Payment Successful');
+  const [description, setDescription] = useState('Your payment has been successfully processed.');
+
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
+  };
+
+  const handlePaymentSuccess = () => {
+    setIsPaymentSuccess(true);
+    l(TAG, "Payment success")
+    // Additional logic if needed
+  };
+
+  const handlePaymentFailure = async () => {
+    setIsPaymentSuccess(false);
+    setMessage("Payment Failed");
+    setDescription("Your payment has failed. Please try again.");
+    // Additional logic if needed
   };
 
 
@@ -108,21 +127,26 @@ const ContactScreen = ({ navigation }) => {
         {selectedTab === 'Friends' && (
           <FlatList
             data={follows}
-            renderItem={({ item }) => (
-            <ContactCardComponent
-                contact={item}
-                onPress={() => handleZap(item)} // Pass the contact data to handleZap
-              />
-            )}
+            renderItem={({ item }) =>
+              item.profile ? ( // Check if profile data exists
+                <ContactCardComponent
+                  contact={item}
+                  onPress={() => handleZap(item)}
+                />
+              ) : (
+                <LoadingModal visible={true} message="Loading..." />
+              )
+            }
             keyExtractor={(item) => item.npub}
           />
         )}
-        <PaymentModal
-          isVisible={isModalVisible}
-          onClose={toggleModal}
-          // onPay={handlePay}
-          contact={selectedContact} 
-        />
+          <PaymentModal
+            isVisible={isModalVisible}
+            onClose={toggleModal}
+            onSuccess={handlePaymentSuccess}
+            onFailure={handlePaymentFailure}
+            contact={selectedContact}
+          />
         {/* Add another conditional section for 'Debts' tab */}
         {selectedTab === 'Debts' && (
           <View>
@@ -130,6 +154,12 @@ const ContactScreen = ({ navigation }) => {
           </View>
         )}
       </View>
+      <SuccessModal
+          isVisible={isPaymentSuccess}
+          onClose={() => setIsPaymentSuccess(false)}
+          message={message} 
+          description={description}
+      />
 
     </SafeAreaView>
   );
