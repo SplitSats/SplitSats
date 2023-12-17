@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FILL_CARD_COLOR } from "@styles/styles";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
-import { truncateNpub } from '@nostr/util'
+import { truncateNpub, getNostrUsername } from '@nostr/util'
 
 const ContactCardComponent = ({ contact, onPress }) => {
   
   const [contactPressed, setContactPressed] = useState('');
+  const [user, setUser] = useState('');
+  
   useEffect(() => {
     setContactPressed(contact);
   }, [contact]);
@@ -19,10 +21,13 @@ const ContactCardComponent = ({ contact, onPress }) => {
   };
 
   return (
-    <View style={styles.cardContainer}>
-      <Image source={{ uri: contact.profile?.image }} style={styles.profileImage} />
+    <View style={styles.cardContainer}> 
+        <Image
+          source={{ uri: contact.profile.image }}
+          style={styles.profileImage}
+        />
       <View style={styles.userInfo}>
-        <Text style={styles.userName}>{contact.profile?.displayName}</Text>
+        <Text style={styles.userName}>{getNostrUsername(contact.profile)}</Text>
         <Text style={styles.npub}>{truncateNpub(contact.npub)}</Text>
       </View>
       {/* A little button with a thunder icon for paying  */}
@@ -86,6 +91,20 @@ const styles = StyleSheet.create({
   payText: {
     color: 'white',
     fontSize: 14,
+  },
+  profileImagePlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: SECONDARY_COLOR, // Background color for placeholder
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  initials: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
   }
 });
 

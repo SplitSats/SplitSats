@@ -1,56 +1,64 @@
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, TextInput, TouchableOpacity, Clipboard } from 'react-native';
 import ButtonConfirm from '@comps/ButtonConfirm'
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@styles/styles'
 import Header from "@comps/Header";
 import { useNWCContext, useConnectWithAlby, useNwcUrl, useNWCEnable } from '@src/context/NWCContext';
 import QRCodeScreen from "@comps/QRcode";
 import { err, l } from '@log';
+import { webln } from "@getalby/sdk";
+import LoadingModal from '@comps/ModalLoading';
 
 
 const NostrWalletConnectScreen = ({ navigation }) => {
   
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(false); 
   const [scanned, setScanned] = useState(false);
   const [isScannerOpen, setScannerOpen] = useState(false);
-  const { 
-		nwcUrl,
-        setNwcUrl,
-        pendingNwcUrl,
-        setPendingNwcUrl,
-        nwcAuthUrl,
-        setNwcAuthUrl,
-        nostrWebLN,
-        setNostrWebLN
-  } = useNWCContext();
+  const [nwcUrl, setNwcUrl]= useNwcUrl();
+  const [userUrl, setUserUrl] = useState('');
 
   const handleBack = () => {
 		navigation.goBack();
 	}  
-
+  const handlePasteFromClipboard = async () => {
+		const clipboardContent = await Clipboard.getString(); // Get content from clipboard
+		setUserUrl(clipboardContent); // Set the content to the TextInput value
+		setLoading(false);
+	};
   const handleConnect = async () => {
     setLoading(true);
-    await setNwcUrl(nwcUrl);
+	if (!userUrl) {
+		err('userUrl is null');
+		return;
+	}
+	await setNwcUrl(userUrl);
+	l('Handle connect with NWCUrl: ', nwcUrl);
+	// const [isLoading, isError, error, webln] = useNWCEnable(nwcUrl);
+	const nostrWebLN = new webln.NostrWebLNProvider({
+		nostrWalletConnectUrl: userUrl,
+	  });
+	await nostrWebLN.enable();
+	const response = await nostrWebLN.getInfo();
+	l('NWC Respose: ', response);
     setLoading(false);
-	await useNWCEnable(nwcUrl);
     navigation.navigate('ConfirmCreateAccount');
   }
 
-  const handleTextChange = (text) => {
-	setNwcUrl(text);
+  const handleTextChange = async (text) => {
+	await setUserUrl(text);
 	setLoading(false);
   }
 
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScanned(true);
     setScannerOpen(false);
     // Check if the scanned data starts with nostr:npub
     if (data.startsWith("nostr+walletconnect://")) {
       // TODO: Handle connection with NWC wallet 
-	  setNwcUrl(data);
-	  l('nwcUrl:', nwcUrl);
+	  await setUserUrl(data);
 	  setLoading(false);
     } else {
       err("Invalid QR Code data: ", data);
@@ -72,11 +80,14 @@ const NostrWalletConnectScreen = ({ navigation }) => {
 				<TextInput
 					style={styles.input}
 					placeholder="nostr+walletconnect://"
-					value={nwcUrl} // Bind the value to the state
+					value={userUrl} // Bind the value to the state
 					onChangeText={(text) => handleTextChange(text)} // Update the state with user input
 				/>
+				 <TouchableOpacity onPress={handlePasteFromClipboard} style={styles.pasteButton}>
+        			<Text style={styles.inputLabel}>Paste</Text>
+      			</TouchableOpacity>
 			</View>
-
+			<LoadingModal visible={loading} message="Loading..." />
 
 			<TouchableOpacity onPress={() => setScannerOpen(true)} style={styles.connectButton}>
               <Text style={styles.buttonText}>SCAN QR CODE</Text>
@@ -121,6 +132,18 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 		padding: 10,
 	},
+	pasteButton: {
+		borderRadius: 25,
+		backgroundColor: PRIMARY_COLOR, // Background color of the button
+		width: '80%',
+		height: 50,
+		alignSelf: 'center',
+		overflow: 'hidden',
+		marginBottom: 10, // Margin bottom for spacing
+		justifyContent: 'center', // Center vertically
+		alignItems: 'center', // Center horizontally
+		color: 'black', // Text color
+	  },
 	connectButton: {
 		position: 'absolute',
 		borderRadius: 25,

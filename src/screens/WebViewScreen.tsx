@@ -26,7 +26,7 @@ const WebViewScreen = ({ navigation }) => {
   };
   
   const handleBack = () => {
-    navigation.goBack();
+    navigation.navigate('WalletScreen');
   }
 
   return (
@@ -35,6 +35,19 @@ const WebViewScreen = ({ navigation }) => {
 
       <WebView
         source={{ uri: nwcAuthUrl }}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.error('WebView error: ', nativeEvent);
+        }}
+        onLoad={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          if (!nativeEvent.loading) {
+            console.log('WebView loaded: ', nativeEvent);
+            if (nativeEvent['canGoBack']) {
+              navigation.goBack();
+            }
+          }
+        }}
         injectedJavaScriptBeforeContentLoaded={`
           window.addEventListener("message", (event) => {
             window.ReactNativeWebView.postMessage(event.data?.type);

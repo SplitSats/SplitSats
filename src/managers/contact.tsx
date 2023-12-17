@@ -1,4 +1,5 @@
 import { IProfileContent } from '@model/nostr';
+import { NDKUser } from '@nostr-dev-kit/ndk';
 import { instanceToPlain, plainToInstance } from 'class-transformer'; // Import necessary serialization libraries
 
 class ContactManager {
@@ -49,6 +50,11 @@ class Contact {
     this.username = username;
     this.npub = npub;
     this.profile = profile;
+  }
+
+  public static fromNDKUser(user: NDKUser): Contact {
+    const contact = new Contact(user.profile?.username, user.npub, user.profile);
+    return contact;
   }
 
   public static fromJSON(json: any): Contact {

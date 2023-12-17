@@ -43,7 +43,7 @@ const GroupsScreen = ({ navigation }) => {
 			if (groupManager) {
 				const fetchedGroups = await groupManager?.getGroups() || [];
 				await setGroups(fetchedGroups);
-				l('Fetched groups:', fetchedGroups);
+				// l('Fetched groups:', fetchedGroups);
 			} else {
 			  err('Group manager or getGroups method is undefined.');
 			}

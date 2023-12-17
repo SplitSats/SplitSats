@@ -3,19 +3,24 @@ import React, { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View, Image, Clipboard } from 'react-native';
 import QRCode from 'react-native-qrcode-svg'; // Import the QRCode component
 import { useUserProfileStore } from '@store';
-import { getWallet, NPUB } from '@store/secure';
+import { getWallet, NPUB, PUBLIC_KEY_HEX } from '@store/secure';
 import { l, err } from '@log';
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '@src/styles/styles';
+import { getnprofile } from '@src/nostr/profile';
+
 
 const UserProfile = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [ndk, setNdk] = useState(null);
   const [fetching, setFetching] = useState(false);
   const { userProfile, setUserProfile } = useUserProfileStore();
+  const [nprofile, setNprofile] = useState('');
 
-  
+
 	useEffect(() => {
 		const fetchUserProfile = async () => {
+      const pk = await getWallet(PUBLIC_KEY_HEX) as string;
+      const nprofile = getnprofile(pk);
 			// Use Nostr profile
 			try {
 				if (!ndk) {
@@ -148,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: SECONDARY_COLOR,
+    backgroundColor: PRIMARY_COLOR,
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
@@ -172,7 +177,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   copyButton: {
-    backgroundColor: PRIMARY_COLOR,
+    backgroundColor: SECONDARY_COLOR,
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 20,

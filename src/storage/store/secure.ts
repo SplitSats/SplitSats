@@ -6,13 +6,15 @@ export const NPUB = 'npub';
 export const NSEC = 'nsec';
 export const PUBLIC_KEY_HEX = 'public_key_hex';
 export const PRIVATE_KEY_HEX = 'private_key_hex';
+export const NWC_URL = 'nwc_url';
 
 export type WalletType =
   | typeof WORDS
   | typeof PRIVATE_KEY_HEX
   | typeof PUBLIC_KEY_HEX
   | typeof NPUB
-  | typeof NSEC;
+  | typeof NSEC
+  | typeof NWC_URL;
 
 export async function createWallet(type: WalletType, data: string): Promise<void> {
   await SecureStore.setItemAsync(type, data);

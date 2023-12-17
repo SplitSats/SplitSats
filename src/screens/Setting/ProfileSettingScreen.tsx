@@ -15,6 +15,8 @@ import { useNDK } from '@src/context/NDKContext';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
 import { useUserProfileStore } from '@store'
 import Header from "@comps/Header";
+import LoadingModal from '@comps/ModalLoading';
+
 
 const ProfileSettingScreen = ({ navigation }) => {
 
@@ -65,6 +67,7 @@ const ProfileSettingScreen = ({ navigation }) => {
 	const handleBack = () => {
 		navigation.goBack();
 	};
+
 	const renderItem = ({ item }) => (
 		<View style={styles.inputContainer}>
 		  <Text style={styles.label}>{item.label}</Text>
@@ -118,6 +121,8 @@ const ProfileSettingScreen = ({ navigation }) => {
 			contentContainerStyle={styles.formContainer}
 			/>
 			</KeyboardAvoidingView>
+			<LoadingModal visible={loading} message="Loading..." />
+
 			<ButtonConfirm title="UPDATE PROFILE" onPress={handleUpdateProfile} disabled={false}/>
 		</SafeAreaView>
 	)

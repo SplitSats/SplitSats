@@ -34,7 +34,7 @@ import { publishGroup } from '@nostr';
 import LoadingModal from '@comps/ModalLoading';
 import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
 
-const CreateNewGroup = ({ navigation, route }) => {
+const CreateNewBill = ({ navigation, route }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();

@@ -4,6 +4,7 @@ import { Event as NostrEvent } from 'nostr-tools'
 import { getPublicKey, nip19, nip06 } from 'nostr-tools';
 import { l, err } from '@log';
 
+
 export function toPrivateKeyHex(anything: string): string {
   if (!anything || anything.length === 0) {
     throw new Error('data is empty');

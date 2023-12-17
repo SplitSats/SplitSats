@@ -12,7 +12,29 @@ import { nip05, nip44 } from 'nostr-tools'
 import { nostr } from '@getalby/lightning-tools';
 import { G } from 'react-native-svg';
 import { plainToInstance, instanceToPlain } from 'class-transformer';
+import { Contact } from '@src/managers/contact';
 
+export async function getUserFollows(ndk: NDK): Promise<Set<NDKUser> | undefined> {
+  // Return Set<NDKUser> that the user is following
+  const follows = await ndk.activeUser?.follows();
+  // Assuming `follows` is your set of NDKUsers
+  if (follows && follows.size > 0) {
+    follows.forEach(async (user) => {
+      // Fetch the profile for each user
+      const userProfile = await user.fetchProfile();
+      if (userProfile) {
+        console.log(`User: ${userProfile.name}: ${user.npub}`);
+        // Print other details from the userProfile object as needed
+      } else {
+        console.log(`Failed to fetch profile for user with Npub: ${user.npub}`);
+      }
+    });
+  } else {
+    console.log('The "follows" set is empty or undefined.');
+  }
+
+  return follows;
+}
 
 export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfileContent | null> {
   try {
@@ -26,10 +48,10 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
       npub = query;
     } else if (query.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
       l('Query is a email-like')
-      // let profile = await nip05.queryProfile('jb55.com')
-      // console.log(profile.pubkey)
-
-      npub = await nip05toNpub(query);
+      let profile = await nip05.queryProfile(query)
+      console.log(profile?.pubkey)
+      npub = profile?.pubkey || ''
+      // npub = await nip05toNpub(query);
       l('NIP05 converted to Npub:', npub);
       // check if npub is a valid string
       if(!npub || typeof npub !== 'string') {
@@ -61,6 +83,7 @@ export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
   }
   const privateKey = await getWallet(PRIVATE_KEY_HEX);
   const npub = await getWallet(NPUB);
+  const senderHexPubKey =  await ndk.activeUser?.pubkey;
 
   for (const member of groupMembers) {
     const nostrUser = ndk.getUser({ npub: member });
@@ -75,15 +98,33 @@ export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
   
     const ndkEvent = new NDKEvent(ndk);
     ndkEvent.kind = EventKind.DirectMessage;
+    ndkEvent.tag(nostrUser, 'p');
     // ndkEvent.kind = EventKind.SplitGroupRequest;
     
     ndkEvent.content = ciphertext;
     await ndkEvent.publish();
     l('[NDK] Group request sent to:', member);
-  l('[NDK] Group published!', groupData);
+  l('[NDK] Group published!', ndkEvent);
   }
 
 }
+export async function zapUser(ndk: NDK, npub: string, amount: integer, comment: string): Promise<string> {
+  if (!ndk) {
+    throw new Error('NDK not initialized');
+  }
+  const nostrUser = await ndk.getUser({ npub: npub });
+  if (!nostrUser) {
+    err('Nostr user not found: ', contact.npub);
+    throw new Error('Nostr user not found');
+  }
+  l('[NDK] Zapping user:', nostrUser)
+  const paymentRequest = await nostrUser.zap(amount, comment);
+  // sleep for 2 seconds
+  await new Promise(r => setTimeout(r, 2000));
+  l('[NDK] Payment request:', paymentRequest);
+  return paymentRequest;
+}
+
 
 export async function followNpubs(ndk: NDK, npubs: string[]): Promise<boolean> {
   if (!ndk) {
