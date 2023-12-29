@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { FILL_CARD_COLOR } from "@styles/styles";
+import { truncateNpub, getNostrUsername } from '@nostr/util'
 
 const MemberCardComponent = ({ contact }) => {
   return (
     <View style={styles.container}>
     <Image source={{ uri: contact.profile?.image }} style={styles.image} />
-      <Text style={styles.name}>{contact.profile?.displayName}</Text>
+      <Text style={styles.name}>{getNostrUsername(contact.profile)}</Text>
     </View>
   );
 };

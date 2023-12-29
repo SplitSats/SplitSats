@@ -4,15 +4,28 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { FILL_CARD_COLOR } from "@styles/styles";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { truncateNpub, getNostrUsername } from '@nostr/util'
+import { l } from '@log';
+
 
 const ContactCardComponent = ({ contact, onPress }) => {
   
+  const [userName, setUserName] = useState('');
+  const [imageUri, setImageUri] = useState('');
+  const [npub, setNpub] = useState('');
   const [contactPressed, setContactPressed] = useState('');
-  const [user, setUser] = useState('');
+  
   
   useEffect(() => {
     setContactPressed(contact);
   }, [contact]);
+
+  useEffect(() => {
+    setUserName(getNostrUsername(contact.profile));
+    setImageUri(contact.profile?.image);
+    setNpub(truncateNpub(contact.npub));
+    l("userName: ", userName);  
+  }, [contact]);
+
 
   const handlePress = () => {
     if (onPress) {
@@ -21,14 +34,17 @@ const ContactCardComponent = ({ contact, onPress }) => {
   };
 
   return (
-    <View style={styles.cardContainer}> 
-        <Image
-          source={{ uri: contact.profile.image }}
-          style={styles.profileImage}
-        />
+    <View style={styles.cardContainer}>
+      {imageUri !== '' && (
+          <Image source={{ uri: imageUri }} style={styles.profileImage} />
+      )}
       <View style={styles.userInfo}>
-        <Text style={styles.userName}>{getNostrUsername(contact.profile)}</Text>
-        <Text style={styles.npub}>{truncateNpub(contact.npub)}</Text>
+        {userName !== '' && (
+          <Text style={styles.userName}>{userName}</Text>
+        )}
+        {npub !== '' && (
+          <Text style={styles.npub}>{npub}</Text>
+        )}  
       </View>
       {/* A little button with a thunder icon for paying  */}
       <TouchableOpacity style={styles.payContainer} onPress={handlePress}>
@@ -91,20 +107,6 @@ const styles = StyleSheet.create({
   payText: {
     color: 'white',
     fontSize: 14,
-  },
-  profileImagePlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: SECONDARY_COLOR, // Background color for placeholder
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  initials: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
   }
 });
 
