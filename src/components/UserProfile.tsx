@@ -12,11 +12,24 @@ import { getnprofile } from '@src/nostr/profile';
 const UserProfile = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [ndk, setNdk] = useState(null);
+  const [npubEncoded, setNpubEncoded] = useState('');
   const [fetching, setFetching] = useState(false);
   const { userProfile, setUserProfile } = useUserProfileStore();
   const [nprofile, setNprofile] = useState('');
 
 
+  useEffect( 
+    ( ) => {
+    // Set npub encoded to npub:<hex>
+    const fetchNpub = async () => {
+      const npub = await getWallet(NPUB);
+      if (npub) {
+        setNpubEncoded(`nostr:${npub}`);
+      }
+    }
+    fetchNpub();
+  }, [npubEncoded]);
+  
 	useEffect(() => {
 		const fetchUserProfile = async () => {
       const pk = await getWallet(PUBLIC_KEY_HEX) as string;
@@ -84,7 +97,8 @@ const UserProfile = () => {
             <View style={styles.userInfo}>
               <Image source={{ uri: userProfile?.picture }} style={styles.modalUserPhoto} />
               <Text style={styles.modalDisplayName}>{userProfile?.display_name}</Text>
-              <Text style={styles.modalNpub}>{userProfile?.npub}</Text>
+              {/* show only if avalable  */}
+              { userProfile?.npub && <Text style={styles.modalNpub}>{userProfile?.npub}</Text> }
               <TouchableOpacity
                 style={styles.copyButton}
                 onPress={() => copyToClipboard(userProfile?.npub)}
@@ -94,7 +108,7 @@ const UserProfile = () => {
             </View>
 
             <View style={styles.qrCodeContainer}>
-              <QRCode value={userProfile?.npub} size={250} />
+              <QRCode value={npubEncoded} size={250} />
             </View>
 
             <TouchableOpacity style={styles.roundButton} onPress={closeModal}>
@@ -110,39 +124,40 @@ const UserProfile = () => {
 
 const styles = StyleSheet.create({
   header: {
-	marginTop: 50,
-	height: '20%',
-	justifyContent: 'center',
-	position: 'absolute',
-	top: 0,
-	left: 0,
-	right: 0,
+    marginTop: 50,
+    height: '20%',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
   },
   headerContent: {
-	flexDirection: 'row',
-	alignItems: 'center',
-	marginHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  	marginHorizontal: 20,
   },
   userPhoto: {
-	width: 100,
-	height: 100,
-	borderRadius: 50,
-	borderWidth: 2,
-	borderColor: '#FFFFFF',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    marginLeft: 20,
+    borderColor: '#FFFFFF',
   },
   userInfo: {
-	alignItems: 'center',
-	marginBottom: 20,
+    alignItems: 'center',
+    marginBottom: 20,
   },
   welcome: {
-	fontSize: 20,
-	color: 'white',
-	fontWeight: 'bold',
+    fontSize: 20,
+    color: 'white',
+    fontWeight: 'bold',
   },
   subtitle: {
-	fontSize: 30,
-	color: 'white',
-	fontWeight: 'bold',
+    fontSize: 30,
+    color: 'white',
+    fontWeight: 'bold',
   },
   
   // New styles for the modal
@@ -161,9 +176,9 @@ const styles = StyleSheet.create({
   modalUserPhoto: {
     width: 100,
     height: 100,
-	backgroundColor: 'white',
-	borderWidth: 2,
-	borderColor: '#FFFFFF',
+    backgroundColor: 'white',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
     borderRadius: 50,
     marginBottom: 10,
   },
