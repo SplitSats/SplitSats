@@ -118,6 +118,7 @@ const AddFriendScreen = ({ navigation }) => {
     setScanned(true);
     setScannerOpen(false);
     // Check if the scanned data starts with nostr:npub
+    l(TAG, "Scanned data: ", data);
     if (data.startsWith("nostr:npub")) {
       // Extract the npub from the data
       const npub = data.split("nostr:")[1];

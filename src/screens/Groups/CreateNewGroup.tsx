@@ -76,15 +76,18 @@ const CreateNewGroup = ({ navigation, route }) => {
 
   useEffect( () => {
     const fetchContacts = async () => {
-      if (!contactManager) {
-        err("Contact manager not initialized");
-        return;
-      }
-      const contacts = await contactManager.getContacts();
+      // if (!contactManager) {
+      //   err("Contact manager not initialized");
+      //   return;
+      // }
+      // const contacts = await contactManager.getContacts();
+      const contacts = await getUserFollows(ndk)
+      const contactsSet = new Set(contacts);
       l("Contacts: ", contacts);
       // const follows =  getUserFollows(ndk);
-
-      await setUsers(contacts);
+      setUsers([...contactsSet]);
+      
+      // await setUsers(contacts);
     }  
     fetchContacts();
   }, []);

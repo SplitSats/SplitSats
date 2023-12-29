@@ -69,7 +69,7 @@ const ContactScreen = ({ navigation }) => {
 
         const fetchedFollows = await getUserFollows(ndk);
         const followsSet = new Set(fetchedFollows);
-        setFollows([...followsSet]);
+        await setFollows([...followsSet]);
         // l(TAG, "Follows: ", follows);
         // Fetch contacts from contactManager
         if (contactManager ) {
