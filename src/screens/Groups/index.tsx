@@ -19,15 +19,18 @@ import { useUserProfileStore, useContactManagerStore, useGroupManagerStore } fro
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import { l, err } from '@log';
 import GroupCardComponent from '@comps/CardComponentGroup';
-
+import { useNDK } from '@src/context/NDKContext';
+import { getNostrEvents, getNostrFriends, decryptNostrEvent } from '@nostr';
+import { truncateNpub, getNostrUsername } from '@nostr/util'
 
 const GroupsScreen = ({ navigation }) => {
+	const ndk =  useNDK();
 
 	const { setGroupManager, getGroupManager, initializeGroupManager } = useGroupManagerStore();
 	const groupManager = useGroupManagerStore((state) => state.getGroupManager());
 	const [groups, setGroups] = useState([]);
 	const TAG = '[GroupsScreen] ';
-
+	const [friends, setFriends] = useState([]);
 
 	useEffect(() => {
 		const initGroupManager = async () => {
@@ -53,20 +56,41 @@ const GroupsScreen = ({ navigation }) => {
 		};
 		initGroupManager();
 	  }, []);
-	 
+	
+	
+	  useEffect(() => {
+		// Run the function initially
+		const checkEvents = async () => {
+			const friends = await getNostrFriends(ndk);
+			//   l('Friends:', friends);
+			  const friends_npubs = Array.from(friends).map((friend) => friend.pubkey);	
+			  const events = await getNostrEvents(ndk, friends_npubs);
+			  for (const event of events) {
+				//   l('Event:', event.rawEvent());
+				const decripted_content = await decryptNostrEvent(ndk, event);
+				  
+			  }
+			  // Log events if found
+			  if (events.size > 0) {
+				l('Events found:', events?.size);
+			  } else {
+				l('No events found from friends.');
+			  }
+			
+		  };	
+		// Set interval to run checkEvents every 20 seconds
+		const interval = setInterval(() => {
+		  checkEvents();
+		}, 30000); // 20 seconds in milliseconds
+	
+		// Clear interval on unmount to prevent memory leaks
+		return () => clearInterval(interval);
+	  }, []); // Run once on component mount
+
+	  
 	const handleGroupPress = (group) => {
 		navigation.navigate('GroupDetails', { group });
 	};
-
-	const renderGroupCard = ({ item }) => (
-		<TouchableOpacity onPress={() => handleGroupPress(item)}>
-		  <View style={styles.groupCard}>
-			{/* Use an actual image for the group */}
-			<Image source={item.groupImage} style={styles.groupImage} />
-			<Text style={styles.groupName}>{item.name}</Text>
-		  </View>
-		</TouchableOpacity>
-	);
 
 	return (
 		<SafeAreaView style={styles.container}>

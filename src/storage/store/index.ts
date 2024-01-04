@@ -14,7 +14,7 @@ import { l } from '@log';
 interface ContactManagerStore {
   contactManager: ContactManager | null;
   initializeContactManager: () => Promise<void>;
-  getContactManager: () => ContactManager | null;
+  getContactManager: () => ContactManager | null | undefined;
   setContactManager: (manager: ContactManager) => void;
   clearContactManager: () => void;
   rehydrated: boolean;

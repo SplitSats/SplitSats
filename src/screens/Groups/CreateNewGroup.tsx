@@ -32,7 +32,8 @@ import ConfirmModal  from "@comps/ModalConfirm";
 import { useNDK } from '@src/context/NDKContext';
 import { publishGroup } from '@nostr';
 import LoadingModal from '@comps/ModalLoading';
-import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import { queryNostrProfile, getNostrFriends, followNpubs } from '@nostr'
+import { truncateNpub, getNostrUsername } from '@nostr/util'
 
 const CreateNewGroup = ({ navigation, route }) => {
 
@@ -75,21 +76,17 @@ const CreateNewGroup = ({ navigation, route }) => {
   }, []);
 
   useEffect( () => {
-    const fetchContacts = async () => {
+    const fetchFriends = async () => {
       // if (!contactManager) {
       //   err("Contact manager not initialized");
       //   return;
       // }
       // const contacts = await contactManager.getContacts();
-      const contacts = await getUserFollows(ndk)
-      const contactsSet = new Set(contacts);
-      l("Contacts: ", contacts);
-      // const follows =  getUserFollows(ndk);
-      setUsers([...contactsSet]);
+      const friends = await getNostrFriends(ndk)
+      await setUsers([...friends]);
       
-      // await setUsers(contacts);
     }  
-    fetchContacts();
+    fetchFriends();
   }, []);
 
   // Handler to handle selection change in SearchCardComponent
@@ -164,21 +161,16 @@ const CreateNewGroup = ({ navigation, route }) => {
   // Function to sort users based on the search term
   const sortUsers = async () => {
     if (searchTerm) {
-      const contacts = await contactManager.getContacts();
-      const filteredUsers = contacts.filter(
+      // const contacts = await contactManager.getContacts();
+      const filteredUsers = users.filter(
         (user) =>
-          user.profile?.displayName
+            getNostrUsername(user.profile)
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
           user.npub.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setUsers(filteredUsers);
-    } else {
-      const contacts = await contactManager.getContacts()
-      if(contacts.length > 0) {
-        setUsers(contacts);
-      };
-    }
+    } 
   };
 
   useEffect(() => {
@@ -217,6 +209,7 @@ const CreateNewGroup = ({ navigation, route }) => {
         onGroupImageUriChange={handleGroupImageUriChange}
       />
       <Text style={styles.sectionTitle}>Members</Text>
+
       <FlatList
         data={users}
         ListHeaderComponent={() => (
@@ -233,7 +226,6 @@ const CreateNewGroup = ({ navigation, route }) => {
                 ))
               )}
             </View>
-
             <Text style={styles.sectionTitle}>Your friends</Text>
             <SearchUser
               searchTerm={searchTerm}
@@ -261,7 +253,7 @@ const CreateNewGroup = ({ navigation, route }) => {
         onLeftButtonPress={handleNo}
         onRightButtonPress={handleCreateGroup}
       />
-      
+
       {toastVisible && (
         <View style={styles.toastContainer}>
           <Text style={styles.toastText}>{toastMessage}</Text>

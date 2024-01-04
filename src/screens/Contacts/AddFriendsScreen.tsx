@@ -31,7 +31,7 @@ import { ContactManager, Contact } from '@src/managers/contact'
 import { defaultNpubs } from '@nostr/consts'
 import Header from "@comps/Header";
 import { useNDK } from '@src/context/NDKContext';
-import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import { queryNostrProfile, followNpubs } from '@nostr'
 import LoadingModal from '@comps/ModalLoading';
  
 const AddFriendScreen = ({ navigation }) => {
@@ -83,7 +83,7 @@ const AddFriendScreen = ({ navigation }) => {
   useEffect(() => {
     (async () => {
       try {
-        const follows = await getUserFollows(ndk)
+        const follows = await ndk?.activeUser?.follows();
         // Get npubs that i am following
         const contactNpubsSet: Set<string> = new Set(
           follows ? [...follows].map(user => user.npub).filter(npub => npub !== undefined) : []

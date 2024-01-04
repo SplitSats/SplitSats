@@ -102,11 +102,11 @@ const CreateAccountScreen = ({ navigation }) => {
 
     <SafeAreaView style={styles.container}>
         <Header title="NEW ACCOUNT" onPressBack={handleBack} />
-        <KeyboardAvoidingView
+        {/* <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.select({ ios: 0, android: 500 })}
-      >
+      > */}
         <View style={styles.containerPhotos}>
           <BannerUploadComponent imageUri={bannerImageUri} setImageUri={setBannerImageUri} />
           <ImageUploadComponent imageUri={profileImageUri} setImageUri={setProfileImageUri} />
@@ -117,7 +117,7 @@ const CreateAccountScreen = ({ navigation }) => {
           keyExtractor={(item) => item.key}
           contentContainerStyle={styles.formContainer}
         />
-      </KeyboardAvoidingView>
+      {/* </KeyboardAvoidingView> */}
       <ConfirmModal
         isVisible={isModalVisible}
         onClose={closeModal}

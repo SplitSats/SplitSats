@@ -5,6 +5,7 @@ import { FILL_CARD_COLOR } from "@styles/styles";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import { truncateNpub, getNostrUsername } from '@nostr/util'
 import { l } from '@log';
+import { NDKUser} from '@nostr-dev-kit/ndk';
 
 
 const ContactCardComponent = ({ contact, onPress }) => {
@@ -12,18 +13,31 @@ const ContactCardComponent = ({ contact, onPress }) => {
   const [userName, setUserName] = useState('');
   const [imageUri, setImageUri] = useState('');
   const [npub, setNpub] = useState('');
+  const [user, setUser] = useState<NDKUser>(contact);
   const [contactPressed, setContactPressed] = useState('');
   
-  
   useEffect(() => {
-    setContactPressed(contact);
-  }, [contact]);
+    // Fetch profile for contact
+    const fetchProfile = async () => {
+      try {
+        await setUser(contact);
+        await user.fetchProfile();
+        const username = await getNostrUsername(contact.profile)
+        await setUserName(username);
+        await setImageUri(contact.profile?.image);
+        await setNpub(truncateNpub(contact.npub));
+      
+      } catch (error) {
+        console.error('Error fetching profile for contact:', error);
+      }
+    };
+    
+    fetchProfile();
+  }, []);
+
 
   useEffect(() => {
-    setUserName(getNostrUsername(contact.profile));
-    setImageUri(contact.profile?.image);
-    setNpub(truncateNpub(contact.npub));
-    l("userName: ", userName);  
+    setContactPressed(contact);
   }, [contact]);
 
 

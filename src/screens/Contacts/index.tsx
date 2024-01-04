@@ -12,25 +12,26 @@ import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY } from "@styles/styles";
 import ContactCardComponent from "@comps/CardComponentContact";
 import PaymentModal from '@comps/ModalPayment'; 
 import { useNDK } from '@src/context/NDKContext';
-import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import { queryNostrProfile, getNostrFriends,  followNpubs } from '@nostr'
 import RefreshIndicator from '@comps/RefreshIndicator';
 import LoadingModal from '@comps/ModalLoading';
 import  SuccessModal from '@comps/ModalSuccess';
+import { NDKUser } from '@nostr-dev-kit/ndk';
 
 
 const ContactScreen = ({ navigation }) => {
-  const ndk = useNDK();
-  const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
-  const [contacts, setContacts] = useState([]);
+  // const { setContactManager, getContactManager, initializeContactManager } = useContactManagerStore();
+  // const [contacts, setContacts] = useState([]);
   const [selectedTab, setSelectedTab] = useState('Friends');
   const TAG = '[ContactScreen] ';
   const contactManager = useContactManagerStore((state) => state.getContactManager());
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null); // State to hold the selected contact
-  const [follows, setFollows] = useState([]); // State to hold the set of follows
+  const [friends, setFriends] = useState([]); // State to hold the set of follows
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [message, setMessage] = useState('Payment Successful');
   const [description, setDescription] = useState('Your payment has been successfully processed.');
+  const ndk = useNDK();
 
 
   const toggleModal = () => {
@@ -61,24 +62,23 @@ const ContactScreen = ({ navigation }) => {
     const initContactManager = async () => {
       try {
         
-        if (!contactManager) {
-          // If not found in storage, initialize a new one
-          await initializeContactManager();
-          l(TAG, "Contact manager initialized");
-        } 
-
-        const fetchedFollows = await getUserFollows(ndk);
-        const followsSet = new Set(fetchedFollows);
-        await setFollows([...followsSet]);
+        // if (!contactManager) {
+        //   // If not found in storage, initialize a new one
+        //   await initializeContactManager();
+        //   l(TAG, "Contact manager initialized");
+        // } 
+        const fetchedFriends = await getNostrFriends(ndk);
+        
+        await setFriends([...fetchedFriends]);
         // l(TAG, "Follows: ", follows);
         // Fetch contacts from contactManager
-        if (contactManager ) {
-          const fetchedContacts = await contactManager.getContacts() || [];
-          setContacts(fetchedContacts);
-          l('Fetched contacts:', fetchedContacts);
-        } else {
-          err('Contact manager or getContacts method is undefined.');
-        }
+        // if (contactManager ) {
+        //   const fetchedContacts = await contactManager.getContacts() || [];
+        //   setContacts(fetchedContacts);
+        //   l('Fetched contacts:', fetchedContacts);
+        // } else {
+        //   err('Contact manager or getContacts method is undefined.');
+        // }
         // setLoading(false);
 
       } catch (error) {
@@ -126,9 +126,9 @@ const ContactScreen = ({ navigation }) => {
         {/* Conditionally render based on selectedTab */}
         {selectedTab === 'Friends' && (
           <FlatList
-            data={follows}
+            data={friends}
             renderItem={({ item }) =>
-              item.profile ? ( // Check if profile data exists
+              item ? ( // Check if profile data exists
                 <ContactCardComponent
                   contact={item}
                   onPress={() => handleZap(item)}

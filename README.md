@@ -40,15 +40,20 @@ Provide instructions on how to use your application:
 
 ## Features
 
+A friend in split sats is a nostr user that follow us and we follow back.
+
+
 Please take a look to the [technical documentation](doc/03_Technical_Specification.md) in order to understand how groups and bill flow works. 
 
  - [X] Account creation on Nostr
  - [X] Add friends from Nostr 
  - [X] Lightning Wallet Connection with NWC
+ - [X] Pay to lightning address
  - [ ] Create groups with friends using Nostr
  - [ ] Add expenses and bills to groups
  - [ ] Settle debts with Zaps using NWC
- - [ ] Off-line sync with Nostr 
+ - [ ] Off-line sync with Nostr
+ - [ ] Background task to check if user got paid or new event from nostr 
 
 
 ## Dependencies

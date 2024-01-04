@@ -11,20 +11,16 @@ import { ActivityIndicator } from 'react-native';
 import { useUserProfileStore } from '@store'
 import { toPrivateKeyHex } from '@nostr/util';
 import { createWallet, getWallet, PRIVATE_KEY_HEX, PUBLIC_KEY_HEX, NPUB, NSEC } from '@store/secure';
-import { relay } from '@nostr/class/Relay'
-import { EventKind } from '@nostr/consts'
-import { USE_NDK } from '@nostr/consts'
 import {updateNDKProfile}  from '@nostr/profile'
 import Header from "@comps/Header";
-
+import { initializeNDK } from '@nostr';
 
 const ConfirmCreateAccountScreen = ({ navigation }) => {
 
 	const { userProfile, setUserProfile, clearUserProfile } = useUserProfileStore();
   const [loading, setLoading] = useState(false); 
-  const ndk = useNDK();
-
   const [npub, setNpub] = useState("");
+  const ndk = useNDK();
 
   useEffect(()  => {
     const createNostrKeys = async () => {
@@ -44,28 +40,17 @@ const ConfirmCreateAccountScreen = ({ navigation }) => {
       await createWallet(PUBLIC_KEY_HEX, userPublicKey);
       await createWallet(NPUB, npub);
       await createWallet(NSEC, nsec);
+      // const ndkInstance = await initializeNDK()
+      // setNDK(ndkInstance)
       setLoading(false);
     };
     createNostrKeys();
   }, []);
   
   const publishNostrProfile = async (npub, userProfile) => {
-    const userPrivateKey = await getWallet(PRIVATE_KEY_HEX) || '';
-    const userPublicKey = await getWallet(PUBLIC_KEY_HEX);
     let result = false;
-    if (USE_NDK) {
-      
-      result = await updateNDKProfile(ndk, npub, userProfile);
-    }
-    else {
-      const event = {
-        kind: EventKind.SetMetadata,
-        tags: [],
-        content: JSON.stringify(userProfile),
-        created_at: Math.ceil(Date.now() / 1000),
-      }
-      result = await relay.publishEventToPool(event, userPrivateKey);
-    }
+    result = await updateNDKProfile(ndk, npub, userProfile);
+    
     if (!result) {
       err('Error publishing Nostr profile');
       return;

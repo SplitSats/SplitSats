@@ -21,7 +21,7 @@ if (isReactNativeDevMode) {
 		// generally going to be localhost
 		// host: hostname,
 		// Reactotron can monitor AsyncStorage for you
-		useAsyncStorage: false,
+		useAsyncStorage: true,
 		// log the initial restored state from AsyncStorage
 		logInitialState: true,
 		// log out any snapshots as they happen (this is useful for debugging but slow)

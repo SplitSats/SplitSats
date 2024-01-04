@@ -1,7 +1,7 @@
 import { l, err } from '@log';
 import { IProfileContent } from '@model/nostr';
 import { getWallet, PRIVATE_KEY_HEX, NPUB, NSEC } from '@store/secure';
-import { NDKPrivateKeySigner, NDKEvent } from '@nostr-dev-kit/ndk';
+import { NDKPrivateKeySigner, NDKEvent, NDKFilter } from '@nostr-dev-kit/ndk';
 import { NDKUser } from '@nostr-dev-kit/ndk';
 import NDK from '@nostr-dev-kit/ndk'
 import { defaultRelays, EventKind } from '@nostr/consts';
@@ -13,27 +13,58 @@ import { nostr } from '@getalby/lightning-tools';
 import { G } from 'react-native-svg';
 import { plainToInstance, instanceToPlain } from 'class-transformer';
 import { Contact } from '@src/managers/contact';
+import { encrypt, decrypt } from '@nostr/crypto';
+import { truncateNpub, getNostrUsername } from '@nostr/util'
+import { auth } from '@getalby/sdk';
 
 export async function getUserFollows(ndk: NDK): Promise<Set<NDKUser> | undefined> {
   // Return Set<NDKUser> that the user is following
   const follows = await ndk.activeUser?.follows();
-  // Assuming `follows` is your set of NDKUsers
-  if (follows && follows.size > 0) {
-    follows.forEach(async (user) => {
-      // Fetch the profile for each user
-      const userProfile = await user.fetchProfile();
-      if (userProfile) {
-        console.log(`User: ${userProfile.name}: ${user.npub}`);
-        // Print other details from the userProfile object as needed
-      } else {
-        console.log(`Failed to fetch profile for user with Npub: ${user.npub}`);
-      }
-    });
-  } else {
-    console.log('The "follows" set is empty or undefined.');
-  }
-
   return follows;
+}
+
+export async function initializeNDK() {
+	const privateKey = await getWallet(PRIVATE_KEY_HEX);
+	if (!privateKey) {
+		l('No private key found in storage')
+		return null;
+	}
+	const signer = new NDKPrivateKeySigner(privateKey || '');
+	const ndkInstance = new NDK({ explicitRelayUrls: defaultRelays, signer: signer })
+	await ndkInstance.connect()
+	return ndkInstance;
+}
+
+export async function getNostrFriends(ndk: NDK): Promise<Set<NDKUser> | undefined> {
+  // Nostr friends is a set of my followers that I follow back
+  const follows = await ndk.activeUser?.follows();
+  // Todo - save friends on cache and check only new follows
+  const friends = new Set<NDKUser>();
+  if (follows && follows.size > 0) {
+    for (const user of follows) {
+      const userFollows = await user?.follows();   
+      // Check if I am in the user's follows
+      const isFollowAFrind = [...userFollows].some(user => user.pubkey === ndk.activeUser?.pubkey);
+      if (isFollowAFrind) {
+        await friends.add(user);
+      }
+    };
+  } else {
+      l('The "follows" set is empty or undefined.');
+    }
+  return friends;
+}
+
+export async function getNostrEvents(ndk: NDK, authors: string[]): Promise<Set<NDKEvent> | undefined> {
+  if (!ndk) {
+    throw new Error('NDK not initialized');
+  }
+  if (authors.length === 0) {
+    return new Set<NDKEvent>();
+  }
+  const filter: NDKFilter = { kinds: [4], authors: authors };
+  const events = await ndk.fetchEvents(filter);
+  return events;
 }
 
 export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfileContent | null> {
@@ -71,6 +102,25 @@ export async function queryNostrProfile(ndk: NDK, query: string): Promise<IProfi
   }
 }
 
+export async function decryptNostrEvent(ndk: NDK, event: NDKEvent): Promise<string | null> {
+  const sender = ndk.getUser({pubkey: event.pubkey});
+  await sender.fetchProfile();
+  l(`Event from: ${getNostrUsername(sender.profile)} with content: ${event.content}`);
+  try {
+    // const decrypted = await event.decrypt(sender);
+    const privateKey = await getWallet(PRIVATE_KEY_HEX);
+    if (!privateKey) {
+      throw new Error('Private key not found');
+    }
+    const decrypted_text = decrypt(privateKey, event.pubkey, event.content);
+    l('Decrypted event:', decrypted_text);
+    return decrypted_text;
+  } catch (error) {
+    l('Error decrypting event:', error);
+    return null;
+  }
+}
+
 export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
   if (!ndk) {
     throw new Error('NDK not initialized');
@@ -82,8 +132,10 @@ export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
     throw new Error('Group members or data not found');
   }
   const privateKey = await getWallet(PRIVATE_KEY_HEX);
-  const npub = await getWallet(NPUB);
-  const senderHexPubKey =  await ndk.activeUser?.pubkey;
+  if (!privateKey) {
+    throw new Error('Private key not found');
+  }
+  // const senderHexPubKey =  await ndk.activeUser?.pubkey;
 
   for (const member of groupMembers) {
     const nostrUser = ndk.getUser({ npub: member });
@@ -92,10 +144,10 @@ export async function publishGroup(ndk: NDK, group: Group): Promise<boolean> {
       throw new Error('Nostr user not found');
     }
     const receiverPublicKey = nostrUser.pubkey;
-    const sharedKey = nip44.utils.v2.getConversationKey(privateKey, receiverPublicKey);
-    console.log(sharedKey);
-    const ciphertext = nip44.encrypt(sharedKey, groupData);
-  
+    // const sharedKey = nip44.utils.v2.getConversationKey(privateKey, receiverPublicKey);
+    // console.log(sharedKey);
+    // const ciphertext = nip44.encrypt(sharedKey, groupData);
+    const ciphertext = await encrypt(privateKey, receiverPublicKey, groupData);
     const ndkEvent = new NDKEvent(ndk);
     ndkEvent.kind = EventKind.DirectMessage;
     ndkEvent.tag(nostrUser, 'p');

@@ -30,19 +30,17 @@ import { NWCProvider } from '@src/context/NWCContext'
 // import "../applyGlobalPolyfills";
 import { setupURLHandler } from '@src/util/DeepLinkService'; // Replace with the correct path
 
+
 const Stack = createNativeStackNavigator()
 
+
 export default function App() {
-	// useEffect(() => {
-	// 	const cleanupURLHandler = setupURLHandler();
-	// 	return cleanupURLHandler;
-	// }, []);
 
 	return (
+	<NDKProvider>
 	  <View style={{ flex: 1, backgroundColor: "080808" }}>
 	    <SafeAreaProvider>
 		<PolyfillCrypto />
-		<NDKProvider>
 		<NWCProvider>
 			<NavigationContainer>
 				<Stack.Navigator 
@@ -74,9 +72,9 @@ export default function App() {
 				</Stack.Navigator>
 			</NavigationContainer>
 		</NWCProvider>
-		</NDKProvider>
 		</SafeAreaProvider>
 	  </View>
+	</NDKProvider>
 	)
 }
 

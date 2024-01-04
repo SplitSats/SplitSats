@@ -23,19 +23,21 @@ const CreateAccountWrap = ({ userProfile }) => {
         console.log('No npub found')
         return
       }
-      setUserNpub(npub)
+      if(!userNpub) {
+        setUserNpub(npub)
+      }
       let truncated = ''
       try {
         truncated = truncateNpub(userNpub);
       } catch (e) {
         console.log('Error truncating npub:', e)
       }
-      l('truncatedNpub:', truncated)
+      // l('truncatedNpub:', truncated)
       setTruncatedNpub(userNpub !== "" ? truncated : 'npub...')
     }
     fetchUserNpub()
   }
-  , [userNpub, userProfile])
+  , [truncatedNpub])
 
 
   return (

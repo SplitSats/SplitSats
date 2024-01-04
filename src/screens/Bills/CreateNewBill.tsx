@@ -32,7 +32,7 @@ import ConfirmModal  from "@comps/ModalConfirm";
 import { useNDK } from '@src/context/NDKContext';
 import { publishGroup } from '@nostr';
 import LoadingModal from '@comps/ModalLoading';
-import { queryNostrProfile, getUserFollows, followNpubs } from '@nostr'
+import { queryNostrProfile, followNpubs } from '@nostr'
 
 const CreateNewBill = ({ navigation, route }) => {
 

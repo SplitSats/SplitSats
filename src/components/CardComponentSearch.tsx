@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { PRIMARY_COLOR, SECONDARY_COLOR, DARK_GREY, FILL_CARD_COLOR } from "@styles/styles";
 import { CheckBox } from "react-native-elements";
-import { truncateNpub } from '@nostr/util'
 // import Swipeable from "react-native-swipeable";
+import { NDKUser} from '@nostr-dev-kit/ndk';
+import { truncateNpub, getNostrUsername } from '@nostr/util'
 
 const SearchCardComponent = ({
   contact,
@@ -13,6 +14,27 @@ const SearchCardComponent = ({
   ...props
 }) => {
   const [selected, setSelected] = useState(isSelected);
+  const [userName, setUserName] = useState('');
+  const [imageUri, setImageUri] = useState('');
+  const [npub, setNpub] = useState('');
+  
+  useEffect(() => {
+    // Fetch profile for contact
+    const fetchProfile = async () => {
+      try {
+        await contact.fetchProfile();
+        const username = await getNostrUsername(contact.profile)
+        await setUserName(username);
+        await setImageUri(contact.profile?.image);
+        await setNpub(truncateNpub(contact.npub));
+      
+      } catch (error) {
+        console.error('Error fetching profile for contact:', error);
+      }
+    };
+    
+    fetchProfile();
+  }, [contact]);
 
   const handlePress = () => {
     const newSelectedState = !selected;
@@ -48,10 +70,13 @@ const SearchCardComponent = ({
       onPress={handlePress}
       {...props}
     >
-      <Image source={{ uri: contact.profile.image }} style={styles.profileImage} />
+      <Image
+        source={imageUri ? { uri: imageUri } : require('@assets/icon/circle.png')} // Provide your placeholder image path
+        style={styles.profileImage}
+      />
       <View style={styles.userInfo}>
-        <Text style={styles.userName}>{contact.username}</Text>
-        <Text style={styles.userPublicKey}>{truncateNpub(contact.npub)}</Text>
+        <Text style={styles.userName}>{userName}</Text>
+        <Text style={styles.npub}>{npub}</Text>
       </View>
       <CheckBox
         center
@@ -96,7 +121,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
   },
-  userPublicKey: {
+  npub: {
     fontSize: 14,
     color: "grey",
   },

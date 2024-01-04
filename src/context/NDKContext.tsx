@@ -19,9 +19,9 @@ type NDKProviderProps = {
 // Function to create and manage the NDK instance as a singleton
 export function useNDK() {
 	const context = useContext(NDKContext)
-	if (!context) {
-		throw new Error('useNDK must be used within an NDKProvider')
-	}
+	// if (!context) {
+	// 	throw new Error('useNDK must be used within an NDKProvider')
+	// }
 	return context
 }
 
